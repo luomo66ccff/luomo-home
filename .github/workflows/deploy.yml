@@ -1,0 +1,23 @@
+# Deploy LuomoHome
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Deploy via SSH
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${secrets.SSH_HOST}
+          username: ${secrets.SSH_USER}
+          password: ${secrets.SSH_PASSWORD}
+          script: |
+            cd /opt/luomo-home
+            git pull
+            docker compose build --no-cache
+            docker compose up -d
