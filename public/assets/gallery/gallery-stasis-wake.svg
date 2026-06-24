@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 700" width="1200" height="700">
+  <defs><linearGradient id="g2bg" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#020617"/><stop offset="50%" stop-color="#0c1222"/><stop offset="100%" stop-color="#020617"/></linearGradient><radialGradient id="g2glow" cx="50%" cy="45%" r="40%"><stop offset="0%" stop-color="#22d3ee" stop-opacity="0.12"/><stop offset="100%" stop-color="transparent"/></radialGradient></defs>
+  <rect width="1200" height="700" fill="url(#g2bg)"/><rect width="1200" height="700" fill="url(#g2glow)"/>
+  <ellipse cx="600" cy="400" rx="300" ry="120" fill="none" stroke="#22d3ee" stroke-width="0.5" opacity="0.1"/>
+  <ellipse cx="600" cy="400" rx="200" ry="80" fill="none" stroke="#a78bfa" stroke-width="0.5" opacity="0.08"/>
+  <path d="M 200 350 Q 400 250 600 350 T 1000 350" fill="none" stroke="#22d3ee" stroke-width="1" opacity="0.15"/>
+  <path d="M 250 420 Q 500 520 750 420" fill="none" stroke="#f472b6" stroke-width="0.8" opacity="0.1"/>
+  <rect x="500" y="290" width="200" height="80" rx="20" fill="none" stroke="#22d3ee" stroke-width="1" opacity="0.2"/>
+  <rect x="505" y="295" width="190" height="70" rx="17" fill="none" stroke="#a78bfa" stroke-width="0.5" opacity="0.1"/>
+  <circle cx="600" cy="330" r="15" fill="#22d3ee" opacity="0.15"/>
+  <circle cx="600" cy="330" r="6" fill="#22d3ee" opacity="0.3"/>
+  <text x="600" y="670" text-anchor="middle" fill="#22d3ee" font-family="monospace" font-size="12" opacity="0.25" letter-spacing="6">✦ STASIS WAKE ✦</text>
+</svg>

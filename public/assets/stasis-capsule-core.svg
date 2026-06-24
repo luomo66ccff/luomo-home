@@ -1,0 +1,53 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1180 760" role="img" aria-labelledby="title desc">
+  <title id="title">Luomo-chan stasis capsule interface</title>
+  <desc id="desc">Original cyber-magic stasis capsule interface with a holographic assistant core and astral HUD.</desc>
+  <defs>
+    <radialGradient id="bg" cx="50%" cy="42%" r="78%">
+      <stop offset="0" stop-color="#153f5f"/>
+      <stop offset=".55" stop-color="#07111f"/>
+      <stop offset="1" stop-color="#020617"/>
+    </radialGradient>
+    <linearGradient id="aura" x1="176" x2="1010" y1="82" y2="690" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#22d3ee"/>
+      <stop offset=".45" stop-color="#a78bfa"/>
+      <stop offset=".76" stop-color="#f472b6"/>
+      <stop offset="1" stop-color="#fde68a"/>
+    </linearGradient>
+    <filter id="glow" x="-25%" y="-25%" width="150%" height="150%">
+      <feGaussianBlur stdDeviation="9" result="blur"/>
+      <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+  </defs>
+  <rect width="1180" height="760" rx="42" fill="url(#bg)"/>
+  <g opacity=".22" stroke="#a5f3fc" stroke-width="1">
+    <path d="M100 104h980M100 656h980M126 132v496M1054 132v496"/>
+    <path d="M164 172h160M856 172h160M164 588h160M856 588h160"/>
+  </g>
+  <g fill="none" stroke="url(#aura)" filter="url(#glow)">
+    <rect x="332" y="70" width="516" height="620" rx="258" stroke-width="5"/>
+    <rect x="382" y="118" width="416" height="524" rx="214" stroke-width="2" opacity=".7"/>
+    <path d="M410 222c92-102 264-108 360-2M414 540c102 86 258 90 354 0" stroke-width="3" stroke-dasharray="12 16"/>
+    <path d="M590 104v102M590 554v102M366 380h110M704 380h110" stroke-width="3"/>
+  </g>
+  <g filter="url(#glow)">
+    <circle cx="590" cy="376" r="130" fill="#22d3ee" opacity=".12"/>
+    <circle cx="590" cy="376" r="96" fill="#020617" stroke="url(#aura)" stroke-width="5"/>
+    <circle cx="590" cy="376" r="56" fill="url(#aura)" opacity=".9"/>
+    <path d="M546 322l44-68 44 68-44 26z" fill="#071827" stroke="#a5f3fc" stroke-width="4"/>
+    <path d="M530 390c38 42 82 42 120 0" fill="none" stroke="#fde68a" stroke-width="8" stroke-linecap="round"/>
+    <path d="M522 356h46m90 0h-46" stroke="#020617" stroke-width="10" stroke-linecap="round"/>
+  </g>
+  <g font-family="ui-monospace, Consolas, monospace" font-weight="800" font-size="24">
+    <text x="118" y="228" fill="#22d3ee">BIOS: LUOMO-OS</text>
+    <text x="118" y="274" fill="#9fb6c8">SYNC: ASTRAL PATHWAYS</text>
+    <text x="118" y="320" fill="#34d399">CORE: CALM 100%</text>
+    <text x="820" y="228" fill="#f472b6">AI COMPANION</text>
+    <text x="820" y="274" fill="#9fb6c8">STASIS: RELEASED</text>
+    <text x="820" y="320" fill="#fde68a">JUMP: READY</text>
+  </g>
+  <g opacity=".5" fill="#f9a8d4">
+    <path d="M250 456c16 5 24 19 14 36-16-5-24-20-14-36z"/>
+    <path d="M916 452c16 5 24 19 14 36-16-5-24-20-14-36z"/>
+    <path d="M720 154l8 24 24 8-24 8-8 24-8-24-24-8 24-8z"/>
+  </g>
+</svg>

@@ -1,0 +1,67 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 1100" role="img" aria-labelledby="title desc">
+  <title id="title">Original Luomo-chan key art</title>
+  <desc id="desc">An original cyber cloud companion illustration with neon cyan, pink, violet, moon rings, and cloud motifs.</desc>
+  <defs>
+    <radialGradient id="bg" cx="50%" cy="28%" r="72%">
+      <stop offset="0" stop-color="#1b4a68"/>
+      <stop offset=".45" stop-color="#071827"/>
+      <stop offset="1" stop-color="#020617"/>
+    </radialGradient>
+    <linearGradient id="hair" x1="164" x2="738" y1="140" y2="920" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#a5f3fc"/>
+      <stop offset=".42" stop-color="#a78bfa"/>
+      <stop offset=".8" stop-color="#f472b6"/>
+      <stop offset="1" stop-color="#22d3ee"/>
+    </linearGradient>
+    <linearGradient id="cloak" x1="170" x2="710" y1="540" y2="1040" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#0f2032"/>
+      <stop offset=".55" stop-color="#281847"/>
+      <stop offset="1" stop-color="#051827"/>
+    </linearGradient>
+    <linearGradient id="line" x1="120" x2="820" y1="80" y2="1020" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#22d3ee"/>
+      <stop offset=".5" stop-color="#f472b6"/>
+      <stop offset="1" stop-color="#fde68a"/>
+    </linearGradient>
+    <filter id="glow" x="-30%" y="-30%" width="160%" height="160%">
+      <feGaussianBlur stdDeviation="9" result="blur"/>
+      <feMerge>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+  <rect width="900" height="1100" rx="56" fill="url(#bg)"/>
+  <g opacity=".62" fill="none" stroke="url(#line)" stroke-width="2">
+    <circle cx="450" cy="355" r="286"/>
+    <circle cx="450" cy="355" r="214" stroke-dasharray="10 16"/>
+    <path d="M146 358c96-172 479-185 610-4"/>
+    <path d="M177 430c142 142 421 153 545 4"/>
+  </g>
+  <g opacity=".5">
+    <path d="M118 188l8 22 22 8-22 8-8 22-8-22-22-8 22-8z" fill="#fde68a"/>
+    <path d="M747 228l7 18 18 7-18 7-7 18-7-18-18-7 18-7z" fill="#a5f3fc"/>
+    <path d="M712 842l9 24 24 9-24 9-9 24-9-24-24-9 24-9z" fill="#f9a8d4"/>
+  </g>
+  <g filter="url(#glow)" opacity=".9">
+    <path d="M220 881c40-204 127-314 232-314 112 0 198 117 232 315-120 93-344 93-464-1z" fill="url(#cloak)" stroke="url(#line)" stroke-width="4"/>
+    <path d="M258 830c88 58 297 60 384 0" fill="none" stroke="#22d3ee" stroke-opacity=".38" stroke-width="8" stroke-linecap="round"/>
+    <path d="M278 727c-78 30-136 9-173-59 94 7 146-52 202-126" fill="none" stroke="#f472b6" stroke-width="22" stroke-linecap="round" opacity=".55"/>
+    <path d="M622 727c78 30 136 9 173-59-94 7-146-52-202-126" fill="none" stroke="#22d3ee" stroke-width="22" stroke-linecap="round" opacity=".55"/>
+    <path d="M232 394c28-202 166-279 225-279 58 0 196 77 216 281 18 179-80 312-222 312S207 573 232 394z" fill="url(#hair)"/>
+    <path d="M263 418c45-160 143-216 193-216 36 0 118 34 168 133-138-50-257-27-361 83z" fill="#020617" opacity=".27"/>
+    <path d="M286 332l91-154 73 164-96 48z" fill="#071827" stroke="url(#line)" stroke-width="5"/>
+    <path d="M615 331l-89-153-76 163 98 49z" fill="#071827" stroke="url(#line)" stroke-width="5"/>
+    <path d="M303 455c36-75 95-112 148-112 61 0 121 44 152 123 30 77 6 179-153 179-151 0-184-111-147-190z" fill="#eaf6ff"/>
+    <path d="M348 482h86m119 0h-86" stroke="#020617" stroke-width="17" stroke-linecap="round"/>
+    <path d="M415 559c28 24 61 24 90 0" fill="none" stroke="#020617" stroke-width="12" stroke-linecap="round"/>
+    <rect x="330" y="700" width="242" height="154" rx="32" fill="#081420" stroke="#fde68a" stroke-opacity=".65" stroke-width="4"/>
+    <path d="M375 762h151M375 805h96" stroke="#a5f3fc" stroke-width="14" stroke-linecap="round"/>
+    <path d="M452 690l24 72 72 24-72 24-24 72-24-72-72-24 72-24z" fill="#fde68a" opacity=".18"/>
+  </g>
+  <g opacity=".36" fill="none" stroke="#a5f3fc" stroke-width="2">
+    <path d="M96 982h708"/>
+    <path d="M138 1018h624"/>
+    <path d="M198 1052h504"/>
+  </g>
+</svg>

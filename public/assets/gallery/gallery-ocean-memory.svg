@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 700" width="1200" height="700">
+  <defs><linearGradient id="g6bg" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#020617"/><stop offset="40%" stop-color="#082f49"/><stop offset="100%" stop-color="#020617"/></linearGradient></defs>
+  <rect width="1200" height="700" fill="url(#g6bg)"/>
+  <ellipse cx="600" cy="450" rx="500" ry="60" fill="none" stroke="#22d3ee" stroke-width="0.5" opacity="0.08"/>
+  <ellipse cx="600" cy="460" rx="450" ry="40" fill="none" stroke="#22d3ee" stroke-width="0.5" opacity="0.05"/>
+  <ellipse cx="600" cy="470" rx="380" ry="25" fill="none" stroke="#22d3ee" stroke-width="0.5" opacity="0.03"/>
+  <path d="M 100 460 Q 200 440 300 460 T 500 460 T 700 460 T 900 460 T 1100 460" fill="none" stroke="#22d3ee" stroke-width="0.8" opacity="0.12"/>
+  <path d="M 150 470 Q 250 455 350 470 T 550 470 T 750 470 T 950 470 T 1100 470" fill="none" stroke="#60a5fa" stroke-width="0.5" opacity="0.06"/>
+  <circle cx="774.7373420807849" cy="387.02711311305467" r="1.0090449722147672" fill="#22d3ee" opacity="0.05660057287044323"/>
+  <circle cx="167.95859396131777" cy="405.03151466287846" r="3.8402768654975343" fill="#22d3ee" opacity="0.12414285030599503"/>
+  <circle cx="305.4066038784319" cy="460.1224219426656" r="2.063192904736965" fill="#22d3ee" opacity="0.08598165201627384"/>
+  <circle cx="1078.5733205042561" cy="412.59563800132116" r="3.0724120594938724" fill="#22d3ee" opacity="0.08931240731314002"/>
+  <circle cx="1098.165031888869" cy="457.02207406355575" r="2.1750586667007834" fill="#22d3ee" opacity="0.10905459252195007"/>
+  <circle cx="801.31817501243" cy="467.5697491505634" r="3.170203837732376" fill="#22d3ee" opacity="0.08104423577584383"/>
+  <circle cx="1067.020750873664" cy="412.75113513248726" r="1.9316477148166977" fill="#22d3ee" opacity="0.08163046186691694"/>
+  <circle cx="840.4753728600726" cy="411.02941967804105" r="1.3466235811842555" fill="#22d3ee" opacity="0.053383701903933004"/>
+  <circle cx="361.8564768720073" cy="463.2048405643273" r="2.863059560893518" fill="#22d3ee" opacity="0.08157107900380606"/>
+  <circle cx="414.03942327187974" cy="396.24915670214017" r="1.89932477037167" fill="#22d3ee" opacity="0.14343597802265923"/>
+  <circle cx="1039.8206859268053" cy="497.0579724746202" r="1.9851551183283545" fill="#22d3ee" opacity="0.06021281130649036"/>
+  <circle cx="919.3088320731899" cy="370.63473300120063" r="2.8039233992812482" fill="#22d3ee" opacity="0.08118187138083616"/>
+  <circle cx="207.7136759111259" cy="417.786219525489" r="2.1935204462844613" fill="#22d3ee" opacity="0.12626958885968578"/>
+  <circle cx="556.3615109302319" cy="354.33844967862035" r="1.7836957666910425" fill="#22d3ee" opacity="0.12618637711544017"/>
+  <circle cx="1003.0839683716422" cy="440.73369048216045" r="2.3695446436684438" fill="#22d3ee" opacity="0.05301946585412864"/>
+  <text x="600" y="670" text-anchor="middle" fill="#22d3ee" font-family="monospace" font-size="12" opacity="0.25" letter-spacing="6">✦ OCEAN MEMORY ✦</text>
+</svg>

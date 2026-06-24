@@ -1,0 +1,32 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 400" width="600" height="400">
+  <defs>
+    <linearGradient id="hudGrad" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#22d3ee" stop-opacity="0.7"/>
+      <stop offset="100%" stop-color="#22d3ee" stop-opacity="0.15"/>
+    </linearGradient>
+    <filter id="hudGlow"><feGaussianBlur stdDeviation="2"/></filter>
+  </defs>
+  <rect width="600" height="400" fill="transparent"/>
+  <path d="M 20 60 L 20 20 L 60 20" fill="none" stroke="#22d3ee" stroke-width="2" opacity="0.7"/>
+  <path d="M 20 50 L 20 20 L 50 20" fill="none" stroke="#fde68a" stroke-width="1" opacity="0.3"/>
+  <path d="M 580 60 L 580 20 L 540 20" fill="none" stroke="#22d3ee" stroke-width="2" opacity="0.7"/>
+  <path d="M 580 50 L 580 20 L 550 20" fill="none" stroke="#fde68a" stroke-width="1" opacity="0.3"/>
+  <path d="M 20 340 L 20 380 L 60 380" fill="none" stroke="#22d3ee" stroke-width="2" opacity="0.5"/>
+  <path d="M 580 340 L 580 380 L 540 380" fill="none" stroke="#22d3ee" stroke-width="2" opacity="0.5"/>
+  <line x1="80" y1="20" x2="520" y2="20" stroke="url(#hudGrad)" stroke-width="1" opacity="0.4"/>
+  <line x1="80" y1="380" x2="520" y2="380" stroke="url(#hudGrad)" stroke-width="1" opacity="0.3"/>
+  <circle cx="300" cy="200" r="40" fill="none" stroke="#22d3ee" stroke-width="0.8" opacity="0.2"/>
+  <circle cx="300" cy="200" r="28" fill="none" stroke="#22d3ee" stroke-width="0.5" opacity="0.15"/>
+  <line x1="300" y1="160" x2="300" y2="140" stroke="#22d3ee" stroke-width="1" opacity="0.3"/>
+  <line x1="300" y1="240" x2="300" y2="260" stroke="#22d3ee" stroke-width="1" opacity="0.3"/>
+  <line x1="260" y1="200" x2="240" y2="200" stroke="#22d3ee" stroke-width="1" opacity="0.3"/>
+  <line x1="340" y1="200" x2="360" y2="200" stroke="#22d3ee" stroke-width="1" opacity="0.3"/>
+  <line x1="63" y1="60" x2="63" y2="340" stroke="#22d3ee" stroke-width="0.5" opacity="0.15"/>
+  <line x1="537" y1="60" x2="537" y2="340" stroke="#22d3ee" stroke-width="0.5" opacity="0.15"/>
+  <text x="30" y="15" fill="#22d3ee" font-family="monospace" font-size="10" opacity="0.6" letter-spacing="3">SYS // ONLINE</text>
+  <text x="400" y="395" fill="#22d3ee" font-family="monospace" font-size="9" opacity="0.4" letter-spacing="2">ASTRAL // LOCKED</text>
+  <circle cx="80" cy="380" r="3" fill="#34d399" opacity="0.8"/>
+  <circle cx="95" cy="380" r="3" fill="#34d399" opacity="0.6"/>
+  <circle cx="110" cy="380" r="3" fill="#34d399" opacity="0.4"/>
+  <text x="125" y="383" fill="#34d399" font-family="monospace" font-size="8" opacity="0.5" letter-spacing="1">ALL NOMINAL</text>
+</svg>

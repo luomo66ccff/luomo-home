@@ -1,0 +1,15 @@
+services:
+  luomo-home:
+    build: .
+    container_name: luomo-home
+    restart: unless-stopped
+    env_file:
+      - .env
+    ports:
+      - "127.0.0.1:${LUOMO_HOME_HOST_PORT:-7891}:7891"
+    networks:
+      - luomocore_default
+
+networks:
+  luomocore_default:
+    external: true

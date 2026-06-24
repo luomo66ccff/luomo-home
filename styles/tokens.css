@@ -1,0 +1,39 @@
+/* LuomoHome Design Tokens v6.0 */
+
+:root {
+  /* Background */
+  --luomo-bg-deep: #020617;
+  --luomo-bg-panel: rgba(15, 23, 42, 0.66);
+  --luomo-bg-card: rgba(15, 32, 50, 0.78);
+
+  /* Accent */
+  --luomo-cyan: #67e8f9;
+  --luomo-pink: #f0abfc;
+  --luomo-violet: #a78bfa;
+  --luomo-gold: #fde68a;
+
+  /* Border */
+  --luomo-border-cyan: rgba(125, 211, 252, 0.16);
+  --luomo-border-pink: rgba(244, 114, 182, 0.18);
+  --luomo-border-soft: rgba(125, 211, 252, 0.10);
+
+  /* Text */
+  --luomo-text-main: rgba(248, 250, 252, 0.94);
+  --luomo-text-soft: rgba(203, 213, 225, 0.68);
+  --luomo-text-muted: rgba(148, 163, 184, 0.50);
+
+  /* Glass */
+  --luomo-glass-backdrop: blur(14px);
+  --luomo-glass-bg: rgba(15, 23, 42, 0.66);
+  --luomo-glass-border: rgba(125, 211, 252, 0.14);
+
+  /* Card */
+  --luomo-radius-card: 28px;
+  --luomo-radius-pill: 999px;
+  --luomo-glow-cyan: 0 0 40px rgba(34, 211, 238, 0.14);
+  --luomo-glow-pink: 0 0 40px rgba(244, 114, 182, 0.12);
+  --luomo-shadow-card: 0 18px 60px rgba(2, 6, 23, 0.32);
+
+  /* Transition */
+  --luomo-ease-card: 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+}

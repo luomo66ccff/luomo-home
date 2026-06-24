@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="720" viewBox="0 0 1200 720">
+<defs>
+  <linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#7dd3fc" stop-opacity=".42"/><stop offset=".5" stop-color="#ffffff" stop-opacity=".16"/><stop offset="1" stop-color="#a78bfa" stop-opacity=".28"/></linearGradient>
+  <filter id="glow"><feGaussianBlur stdDeviation="4" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+</defs>
+<rect width="1200" height="720" fill="none"/>
+<g stroke="url(#g)" fill="none" filter="url(#glow)" stroke-linecap="round">
+  <path d="M72 96h240l42 42h282" stroke-width="2"/>
+  <path d="M1128 624H888l-42-42H564" stroke-width="2"/>
+  <path d="M96 600V156l54-54" stroke-width="1.6"/>
+  <path d="M1104 120v444l-54 54" stroke-width="1.6"/>
+  <circle cx="210" cy="188" r="52" stroke-width="1.5" opacity=".75"/>
+  <circle cx="210" cy="188" r="8" fill="#7dd3fc" opacity=".68"/>
+  <path d="M170 188h80M210 148v80" stroke-width="1" opacity=".65"/>
+  <path d="M720 156h300M720 184h210M720 212h255" opacity=".58"/>
+  <path d="M210 532h290M210 560h210M210 588h250" opacity=".46"/>
+  <rect x="740" y="470" width="300" height="84" rx="18" stroke-width="1.6" opacity=".7"/>
+  <path d="M780 512h220" opacity=".6"/>
+</g>
+<g fill="#e0f2fe" opacity=".66" font-family="monospace" font-size="22">
+  <text x="730" y="140">ACADEMY CLOUD UI // LC-7891</text>
+  <text x="760" y="523">SYSTEM CARD · SKY BLUE</text>
+  <text x="210" y="630">CAMPUS SIGNAL · SOFT HUD</text>
+</g>
+</svg>

@@ -1,0 +1,45 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1180 760" role="img" aria-labelledby="title desc">
+  <title id="title">Glowing grimoire UI</title>
+  <desc id="desc">Original glowing magic grimoire and cyber UI spellbook interface for Luomo Cloud.</desc>
+  <defs>
+    <radialGradient id="bg" cx="50%" cy="42%" r="78%">
+      <stop offset="0" stop-color="#2b194a"/>
+      <stop offset=".5" stop-color="#07111f"/>
+      <stop offset="1" stop-color="#020617"/>
+    </radialGradient>
+    <linearGradient id="edge" x1="130" x2="1040" y1="92" y2="688" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#fde68a"/>
+      <stop offset=".36" stop-color="#f472b6"/>
+      <stop offset=".68" stop-color="#a78bfa"/>
+      <stop offset="1" stop-color="#22d3ee"/>
+    </linearGradient>
+    <filter id="glow" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="8" result="blur"/>
+      <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+  </defs>
+  <rect width="1180" height="760" rx="42" fill="url(#bg)"/>
+  <g filter="url(#glow)">
+    <path d="M180 178c106-38 242-32 382 24v418c-142-64-278-70-382-24z" fill="#0b1727" stroke="url(#edge)" stroke-width="5"/>
+    <path d="M1000 178c-106-38-242-32-382 24v418c142-64 278-70 382-24z" fill="#0b1727" stroke="url(#edge)" stroke-width="5"/>
+    <path d="M590 198v428" stroke="#fde68a" stroke-width="5" opacity=".7"/>
+  </g>
+  <g fill="none" stroke="url(#edge)" stroke-width="2" opacity=".66">
+    <circle cx="590" cy="380" r="150"/>
+    <circle cx="590" cy="380" r="96" stroke-dasharray="10 16"/>
+    <path d="M590 230l36 112 118 0-96 68 38 112-96-70-96 70 38-112-96-68 118 0z"/>
+    <path d="M236 274h236M236 330h184M236 496h244M704 274h236M704 330h184M704 496h244"/>
+  </g>
+  <g font-family="ui-monospace, Consolas, monospace" font-weight="800">
+    <text x="236" y="246" fill="#fde68a" font-size="22">SPELL LOG // 01</text>
+    <text x="236" y="386" fill="#a5f3fc" font-size="24">Magic circuits connected.</text>
+    <text x="236" y="438" fill="#f9a8d4" font-size="24">Sakura data stream online.</text>
+    <text x="704" y="246" fill="#22d3ee" font-size="22">CLOUD ROUTES</text>
+    <text x="704" y="386" fill="#eaf6ff" font-size="24">Files · APIs · Terminals</text>
+    <text x="704" y="438" fill="#eaf6ff" font-size="24">Bots · Snapshots · Logs</text>
+  </g>
+  <g opacity=".5" fill="#fde68a">
+    <path d="M102 110l9 26 26 9-26 9-9 26-9-26-26-9 26-9z"/>
+    <path d="M1058 612l9 26 26 9-26 9-9 26-9-26-26-9 26-9z"/>
+  </g>
+</svg>

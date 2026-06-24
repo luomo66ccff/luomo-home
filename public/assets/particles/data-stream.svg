@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 400" width="200" height="400">
+  <defs><linearGradient id="dsGrad" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#22d3ee" stop-opacity="0.6"/><stop offset="100%" stop-color="#22d3ee" stop-opacity="0"/></linearGradient></defs>
+  <rect width="200" height="400" fill="transparent"/>
+  <text x="10" y="50" fill="url(#dsGrad)" font-family="monospace" font-size="8" opacity="0.3" letter-spacing="6">0101 CLOUD</text>
+  <text x="60" y="120" fill="#22d3ee" font-family="monospace" font-size="8" opacity="0.2" letter-spacing="6">MAGIC DATA</text>
+  <text x="30" y="200" fill="#22d3ee" font-family="monospace" font-size="8" opacity="0.15" letter-spacing="8">API FLOW</text>
+  <text x="80" y="300" fill="#a78bfa" font-family="monospace" font-size="8" opacity="0.2" letter-spacing="6">BOT OPS</text>
+  <text x="20" y="370" fill="#22d3ee" font-family="monospace" font-size="8" opacity="0.12" letter-spacing="6">FILE TERM</text>
+</svg>
