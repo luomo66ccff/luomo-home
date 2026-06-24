@@ -1,0 +1,70 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 720" role="img" aria-labelledby="title desc">
+  <title id="title">Luomo Cloud service orbit passes</title>
+  <desc id="desc">Original neon service access passes arranged like a constellation network.</desc>
+  <defs>
+    <linearGradient id="pass" x1="140" x2="1070" y1="90" y2="650" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#22d3ee"/>
+      <stop offset=".45" stop-color="#a78bfa"/>
+      <stop offset=".74" stop-color="#f472b6"/>
+      <stop offset="1" stop-color="#fde68a"/>
+    </linearGradient>
+    <radialGradient id="back" cx="50%" cy="40%" r="72%">
+      <stop offset="0" stop-color="#123a57"/>
+      <stop offset=".55" stop-color="#07111f"/>
+      <stop offset="1" stop-color="#020617"/>
+    </radialGradient>
+    <filter id="glow" x="-25%" y="-25%" width="150%" height="150%">
+      <feGaussianBlur stdDeviation="7" result="blur"/>
+      <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+  </defs>
+  <rect width="1200" height="720" rx="40" fill="url(#back)"/>
+  <g opacity=".35" stroke="url(#pass)" stroke-width="3" fill="none" filter="url(#glow)">
+    <path d="M206 192 560 116 982 194 916 536 520 606 184 440Z"/>
+    <path d="M560 116 520 606"/>
+    <path d="M206 192 916 536"/>
+    <path d="M982 194 184 440"/>
+  </g>
+  <g font-family="ui-monospace, Consolas, monospace" font-weight="800">
+    <g transform="translate(118 132) rotate(-7)">
+      <rect width="258" height="126" rx="22" fill="#071827" stroke="url(#pass)" stroke-width="3"/>
+      <text x="26" y="42" fill="#22d3ee" font-size="20">SYS-01</text>
+      <text x="26" y="80" fill="#eaf6ff" font-size="30">LuomoOps</text>
+      <circle cx="224" cy="36" r="10" fill="#34d399"/>
+    </g>
+    <g transform="translate(450 70) rotate(4)">
+      <rect width="282" height="134" rx="24" fill="#071827" stroke="url(#pass)" stroke-width="3"/>
+      <text x="28" y="44" fill="#f472b6" font-size="20">SYS-02</text>
+      <text x="28" y="84" fill="#eaf6ff" font-size="32">LuomoFile</text>
+      <circle cx="244" cy="40" r="10" fill="#34d399"/>
+    </g>
+    <g transform="translate(806 136) rotate(7)">
+      <rect width="274" height="130" rx="24" fill="#071827" stroke="url(#pass)" stroke-width="3"/>
+      <text x="28" y="42" fill="#a78bfa" font-size="20">SYS-03</text>
+      <text x="28" y="82" fill="#eaf6ff" font-size="32">LuomoAPI</text>
+      <circle cx="236" cy="38" r="10" fill="#34d399"/>
+    </g>
+    <g transform="translate(724 450) rotate(-5)">
+      <rect width="326" height="134" rx="24" fill="#071827" stroke="url(#pass)" stroke-width="3"/>
+      <text x="28" y="44" fill="#34d399" font-size="20">SYS-04</text>
+      <text x="28" y="84" fill="#eaf6ff" font-size="30">LuomoTerminal</text>
+      <circle cx="288" cy="40" r="10" fill="#34d399"/>
+    </g>
+    <g transform="translate(386 502) rotate(3)">
+      <rect width="300" height="126" rx="22" fill="#071827" stroke="url(#pass)" stroke-width="3"/>
+      <text x="26" y="42" fill="#fde68a" font-size="20">SYS-05</text>
+      <circle cx="262" cy="36" r="10" fill="#fbbf24"/>
+    </g>
+    <g transform="translate(126 380) rotate(8)">
+      <rect width="300" height="126" rx="22" fill="#071827" stroke="url(#pass)" stroke-width="3"/>
+      <text x="26" y="42" fill="#60a5fa" font-size="20">SYS-06</text>
+      <text x="26" y="80" fill="#eaf6ff" font-size="30">AstrBot API</text>
+      <circle cx="262" cy="36" r="10" fill="#34d399"/>
+    </g>
+  </g>
+  <g opacity=".5" fill="#fde68a">
+    <path d="M596 292l12 36 36 12-36 12-12 36-12-36-36-12 36-12z"/>
+    <path d="M1040 340l8 24 24 8-24 8-8 24-8-24-24-8 24-8z"/>
+    <path d="M170 306l7 20 20 7-20 7-7 20-7-20-20-7 20-7z"/>
+  </g>
+</svg>

@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 200" width="600" height="200">
+  <defs><linearGradient id="dGrad" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#22d3ee" stop-opacity="0.6"/><stop offset="50%" stop-color="#a78bfa" stop-opacity="0.4"/><stop offset="100%" stop-color="#f472b6" stop-opacity="0.6"/></linearGradient></defs>
+  <rect width="600" height="200" fill="transparent"/>
+  <rect x="4" y="4" width="592" height="192" rx="22" fill="rgba(2,6,23,0.82)" stroke="url(#dGrad)" stroke-width="1.5"/>
+  <rect x="8" y="8" width="584" height="184" rx="20" fill="none" stroke="rgba(244,114,182,0.2)" stroke-width="0.5"/>
+  <path d="M 22 22 L 22 178" stroke="rgba(34,211,238,0.3)" stroke-width="1"/>
+  <path d="M 578 22 L 578 178" stroke="rgba(244,114,182,0.2)" stroke-width="0.5"/>
+</svg>

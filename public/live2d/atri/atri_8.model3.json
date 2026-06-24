@@ -1,0 +1,113 @@
+{
+  "Version": 3,
+  "FileReferences": {
+    "Moc": "atri_8.moc3",
+    "Textures": [
+      "atri_8.4096/texture_00.png",
+      "atri_8.4096/texture_01.png"
+    ],
+    "Physics": "atri_8.physics3.json",
+    "DisplayInfo": "atri_8.cdi3.json",
+    "Expressions": [
+      {
+        "Name": "expression1",
+        "File": "expression1.exp3.json"
+      },
+      {
+        "Name": "expression2",
+        "File": "expression2.exp3.json"
+      },
+      {
+        "Name": "expression3",
+        "File": "expression3.exp3.json"
+      },
+      {
+        "Name": "expression4",
+        "File": "expression4.exp3.json"
+      },
+      {
+        "Name": "expression5",
+        "File": "expression5.exp3.json"
+      },
+      {
+        "Name": "expression6",
+        "File": "expression6.exp3.json"
+      },
+      {
+        "Name": "expression7",
+        "File": "expression7.exp3.json"
+      },
+      {
+        "Name": "expression8",
+        "File": "expression8.exp3.json"
+      },
+      {
+        "Name": "expression9",
+        "File": "expression9.exp3.json"
+      },
+      {
+        "Name": "expression10",
+        "File": "expression10.exp3.json"
+      },
+      {
+        "Name": "expression11",
+        "File": "expression11.exp3.json"
+      },
+      {
+        "Name": "expression12",
+        "File": "expression12.exp3.json"
+      },
+      {
+        "Name": "expression13",
+        "File": "expression13.exp3.json"
+      },
+      {
+        "Name": "expression14",
+        "File": "expression14.exp3.json"
+      },
+      {
+        "Name": "expression15",
+        "File": "expression15.exp3.json"
+      },
+      {
+        "Name": "expression16",
+        "File": "expression16.exp3.json"
+      }
+    ],
+    "Motions": {
+      "dec-l": [
+        {
+          "File": "dec-l.motion3.json"
+        }
+      ],
+      "dec-r": [
+        {
+          "File": "dec-r.motion3.json"
+        }
+      ],
+      "model": [
+        {
+          "File": "model.motion3.json"
+        }
+      ]
+    }
+  },
+  "Groups": [
+    {
+      "Target": "Parameter",
+      "Name": "EyeBlink",
+      "Ids": [
+        "ParamEyeLOpen",
+        "ParamEyeROpen"
+      ]
+    },
+    {
+      "Target": "Parameter",
+      "Name": "LipSync",
+      "Ids": [
+        "ParamMouthForm",
+        "ParamMouthOpenY"
+      ]
+    }
+  ]
+}

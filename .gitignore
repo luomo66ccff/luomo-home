@@ -1,0 +1,15 @@
+.next/
+node_modules/
+.env
+*.local
+.DS_Store
+*.log
+out/
+coverage/
+tsconfig.tsbuildinfo
+session-*.md
+app-backup-*
+*.bak
+.backup-*
+__pycache__/
+*.pyc

@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600" width="800" height="600">
+  <defs><linearGradient id="ngGrad" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#22d3ee" stop-opacity="0.3"/><stop offset="100%" stop-color="#22d3ee" stop-opacity="0"/></linearGradient></defs>
+  <rect width="800" height="600" fill="transparent"/>
+  <line x1="0" y1="0" x2="0" y2="600" stroke="rgba(34,211,238,0.04)" stroke-width="0.5"/>
+  <line x1="72" y1="0" x2="72" y2="600" stroke="rgba(34,211,238,0.04)" stroke-width="0.5"/>
+  <line x1="144" y1="0" x2="144" y2="600" stroke="rgba(34,211,238,0.04)" stroke-width="0.5"/>
+  <line x1="216" y1="0" x2="216" y2="600" stroke="rgba(34,211,238,0.04)" stroke-width="0.5"/>
+  <line x1="288" y1="0" x2="288" y2="600" stroke="rgba(34,211,238,0.04)" stroke-width="0.5"/>
+  <line x1="360" y1="0" x2="360" y2="600" stroke="rgba(34,211,238,0.04)" stroke-width="0.5"/>
+  <line x1="432" y1="0" x2="432" y2="600" stroke="rgba(34,211,238,0.04)" stroke-width="0.5"/>
+  <line x1="504" y1="0" x2="504" y2="600" stroke="rgba(34,211,238,0.04)" stroke-width="0.5"/>
+  <line x1="576" y1="0" x2="576" y2="600" stroke="rgba(34,211,238,0.04)" stroke-width="0.5"/>
+  <line x1="648" y1="0" x2="648" y2="600" stroke="rgba(34,211,238,0.04)" stroke-width="0.5"/>
+  <line x1="720" y1="0" x2="720" y2="600" stroke="rgba(34,211,238,0.04)" stroke-width="0.5"/>
+  <line x1="792" y1="0" x2="792" y2="600" stroke="rgba(34,211,238,0.04)" stroke-width="0.5"/>
+  <line x1="0" y1="20" x2="800" y2="20" stroke="url(#ngGrad)" stroke-width="0.5"/>
+  <line x1="0" y1="100" x2="800" y2="100" stroke="url(#ngGrad)" stroke-width="0.5"/>
+  <line x1="0" y1="180" x2="800" y2="180" stroke="url(#ngGrad)" stroke-width="0.5"/>
+  <line x1="0" y1="260" x2="800" y2="260" stroke="url(#ngGrad)" stroke-width="0.5"/>
+  <line x1="0" y1="340" x2="800" y2="340" stroke="url(#ngGrad)" stroke-width="0.5"/>
+  <line x1="0" y1="420" x2="800" y2="420" stroke="url(#ngGrad)" stroke-width="0.5"/>
+  <line x1="0" y1="500" x2="800" y2="500" stroke="url(#ngGrad)" stroke-width="0.5"/>
+  <line x1="0" y1="580" x2="800" y2="580" stroke="url(#ngGrad)" stroke-width="0.5"/>
+  <path d="M 0 40 L 800 40" stroke="rgba(34,211,238,0.06)" stroke-width="1"/>
+  <path d="M 0 560 L 800 560" stroke="rgba(34,211,238,0.06)" stroke-width="1"/>
+</svg>
