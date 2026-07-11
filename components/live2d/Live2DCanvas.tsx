@@ -8,6 +8,7 @@ import type { AtriActiveForms } from "@/lib/live2d/atriForms";
 import { pushLive2DDebug } from "@/lib/live2d/live2dDebug";
 import { applyCompanionModelLayout } from "@/lib/live2d/live2dLayout";
 import { applyCompanionExpression, applyCompanionMotion } from "@/lib/live2d/live2dControls";
+import { fallbackAreaFromNormalizedPoint, type CompanionTouchArea } from "@/lib/companions/companionTouch";
 
 declare global {
   interface Window {
@@ -29,6 +30,7 @@ interface Props {
   characterId?: string;
   onLoad?: () => void;
   onError?: () => void;
+  onTouch?: (payload: { x: number; y: number; normalizedX: number; normalizedY: number; area: CompanionTouchArea; characterId: string }) => void;
   collapsed?: boolean;
   variant?: Live2dVariant;
 }
@@ -73,7 +75,7 @@ const MODEL_PATHS: Record<string, string> = {
   allium: "/live2d/companions/allium/ariu/ariu.model3.json",
 };
 
-export default function Live2DCanvas({ characterId = "atri", mood = "idle", form = "default", expression, motion, emotionStrength, activeForms, allowSecret = false, allowDebug = false, onLoad, onError, collapsed, modelPath, layout, variant = "dock" }: Props) {
+export default function Live2DCanvas({ characterId = "atri", mood = "idle", form = "default", expression, motion, emotionStrength, activeForms, allowSecret = false, allowDebug = false, onLoad, onError, onTouch, collapsed, modelPath, layout, variant = "dock" }: Props) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const appRef = useRef<any>(null);
   const modelRef = useRef<any>(null);
@@ -373,6 +375,15 @@ export default function Live2DCanvas({ characterId = "atri", mood = "idle", form
         ref: canvasRef,
         className: "block w-full h-full pointer-events-auto",
         "aria-label": "Live2D model",
+        onPointerDown: (event: React.PointerEvent<HTMLCanvasElement>) => {
+          if (!onTouch) return;
+          const rect = event.currentTarget.getBoundingClientRect();
+          const x = event.clientX - rect.left;
+          const y = event.clientY - rect.top;
+          const normalizedX = rect.width ? x / rect.width : 0.5;
+          const normalizedY = rect.height ? y / rect.height : 0.5;
+          onTouch({ x, y, normalizedX, normalizedY, area: fallbackAreaFromNormalizedPoint(normalizedX, normalizedY), characterId });
+        },
       })
     )
   );

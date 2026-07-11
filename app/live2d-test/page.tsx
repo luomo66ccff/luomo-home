@@ -10,6 +10,7 @@ import type { CompanionId } from "@/lib/companions/companionRegistry";
 import { getCompanionProfile } from "@/lib/companions/companionRegistry";
 import { companionLive2DControls } from "@/lib/companions/companionLive2DControls";
 import { applyCompanionExpression, applyCompanionMotion } from "@/lib/live2d/live2dControls";
+import { releaseModelChatLock, tryAcquireModelChatLock } from "@/lib/modelChatLock";
 
 export default function Live2DTestPage() {
   const [companionId, setCompanionId] = useState<CompanionId>("atri");
@@ -89,6 +90,7 @@ export default function Live2DTestPage() {
       setBrainResponse({ ok: false, source: "local", mood: "warning", text: "当前 Companion 为观赏模式，仅 ATRI 支持云端对话。" });
       return;
     }
+    if (brainLoading || !tryAcquireModelChatLock()) return;
     setBrainLoading(true);
     setBrainError(null);
     setBrainResponse({ ok: true, source: "local", mood: "thinking", text: "ATRI 正在思考中……" });
@@ -106,10 +108,11 @@ export default function Live2DTestPage() {
     } catch (error) {
       const msg = error instanceof Error ? error.message : String(error);
       setBrainError(msg);
-      setBrainResponse({ ok: false, source: "client-error", mood: "warning", text: "请求失败：" + msg });
+      setBrainResponse({ ok: false, source: "client-error", mood: "warning", text: "请求失败，请稍后重试。" });
       pushDebugLog("error", "brain request failed", { error: msg });
     } finally {
       setBrainLoading(false);
+      releaseModelChatLock();
     }
   }
   return (
@@ -233,17 +236,19 @@ export default function Live2DTestPage() {
                             <form className="mt-3 flex gap-2" onSubmit={(e) => handleBrainSubmit(e)}>
                 <input value={brainInput} onChange={e => setBrainInput(e.target.value)}
                   disabled={brainLoading}
+                  readOnly={brainLoading}
+                  data-model-chat-input
                   placeholder="向 ATRI 低声说些什么..."
                   className="min-w-0 flex-1 rounded-2xl border border-cyan-200/15 bg-black/30 px-4 py-2 text-sm text-cyan-50 outline-none placeholder:text-slate-500 focus:border-cyan-200/40"
                 />
-                <button type="submit" disabled={brainLoading || !brainInput.trim()}
+                <button type="submit" disabled={brainLoading || !brainInput.trim()} data-model-chat-send
                   className="shrink-0 rounded-2xl border border-cyan-200/20 bg-cyan-300/10 px-4 py-2 text-sm font-semibold text-cyan-100 hover:bg-cyan-300/20 disabled:cursor-not-allowed disabled:opacity-50">
                   {brainLoading ? "Sending..." : "Send"}
                 </button>
               </form>
               <div className="flex flex-wrap gap-2 mt-3">
                 {quickPrompts.map(p => (
-                  <button key={p} type="button" disabled={brainLoading}
+                  <button key={p} type="button" disabled={brainLoading} data-model-chat-option
                     onClick={() => { setBrainInput(p); handleBrainSubmit(undefined, p); }}
                     className="rounded-full bg-white/5 px-3 py-1 text-xs text-slate-300 hover:bg-white/10 disabled:opacity-50">{p}</button>
                 ))}

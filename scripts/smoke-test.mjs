@@ -32,7 +32,8 @@ if (!Array.isArray(servicesJson.services)) {
 }
 
 const home = await get("/");
-for (const marker of ["Luomo Cloud", "LuomoOps", "LuomoFile", "LuomoAPI", "LuomoTerminal", "LuomoBrowse", "AstrBot API"]) {
+const homepageMarkers = ["Luomo Cloud", ...servicesJson.services.map((service) => service.name)];
+for (const marker of homepageMarkers) {
   if (!home.text.includes(marker)) {
     throw new Error(`homepage missing ${marker}`);
   }

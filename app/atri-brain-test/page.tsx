@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { releaseModelChatLock, tryAcquireModelChatLock } from "@/lib/modelChatLock";
 
 export default function AtriBrainTestPage() {
   const [message, setMessage] = useState("今天系统状态怎么样");
@@ -19,6 +20,7 @@ export default function AtriBrainTestPage() {
   ];
 
   async function send(input = message) {
+    if (loading || !tryAcquireModelChatLock()) return;
     setLoading(true);
     try {
       const res = await fetch("/api/atri/brain", {
@@ -40,9 +42,11 @@ export default function AtriBrainTestPage() {
       setResult({
         ok: false,
         error: error instanceof Error ? error.message : String(error),
+        text: "请求失败，请稍后重试。",
       });
     } finally {
       setLoading(false);
+      releaseModelChatLock();
     }
   }
 
@@ -63,12 +67,15 @@ export default function AtriBrainTestPage() {
             value={message}
             onChange={(e) => setMessage(e.target.value)}
             onKeyDown={(e) => { if (e.key === "Enter") send(); }}
+            readOnly={loading}
+            data-model-chat-input
             className="min-w-0 flex-1 rounded-2xl border border-cyan-300/20 bg-black/30 px-4 py-3 text-sm outline-none focus:border-cyan-300/50"
             placeholder="向 ATRI 低声说些什么..."
           />
           <button
             onClick={() => send()}
             disabled={loading}
+            data-model-chat-send
             className="rounded-2xl border border-cyan-300/20 bg-cyan-400/10 px-5 py-3 text-sm font-semibold text-cyan-100 hover:bg-cyan-400/20 disabled:opacity-50"
           >
             {loading ? "Sending..." : "Send"}
@@ -79,6 +86,8 @@ export default function AtriBrainTestPage() {
             <button
               key={preset}
               onClick={() => { setMessage(preset); send(preset); }}
+              disabled={loading}
+              data-model-chat-option
               className="rounded-full border border-white/10 bg-white/5 px-3 py-1.5 text-xs text-slate-300 hover:border-cyan-300/30 hover:text-cyan-100"
             >
               {preset}

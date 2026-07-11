@@ -11,6 +11,8 @@ import { getCompanionProfile } from "@/lib/companions/companionRegistry";
 import { getRandomReaction } from "@/lib/companions/companionReaction";
 import { CharacterSwitcher } from "@/components/layout/CharacterSwitcher";
 import { SECTIONS } from "@/content/sections";
+import { releaseModelChatLock, tryAcquireModelChatLock } from "@/lib/modelChatLock";
+import { getCompanionTouchReaction, pickTouchLine, type CompanionTouchArea } from "@/lib/companions/companionTouch";
 
 type LuomoMood = "idle" | "welcome" | "curious" | "focused" | "excited" | "secret" | "system" | "greeting" | "sleepy" | "warning";
 
@@ -49,7 +51,7 @@ export default function LuomoCompanionDock({ onCollapsedChange, initialCollapsed
   // First-time desktop migration: force expand on v7.0.1 upgrade
   useEffect(() => {
     if (!hydrated) return;
-    const migratedKey = "luomo:live2d-dock-migrated-v701";
+    const migratedKey = "luomo:live2d-dock-migrated-v702";
     try {
       if (!isMobile && !localStorage.getItem(migratedKey)) {
         localStorage.setItem("luomochan_folded", "false");
@@ -242,16 +244,25 @@ const handleNextLine = useCallback(() => {
     const handler = async (e: Event) => {
       const { message } = (e as CustomEvent).detail;
       if (!message) return;
-      const res = await fetch("/api/atri/brain", {
-        method: "POST", headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ message, context: { currentSection: section, currentMood: mood, servicesCount: 5 } }),
-      });
-      const data = await res.json();
-      if (data) applyAtriBrainResponse(data);
+      if (!tryAcquireModelChatLock()) return;
+      applyAtriThinking({ text: "ATRI 正在思考中……记忆回路正在微微发光。", mood: "focused", source: "thinking" });
+      try {
+        const res = await fetch("/api/atri/brain", {
+          method: "POST", headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ message, context: { currentSection: section, currentMood: mood, servicesCount: 5 } }),
+        });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data?.text || "HTTP " + res.status);
+        if (data) applyAtriBrainResponse(data);
+      } catch {
+        applyAtriBrainResponse({ ok: false, source: "client-error", mood: "warning", text: "模型暂时没有回应，请稍后再试。" });
+      } finally {
+        releaseModelChatLock();
+      }
     };
     window.addEventListener("atri:ask", handler);
     return () => window.removeEventListener("atri:ask", handler);
-  }, [applyAtriBrainResponse, section, mood]);
+  }, [applyAtriBrainResponse, applyAtriThinking, section, mood]);
 
   useEffect(() => {
     const handler = () => { const sec = getCurrentSection(); setSection(sec); if (mood === "idle" || mood === "greeting") setMood("idle"); };
@@ -317,6 +328,21 @@ const handleNextLine = useCallback(() => {
     playRandomCompanionReaction("switch");
   }, [character]);
 
+  const handleCompanionTouch = useCallback((payload: { area: CompanionTouchArea }) => {
+    const reaction = getCompanionTouchReaction(character, payload.area);
+    const text = pickTouchLine(reaction.lines);
+    if (text) {
+      setDisplayedText(text);
+      setDialoguePages([text]);
+      setDialoguePageIndex(0);
+      setDialogueSource("touch");
+    }
+    if (reaction.mood) setMood(reaction.mood as LuomoMood);
+    if (reaction.expression) setCompanionExpression(reaction.expression);
+    if (reaction.motion) setCompanionMotion(reaction.motion);
+    setManualUntil(Date.now() + 9000);
+  }, [character]);
+
   return (
     <>
       <StardustBurst active={stardustActive} onDone={() => setStardustActive(false)} />
@@ -351,6 +377,7 @@ const handleNextLine = useCallback(() => {
                 allowSecret={allowSecret}
                 allowDebug={allowDebug}
                 variant="dock"
+                onTouch={handleCompanionTouch}
               />
             </div>
 
@@ -454,6 +481,7 @@ const handleNextLine = useCallback(() => {
             allowSecret={allowSecret}
             allowDebug={allowDebug}
             variant="mobile"
+            onTouch={handleCompanionTouch}
           />
         </div>
 

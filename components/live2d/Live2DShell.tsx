@@ -5,6 +5,7 @@ import Live2DFallback from "./Live2DFallback";
 import { live2dConfig, type Live2dVariant } from "@/lib/live2d/live2dConfig";
 import { pushLive2DDebug } from "@/lib/live2d/live2dDebug";
 import type { CompanionLayout } from "@/lib/companions/companionRegistry";
+import type { CompanionTouchArea } from "@/lib/companions/companionTouch";
 
 const Live2DCanvas = dynamic(() => import("./Live2DCanvas"), {
   ssr: false,
@@ -30,10 +31,11 @@ interface Props {
   collapsed?: boolean;
   onToggle?: () => void;
   onError?: () => void;
+  onTouch?: (payload: { x: number; y: number; normalizedX: number; normalizedY: number; area: CompanionTouchArea; characterId: string }) => void;
   variant?: Live2dVariant;
 }
 
-export default function Live2DShell({ characterId = "atri", modelPath, layout, mood = "idle", form = "default", expression, motion, emotionStrength, activeForms, allowSecret = false, allowDebug = false, collapsed, onToggle, onError, variant = "dock" }: Props) {
+export default function Live2DShell({ characterId = "atri", modelPath, layout, mood = "idle", form = "default", expression, motion, emotionStrength, activeForms, allowSecret = false, allowDebug = false, collapsed, onToggle, onError, onTouch, variant = "dock" }: Props) {
   const [live2dFailed, setLive2dFailed] = useState(false);
   const [webglAvailable, setWebglAvailable] = useState(true);
 
@@ -91,6 +93,7 @@ export default function Live2DShell({ characterId = "atri", modelPath, layout, m
         onLoad={() => setLive2dFailed(false)}
         activeForms={characterId === "atri" ? activeForms : {}}
         onError={() => { setLive2dFailed(true); onError?.(); }}
+        onTouch={onTouch}
       />
     </div>
   );

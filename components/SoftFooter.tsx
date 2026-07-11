@@ -1,36 +1,26 @@
-import { FOOTER, SITE } from "@/content/copy";
+import styles from "./HomeExperience.module.css";
+import { FOOTER_LINKS } from "@/lib/home-content";
 
 export default function SoftFooter() {
-  const f = FOOTER;
+  const year = new Date().getFullYear();
+
   return (
-    <footer className="relative z-10 border-t border-cyan-200/10 px-6 py-8 lg:px-10">
-      <div className="mx-auto grid max-w-[1280px] items-center gap-6 text-center lg:grid-cols-[1fr_1.4fr_1fr]">
-        <div className="min-w-0 text-center lg:text-left">
-          <p className="text-xs tracking-[0.18em] text-cyan-200/75">
-            Luomo Cloud <span className="text-fuchsia-200/45">✦</span>
+    <footer className={styles.footer}>
+      <div className={styles.footerInner}>
+        <div>
+          <p className={styles.footerBrand}>
+            Luomo <span>/ personal digital universe</span>
           </p>
-          <p className="mt-1 text-xs text-slate-400/70">
-            Built with curiosity and a little anime soul
-          </p>
+          <p className={styles.footerQuote}>愿每一次连接，都通往更辽阔的世界。</p>
         </div>
-
-        <div className="min-w-0 text-center">
-          <p className="text-sm font-medium tracking-[0.16em] text-cyan-50/90">
-            {f.zh}
-          </p>
-          <p className="mt-2 text-xs tracking-[0.12em] text-slate-300/60">
-            {f.en}
-          </p>
-          <p className="mt-1 text-xs tracking-[0.08em] text-slate-300/55">
-            {f.ja}
-          </p>
-        </div>
-
-        <div className="text-center lg:text-right">
-          <p className="text-xs tracking-[0.22em] text-slate-400/60">
-            © 2026
-          </p>
-        </div>
+        <nav className={styles.footerLinks} aria-label="Footer service links">
+          {FOOTER_LINKS.map((link) => (
+            <a href={link.href} target="_blank" rel="noopener noreferrer" key={link.href}>
+              {link.label}
+            </a>
+          ))}
+        </nav>
+        <p className={styles.footerCopy}>© {year} LUOMO · Systems Online</p>
       </div>
     </footer>
   );

@@ -1,75 +1,75 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import BootSequence from "@/components/BootSequence";
-import AmbientGlow from "@/components/effects/AmbientGlow";
-import HologramGrid from "@/components/effects/HologramGrid";
 import ScrollProgress from "@/components/ScrollProgress";
-import MouseGlow from "@/components/MouseGlow";
 import VisualLayer from "@/components/visual/VisualLayer";
 import LuomoCompanionDock from "@/components/LuomoCompanionDock";
 import HeroCore from "@/components/HeroCore";
-import MotionSection from "@/components/MotionSection";
 import VisualWorldGallery from "@/components/VisualWorldGallery";
 import ServiceConstellation from "@/components/ServiceConstellation";
+import ProjectShowcase from "@/components/ProjectShowcase";
 import OperationsCockpit from "@/components/OperationsCockpit";
-import InfrastructureOrbit from "@/components/InfrastructureOrbit";
+import AboutSection from "@/components/AboutSection";
 import BuildTimeline from "@/components/BuildTimeline";
 import EnterCloudCTA from "@/components/EnterCloudCTA";
 import CommandPalette from "@/components/CommandPalette";
-import SectionNavigator from "@/components/SectionNavigator";
 import ScrollToTop from "@/components/ScrollToTop";
 import SoftFooter from "@/components/SoftFooter";
+import HomeNavigation from "@/components/HomeNavigation";
 import { useLuomoPreferences } from "@/hooks/useLuomoPreferences";
+import styles from "./HomeExperience.module.css";
 
 export default function HomeShell() {
   const { prefs, setTheme, toggleParticles, setLuomoChanCollapsed } = useLuomoPreferences();
-  const [bootComplete, setBootComplete] = useState(false);
-
-  useEffect(() => {
-    const timer = setTimeout(() => setBootComplete(true), 4000);
-    return () => clearTimeout(timer);
-  }, []);
 
   return (
-    <main suppressHydrationWarning className="relative min-h-screen bg-[#020617] overflow-x-hidden">
-      {!bootComplete && <BootSequence />}
+    <main suppressHydrationWarning className={styles.home}>
       <ScrollProgress />
-      <MouseGlow />
-      <VisualLayer starfield={prefs.particlesEnabled} sakura={prefs.particlesEnabled} noise={true} enabled={prefs.particlesEnabled} />
-      <LuomoCompanionDock
-        onCollapsedChange={setLuomoChanCollapsed}
-        initialCollapsed={prefs.luomoChanCollapsed}
+      <VisualLayer
+        enabled={prefs.particlesEnabled}
+        starfield
+        starfieldDensity="low"
+        sakura
+        noise
       />
-      <SectionNavigator />
+      <HomeNavigation />
+      <div className={styles.companionLayer}>
+        <LuomoCompanionDock
+          onCollapsedChange={setLuomoChanCollapsed}
+          initialCollapsed={prefs.luomoChanCollapsed}
+        />
+      </div>
       <ScrollToTop />
 
-      <section id="hero" className="relative min-h-screen overflow-hidden bg-[#020617]">
+      <section id="hero" className={styles.hero}>
         <HeroCore />
       </section>
 
-      <section id="visual-world" className="relative py-24 md:py-32">
-        <MotionSection><VisualWorldGallery /></MotionSection>
+      <section id="services" className={styles.section}>
+        <ServiceConstellation />
       </section>
 
-      <section id="service-constellation" className="relative py-24 md:py-32">
-        <MotionSection><ServiceConstellation /></MotionSection>
+      <section id="projects" className={styles.section + " " + styles.projectSection}>
+        <ProjectShowcase />
       </section>
 
-      <section id="operations-cockpit" className="relative py-24 md:py-32">
-        <MotionSection><OperationsCockpit /></MotionSection>
+      <section id="operations" className={styles.section + " " + styles.sectionAlt}>
+        <OperationsCockpit />
       </section>
 
-      <section id="infrastructure-orbit" className="relative py-24 md:py-32">
-        <MotionSection><InfrastructureOrbit /></MotionSection>
+      <section id="about" className={styles.section}>
+        <AboutSection />
       </section>
 
-      <section id="build-log" className="relative py-24 md:py-32">
-        <MotionSection><BuildTimeline /></MotionSection>
+      <section id="worlds" className={styles.section}>
+        <VisualWorldGallery />
       </section>
 
-      <section id="enter-cloud" className="relative min-h-dvh flex items-center justify-center overflow-hidden">
-        <MotionSection><EnterCloudCTA /></MotionSection>
+      <section id="build" className={styles.section + " " + styles.sectionAlt}>
+        <BuildTimeline />
+      </section>
+
+      <section id="enter" className={styles.cta}>
+        <EnterCloudCTA />
       </section>
 
       <SoftFooter />

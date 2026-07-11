@@ -48,7 +48,7 @@ const companionProfiles: Record<CompanionId, CompanionProfile> = {
   },
   murasame: {
     id: "murasame", displayName: "丛雨", shortName: "丛雨",
-    tagline: "风之精灵……吗？",
+    tagline: "穗织之乡的守护灵",
     modelPath: "/live2d/companions/murasame/Murasame.model3.json",
     defaultLines: [
       "丛雨，前来报到。请多指教。",
@@ -64,7 +64,7 @@ const companionProfiles: Record<CompanionId, CompanionProfile> = {
   },
   allium: {
     id: "allium", displayName: "Allium", shortName: "Allium",
-    tagline: "数据花园的守护者",
+    tagline: "数据花园的巡航终端",
     modelPath: "/live2d/companions/allium/ariu/ariu.model3.json",
     defaultLines: [
       "Allium 系统已就绪。",

@@ -1,67 +1,77 @@
 "use client";
 
 import { useState } from "react";
-import { motion } from "framer-motion";
+import { ChevronUp, LayoutGrid } from "lucide-react";
 import { galleryItems } from "@/lib/visual-assets";
 import GalleryLightbox from "./GalleryLightbox";
-import MotionSection from "./MotionSection";
+import styles from "./HomeExperience.module.css";
 
 export default function VisualWorldGallery() {
-  const items = galleryItems;
   const [selectedIndex, setSelectedIndex] = useState<number | null>(null);
+  const [expanded, setExpanded] = useState(false);
+  const visibleItems = expanded ? galleryItems : galleryItems.slice(0, 3);
 
   return (
-    <MotionSection id="gallery" className="gallery-scene">
-      <div className="mx-auto max-w-[1280px] px-6 lg:px-10">
-      <div className="section-heading">
-        <p className="section-eyebrow">Visual World // Anime Cyber Gallery</p>
-        <h2>The constellation behind the interface.</h2>
-        <p>Original artworks shape the Luomo Cloud universe. Each frame is a gateway into the cyber-magic dream.</p>
+    <div className={styles.sectionInner}>
+      <div className={styles.galleryToolbar}>
+        <header className={styles.sectionHeader}>
+          <div>
+            <p className={styles.eyebrow}>Visual worlds</p>
+            <h2 className={styles.sectionTitle}>The atmosphere behind the interface.</h2>
+          </div>
+          <p className={styles.sectionDescription}>
+            Original Luomo Cloud scenes give each utility a shared place to belong,
+            without turning the dashboard into a wall of effects.
+          </p>
+        </header>
+        <button
+          className={styles.galleryToggle}
+          type="button"
+          onClick={() => setExpanded((value) => !value)}
+          aria-expanded={expanded}
+        >
+          {expanded ? <ChevronUp size={14} /> : <LayoutGrid size={14} />}
+          {expanded ? "Show less" : "View all worlds"}
+        </button>
       </div>
 
-      <div className="gallery-masonry" aria-label="Luomo Cloud visual gallery">
-        {items.map((item, index) => (
-          <motion.button
+      <div className={styles.galleryGrid} aria-label="Luomo Cloud visual gallery">
+        {visibleItems.map((item, index) => (
+          <button
+            className={styles.galleryCard}
             type="button"
             key={item.key}
-            className="gallery-card glass-card"
-            aria-label={`Open gallery image: ${item.title}`}
             onClick={() => setSelectedIndex(index)}
-            initial={{ opacity: 0, y: 40 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            whileHover={{ y: -6, rotateX: 1.2, rotateY: index % 2 === 0 ? -1.4 : 1.4 }}
-            viewport={{ once: true, margin: "-8%" }}
-            transition={{ duration: 0.6, delay: index * 0.1 }}
+            aria-label={"Open gallery image: " + item.title}
           >
-            <div className="gallery-img-wrap" style={{ background: item.fallback }}>
+            <div className={styles.galleryImageWrap}>
               <img
+                className={styles.galleryImage}
                 src={item.src}
                 alt={item.title}
                 loading="lazy"
                 decoding="async"
-                onError={(e) => { (e.currentTarget as HTMLImageElement).style.display = "none"; }}
               />
-              <div className="gallery-glint" />
-            </div>
-            <div className="gallery-info">
-              <span className="gallery-tags">
-                {item.tags.map((tag) => (<span key={tag}>{tag}</span>))}
+              <span className={styles.galleryIndex}>
+                {String(index + 1).padStart(2, "0")}
               </span>
+            </div>
+            <div className={styles.galleryCopy}>
+              <div className={styles.galleryTags}>
+                {item.tags.slice(0, 3).map((tag) => (
+                  <span key={tag}>#{tag}</span>
+                ))}
+              </div>
               <h3>{item.title}</h3>
               <p>{item.description}</p>
             </div>
-          </motion.button>
+          </button>
         ))}
-      </div>
-
-      <div className="gallery-footer-note">
-        <span>Original Luomo Cloud visual concepts // click any frame to inspect</span>
-      </div>
       </div>
 
       {selectedIndex !== null && (
         <GalleryLightbox index={selectedIndex} onClose={() => setSelectedIndex(null)} />
       )}
-    </MotionSection>
+    </div>
   );
 }

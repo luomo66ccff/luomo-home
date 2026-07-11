@@ -1,131 +1,114 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
-import { Code2, Files, Gauge } from "lucide-react";
-import AccessPassButton from "./AccessPassButton";
+import { ArrowDown, ArrowUpRight, Cloud, Layers3, Server, ShieldCheck, Sparkles } from "lucide-react";
 import { visualAssets } from "@/lib/visual-assets";
-import { HERO } from "@/content/copy";
+import styles from "./HomeExperience.module.css";
 
-const { hero: heroAssets, magic, hud } = visualAssets;
+type StatusPayload = {
+  services?: Array<{ status: string }>;
+};
 
 export default function HeroCore() {
+  const [summary, setSummary] = useState({ ready: 0, total: 5 });
+
+  useEffect(() => {
+    let active = true;
+    fetch("/api/services")
+      .then((response) => response.json())
+      .then((data: StatusPayload) => {
+        if (!active || !data.services) return;
+        setSummary({
+          ready: data.services.filter((service) => service.status === "operational").length,
+          total: data.services.length,
+        });
+      })
+      .catch(() => {});
+
+    return () => {
+      active = false;
+    };
+  }, []);
+
+  const rail = [
+    {
+      label: "Network",
+      value: summary.ready ? summary.ready + " of " + summary.total + " services ready" : "Checking live services",
+      icon: Server,
+    },
+    { label: "Region", value: "Tokyo / Cloudflare edge", icon: Cloud },
+    { label: "Access", value: "Private by design", icon: ShieldCheck },
+    { label: "Stack", value: "Next.js + FastAPI", icon: Layers3 },
+  ];
+
   return (
-    <div className="hero-core-root">
-      <div className="hero-bg-base" />
-      <div
-        className="hero-bg-image"
-        style={{ backgroundImage: `url(${heroAssets.primary})` }}
+    <>
+      <img
+        className={styles.heroBackdrop}
+        src={visualAssets.hero.primary}
+        alt=""
         aria-hidden="true"
       />
-      <div className="hero-bg-mask" aria-hidden="true" />
-      <div
-        className="hero-hud-frame"
-        style={{ backgroundImage: `url(${hud.frame})` }}
-        aria-hidden="true"
-      />
+      <div className={styles.heroShade} aria-hidden="true" />
 
-      <div className="hero-core-grid">
-        <div className="hero-copy-block">
-          <motion.p
-            className="eyebrow hero-eyebrow"
-            initial={{ opacity: 0, y: 18 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6 }}
-          >
-            ASTRAL PATH // ONLINE
-          </motion.p>
-          <motion.h1
-            className="hero-title"
-            initial={{ opacity: 0, y: 28 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.75, delay: 0.1 }}
-          >
-            Luomo Cloud
-          </motion.h1>
-          <motion.div
-            className="mx-auto mt-6 max-w-3xl text-center"
-            initial={{ opacity: 0, y: 22 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.75, delay: 0.22 }}
-          >
-            <p className="text-xl font-semibold tracking-[0.16em] text-cyan-50 sm:text-2xl">
-              渡尽长夜，终见星辰。
-            </p>
-            <p className="mt-3 text-sm tracking-[0.18em] text-cyan-100/70 sm:text-base">
-              Beyond the long night, the stars at last appear.
-            </p>
-            <p className="mt-2 text-sm tracking-[0.12em] text-fuchsia-100/65 sm:text-base">
-              長き夜を渡り、ついに星々を仰ぐ。
-            </p>
-          </motion.div>
-          <motion.p
-            className="hero-sublead"
-            initial={{ opacity: 0, y: 22 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.75, delay: 0.34 }}
-          >
-            Private infrastructure with a little anime soul. Status, storage,
-            operations, and automation are gathered into one glowing gateway.
-          </motion.p>
-
-          <motion.div
-            className="hero-actions hero-action-row"
-            initial={{ opacity: 0, y: 22 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.75, delay: 0.46 }}
-          >
-            <AccessPassButton href="https://ops.luomo.moe" className="hero-primary-pass">
-              <Gauge size={18} />
-              Jump to cockpit
-            </AccessPassButton>
-            <AccessPassButton href="https://file.luomo.moe" className="hero-secondary-pass">
-              <Files size={18} />
-              Open archive
-            </AccessPassButton>
-            <AccessPassButton href="https://api.luomo.moe" className="hero-secondary-pass">
-              <Code2 size={18} />
-              Developer gate
-            </AccessPassButton>
-          </motion.div>
-
-          <motion.div
-            className="hero-status-strip"
-            initial={{ opacity: 0, y: 18 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.65, delay: 0.58 }}
-          >
-            <span />
-            <strong>All systems are glowing quietly.</strong>
-            <em>mood: calm</em>
-          </motion.div>
-        </div>
-
+      <div className={styles.heroInner}>
         <motion.div
-          className="hero-main-visual"
-          initial={{ opacity: 0, scale: 0.96, y: 30 }}
-          animate={{ opacity: 1, scale: 1, y: 0 }}
-          transition={{ duration: 0.9, delay: 0.22 }}
+          className={styles.heroCopy}
+          initial={{ opacity: 0, y: 22 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.72, ease: "easeOut" }}
         >
-          <div className="hero-main-visual-aura" aria-hidden="true" />
-          <img
-            src={heroAssets.fallback}
-            alt="Luomo Cloud cyber magic control room"
-            className="hero-key-art"
-            loading="eager"
-          />
-          <img
-            src={magic.circle}
-            alt=""
-            className="hero-magic-ring"
-            aria-hidden="true"
-          />
-          <div className="hero-visual-console">
-            <span>CORE-01</span>
-            <strong>Cloud jump vector locked</strong>
-            <em>magic circuits stable</em>
+          <p className={styles.eyebrow}>Anime cyber portal / Tokyo node online</p>
+          <h1 className={styles.heroTitle}>Luomo Cloud</h1>
+          <p className={styles.heroLead}>
+            在现实之外，构筑属于自己的云端世界。
+            <span>
+              个人主页、云服务入口、API、文件、终端、运维与看板娘，在同一片星空下安静运转。
+            </span>
+          </p>
+          <div className={styles.heroActions}>
+            <a className={styles.primaryAction} href="#services">
+              探索云端
+              <ArrowDown size={16} />
+            </a>
+            <a
+              className={styles.secondaryAction}
+              href="https://ops.luomo.moe"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              访问控制台
+              <ArrowUpRight size={16} />
+            </a>
+          </div>
+          <div className={styles.heroSigils} aria-label="Luomo Cloud keywords">
+            {["Cloud Services", "Live2D Companion", "API Gateway", "Build Log"].map((item) => (
+              <span key={item}>
+                <Sparkles size={12} aria-hidden="true" />
+                {item}
+              </span>
+            ))}
           </div>
         </motion.div>
       </div>
-    </div>
+
+      <div className={styles.statusRail} aria-label="Cloud summary">
+        <div className={styles.statusRailInner}>
+          {rail.map((item, index) => {
+            const Icon = item.icon;
+            return (
+              <div className={styles.statusRailItem} key={item.label}>
+                {index === 0 ? <span className={styles.liveDot} aria-hidden="true" /> : <Icon size={15} aria-hidden="true" />}
+                <div>
+                  <span>{item.label}</span>
+                  <strong>{item.value}</strong>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+    </>
   );
 }

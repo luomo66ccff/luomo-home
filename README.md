@@ -1,78 +1,105 @@
-# Luomo Cloud Homepage
+# Luomo Home
 
 <div align="center">
 
-![Luomo Cloud](https://luomo.moe/assets/hero/hero-witch-journey-generated.webp)
+![Luomo Home](https://luomo.moe/assets/hero/hero-witch-journey-generated.webp)
 
-**A dreamy cloud gateway drifting among stars, memories, and distant journeys.**
+**个人云服务的首页，也是一个可交互的角色与项目陈列空间。**
 
-[![Website](https://img.shields.io/badge/Web-luomo.moe-22d3ee?style=flat-square)](https://luomo.moe)
-[![License](https://img.shields.io/badge/License-MIT-f472b6?style=flat-square)](LICENSE)
-[![Next.js](https://img.shields.io/badge/Next.js-14-black?style=flat-square&logo=next.js)](https://nextjs.org/)
-[![Live2D](https://img.shields.io/badge/Live2D-Cubism%204-ff69b4?style=flat-square)](https://www.live2d.com/)
+[Website](https://luomo.moe) · [Deployment](docs/DEPLOYMENT.md) · [Assets](ASSETS_ATTRIBUTION.md) · [MIT License](LICENSE)
 
 </div>
 
----
+Luomo Home 用 Next.js 16 把项目入口、服务状态、视觉世界和 Live2D 伙伴收进同一个响应式页面。它不是一张静态导航页：状态卡会读取后端探针，角色系统有独立触摸区域、语音队列和全局聊天锁，移动端则会收束成更轻的浏览体验。
 
-## ✨ Features
+## Current experience
 
-- **🎨 Anime Cyber Visual World** — Full-screen hero with parallax depth, gallery lightbox, and animated constellation scenes
-- **🤖 Live2D Companion System** — Three interactive characters (ATRI, Murasame, Allium) with speech synthesis, touch reactions, and emotion system
-- **🌐 Service Constellation** — Interactive orbit visualization of cloud services (API Gateway, File Hub, Terminal, Ops Dashboard)
-- **📊 Operations Cockpit** — Real-time status monitoring and infrastructure metrics
-- **🏗️ Build Timeline** — Chronological project history visualizer
-- **🎵 Ambient Effects** — Sakura particles, holographic grids, stardust bursts, and dynamic HUD overlays
-- **📱 Mobile-First Responsive** — Fully adaptive layout with companion collapse and mobile-optimized navigation
+- **Project showcase**：展示 LuomoOps、LuomoFile、LuomoTerminal 等项目的定位、技术栈和入口。
+- **Service signals**：服务端聚合健康状态并做短时缓存，浏览器不直接接触内部地址。
+- **Companion dock**：ATRI、Murasame、Allium 可切换，支持触摸反应、文本气泡与浏览器语音。
+- **One chat at a time**：共享聊天锁避免多个角色面板同时占用输入焦点和语音通道。
+- **Accessible motion**：动画层尊重 `prefers-reduced-motion`，核心内容不依赖特效才能使用。
+- **Responsive navigation**：桌面项目轨道与移动端导航使用同一份内容模型。
 
-## 🏗️ Architecture
+## Run it
 
-### Cloud Infrastructure
-
-| Service | Domain | Port | Description |
-|---------|--------|------|-------------|
-| Homepage | luomo.moe | 7891 | Next.js frontend with Live2D |
-| API Hub | api.luomo.moe | 8790 | FastAPI developer gateway |
-| File Hub | file.luomo.moe | 8791 | File storage & sharing |
-| Ops | ops.luomo.moe | 8787 | Status monitoring |
-| Terminal | terminal.luomo.moe | 8793 | Web SSH client |
-| Error Pages | error.luomo.moe | 8090 | Custom error pages |
-| ATRI API | atri-api.luomo.moe | 7891 | AI companion brain |
-| Status | status.luomo.moe | 3001 | Live dashboard |
-
-### Tech Stack
-
-- **Framework**: Next.js 14 (App Router) + TypeScript
-- **Styling**: Tailwind CSS 3
-- **Live2D**: pixi-live2d-display (Cubism 4) + Pixi.js
-- **Runtime**: Node.js 18, Docker
-- **CDN/Edge**: Cloudflare Tunnel
-- **Backend**: FastAPI (Python), uvicorn
-
-### Quick Start
-
-`ash
+```bash
 git clone https://github.com/luomo66ccff/luomo-home.git
 cd luomo-home
-npm install
-npm run dev  # Open http://localhost:7891
+cp .env.example .env.local
+npm ci
+npm run dev
+```
 
-# Docker deployment
-docker compose build --no-cache
-docker compose up -d
-`
+开发服务器监听 `http://localhost:7891`。生产构建：
 
-### Project Structure
+```bash
+npm run check:no-secrets
+npm run build
+npm run start
+```
 
-`
-app/       — Next.js App Router pages and API routes
-components/ — React components (Live2D, gallery, effects, UI)
-lib/       — Core logic (companions, Live2D engine, theme)
-public/    — Static assets (Live2D models, images, icons)
-hooks/     — React hooks
-docs/      — Documentation
-`
+也可以使用 Docker；Compose 默认只发布到回环地址，并加入已有的 `luomocore_default` 网络：
 
-### License
+```bash
+docker network inspect luomocore_default >/dev/null 2>&1 || docker network create luomocore_default
+cp .env.example .env
+docker compose up -d --build
+curl http://127.0.0.1:7891/health
+```
 
-MIT (c) 2026 luomo. See LICENSE for details.
+## Configuration
+
+| Variable | Role |
+| --- | --- |
+| `NEXT_PUBLIC_SITE_NAME` | 页面品牌名 |
+| `NEXT_PUBLIC_SITE_URL` | canonical、站点地图和分享地址 |
+| `LUOMO_OPS_URL` | 状态与运维入口 |
+| `LUOMO_FILE_URL` | 文件服务入口 |
+| `LUOMO_API_URL` | API Hub 入口 |
+| `LUOMO_TERMINAL_URL` | 私人终端入口 |
+| `LUOMO_ATRI_API_URL` | 可选角色对话后端 |
+| `ATRI_BRAIN_PROVIDER` | `scripted`（默认）或显式配置的 `atri-api` |
+| `ATRI_API_TOKEN` | 仅服务端读取的可选桥接 token，不得公开 |
+| `STATUS_FETCH_TIMEOUT_SECONDS` | 单个健康探针超时 |
+| `STATUS_CACHE_SECONDS` | 服务端状态缓存时间 |
+
+以 `NEXT_PUBLIC_` 开头的值会进入客户端包；不要把 token、密码或内部凭据放进这些变量。
+
+## Repository map
+
+```text
+app/                 App Router 页面、健康检查和状态 API
+components/          首页区块、导航、视觉层与角色 UI
+content/             伙伴图谱、文案与页面区块定义
+hooks/               偏好、语音、动画与 Brain 状态
+lib/                 服务注册、Live2D 控制和对话适配
+public/assets/       生成素材及已标注的开放素材
+public/live2d/       本地 Live2D 运行时资源区
+scripts/             秘密扫描、模型检查和 smoke test
+```
+
+## Live2D assets are separate
+
+MIT 许可证覆盖代码，不自动覆盖 `public/live2d` 中的模型、纹理、动作或角色形象。仅使用你原创、委托制作或明确获得 Web 分发授权的模型。素材来源与适用许可证记录在 [ASSETS_ATTRIBUTION.md](ASSETS_ATTRIBUTION.md)。
+
+模型缺失时界面应回退到静态体验；贡献代码时不要在 PR 中附带未授权角色资源。
+
+## Quality checks
+
+```bash
+npm run check:no-secrets
+npm run build
+npm run smoke
+node scripts/inspect-live2d-models.mjs
+```
+
+`smoke` 需要已启动的服务。视觉改动应同时检查宽屏、窄屏、减少动态效果模式和角色面板互斥。
+
+## Contributing
+
+这里保留 Luomo 的内容与品牌取向，但可复用的状态聚合、角色交互和可访问性改进欢迎提交。请先阅读 [CONTRIBUTING.md](CONTRIBUTING.md)。
+
+## License
+
+源代码采用 [MIT License](LICENSE)。图片、第三方字体、Live2D SDK 与模型按各自条款处理，详见素材说明。

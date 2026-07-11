@@ -1,6 +1,7 @@
 "use client";
 import { useState, useCallback, useRef } from "react";
 import type { AtriBrainResponse } from "@/lib/atri-brain/types";
+import { releaseModelChatLock, tryAcquireModelChatLock } from "@/lib/modelChatLock";
 
 export function useAtriBrain() {
   const [loading, setLoading] = useState(false);
@@ -9,7 +10,10 @@ export function useAtriBrain() {
   const abortRef = useRef<AbortController | null>(null);
 
   const askAtri = useCallback(async (message: string, context?: any) => {
-    abortRef.current?.abort();
+    if (!tryAcquireModelChatLock()) {
+      return { ok: false, source: "client-locked", text: "ATRI 正在回复中，请稍等一下。", mood: "focused" };
+    }
+
     const ctrl = new AbortController();
     abortRef.current = ctrl;
     setLoading(true); setError(null);
@@ -23,9 +27,11 @@ export function useAtriBrain() {
       return data;
     } catch (e: any) {
       if (e.name !== "AbortError") { setError(e.message); }
-      return { ok: false, source: "fallback", text: "ATRI 暂时无法回应。", mood: "idle" };
+      return { ok: false, source: "fallback", text: "模型暂时没有回应，请稍后再试。", mood: "idle" };
     } finally {
       setLoading(false);
+      if (abortRef.current === ctrl) abortRef.current = null;
+      releaseModelChatLock();
     }
   }, []);
 

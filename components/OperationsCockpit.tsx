@@ -1,148 +1,162 @@
 "use client";
 
-import { Activity, Gauge, RadioTower, Sparkles, RefreshCw } from "lucide-react";
-import MotionSection from "./MotionSection";
-import { useState, useEffect, useCallback } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
+import { RefreshCw } from "lucide-react";
+import { galleryItems } from "@/lib/visual-assets";
+import styles from "./HomeExperience.module.css";
 
-const baseMetrics = [
-  { label: "Services connected", key: "operational", icon: Gauge },
-  { label: "Active incidents", key: "down", icon: Activity },
-  { label: "Unknown status", key: "unknown", icon: RadioTower },
-  { label: "Cloud mood", key: "mood", icon: Sparkles },
-];
+type StatusItem = {
+  id: string;
+  name: string;
+  status: string;
+  latency_ms: number | null;
+};
 
-interface StatusItem {
-  id: string; name: string; status: string; latency_ms: number | null;
+function statusClass(status: string) {
+  if (status === "operational") return styles.statusOperational;
+  if (status === "degraded") return styles.statusDegraded;
+  if (status === "down") return styles.statusDown;
+  return styles.statusUnknown;
 }
 
 export default function OperationsCockpit() {
   const [services, setServices] = useState<StatusItem[]>([]);
   const [lastChecked, setLastChecked] = useState<string | null>(null);
   const [refreshing, setRefreshing] = useState(false);
-  const [cooldown, setCooldown] = useState(false);
 
   const fetchServices = useCallback(async () => {
+    setRefreshing(true);
     try {
-      setRefreshing(true);
-      const res = await fetch("/api/services");
-      const data = await res.json();
+      const response = await fetch("/api/services", { cache: "no-store" });
+      const data = await response.json();
       setServices(data.services || []);
-      setLastChecked(new Date().toLocaleTimeString());
+      setLastChecked(new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }));
     } catch {
-      // degraded / unknown
+      setLastChecked("unavailable");
     } finally {
       setRefreshing(false);
-      setCooldown(true);
-      setTimeout(() => setCooldown(false), 10000);
     }
   }, []);
 
-  useEffect(() => { fetchServices(); }, [fetchServices]);
+  useEffect(() => {
+    fetchServices();
+  }, [fetchServices]);
 
-  const operational = services.filter((s: StatusItem) => s.status === "operational").length;
-  const downCount = services.filter((s: StatusItem) => s.status === "down").length;
-  const unknownCount = services.filter((s: StatusItem) => s.status === "unknown").length;
+  const metrics = useMemo(() => {
+    const operational = services.filter((service) => service.status === "operational").length;
+    const attention = services.filter((service) =>
+      ["degraded", "down"].includes(service.status),
+    ).length;
+    const latencies = services
+      .map((service) => service.latency_ms)
+      .filter((latency): latency is number => latency != null)
+      .sort((a, b) => a - b);
+    const middle = Math.floor(latencies.length / 2);
+    const median = latencies.length
+      ? latencies.length % 2
+        ? latencies[middle]
+        : Math.round((latencies[middle - 1] + latencies[middle]) / 2)
+      : null;
 
-  const getMood = () => {
-    if (downCount > 0) return "alert ⚠";
-    if (unknownCount > 1) return "uncertain ✦";
-    return "calm ✦";
-  };
+    return { operational, attention, median };
+  }, [services]);
+
+  const cockpitImage =
+    galleryItems.find((item) => item.key === "sci-fi-cockpit")?.src ||
+    "/assets/gallery/gallery-sci-fi-cockpit-generated.webp";
 
   return (
-    <MotionSection id="cockpit" className="cockpit-scene">
-      <div className="mx-auto max-w-[1280px] px-6 lg:px-10">
-      <div className="section-heading">
-        <p className="section-eyebrow">Scene 04 · Operations Cockpit</p>
-        <h2>Signals from the cloud are gathered here.</h2>
-        <p>Calm, clear, and ready — the private cloud bridge keeps glowing without drama.</p>
-      </div>
-
-      <div className="cockpit-grid">
-        {/* Metrics Cards */}
-        <div className="metrics-grid">
-          {baseMetrics.map((metric) => {
-            const Icon = metric.icon;
-            let value: string;
-            if (metric.key === "operational") value = String(operational);
-            else if (metric.key === "down") value = String(downCount);
-            else if (metric.key === "unknown") value = String(unknownCount);
-            else value = getMood();
-            return (
-              <div className="metric-card glass-card" key={metric.label}>
-                <Icon size={21} className="text-cyan-300" />
-                <strong className={metric.key === "down" && downCount > 0 ? "text-red-400" : ""}>{value}</strong>
-                <span>{metric.label}</span>
-              </div>
-            );
-          })}
+    <div className={styles.sectionInner}>
+      <header className={styles.sectionHeader}>
+        <div>
+          <p className={styles.eyebrow}>Operations</p>
+          <h2 className={styles.sectionTitle}>A calmer view of the moving parts.</h2>
         </div>
+        <p className={styles.sectionDescription}>
+          Health checks and latency are reduced to the signals that matter, while the
+          full cockpit remains one click away in LuomoOps.
+        </p>
+      </header>
 
-        {/* Radar + Signal List */}
-        <div className="radar-card glass-card">
-          <div className="radar-orb radar-scan">
-            <span />
-          </div>
-          <div>
-            <div className="flex items-center justify-between flex-wrap gap-2 mb-3">
-              <p className="text-xs text-slate-400">Service Signals</p>
-              <div className="flex items-center gap-2">
-                {lastChecked && (
-                  <span className="text-xs text-slate-500 font-mono">last: {lastChecked}</span>
-                )}
-                <button
-                  onClick={fetchServices}
-                  disabled={refreshing || cooldown}
-                  className={"px-3 py-1.5 text-xs rounded-full transition-all font-mono " +
-                    (refreshing || cooldown
-                      ? "bg-white/5 text-slate-600 cursor-not-allowed"
-                      : "bg-white/10 border border-white/20 text-white/70 hover:text-white hover:bg-white/20")}
-                >
-                  {refreshing ? (
-                    <span className="flex items-center gap-1"><RefreshCw size={12} className="animate-spin" /> refreshing</span>
-                  ) : cooldown ? (
-                    "wait..."
-                  ) : (
-                    "refresh status"
-                  )}
-                </button>
+      <div className={styles.operationsGrid}>
+        <div className={styles.operationsVisual}>
+          <img
+            className={styles.operationsImage}
+            src={cockpitImage}
+            alt="Luomo Cloud operations cockpit"
+            loading="lazy"
+          />
+          <div className={styles.operationsShade} aria-hidden="true" />
+          <div className={styles.operationsCaption}>
+            <span>CONTROL SURFACE / TOKYO</span>
+            <h3>Infrastructure should feel legible before it feels impressive.</h3>
+            <div className={styles.metrics}>
+              <div className={styles.metric}>
+                <strong>{services.length ? metrics.operational : "--"}</strong>
+                <span>Operational</span>
+              </div>
+              <div className={styles.metric}>
+                <strong>{services.length ? metrics.attention : "--"}</strong>
+                <span>Needs attention</span>
+              </div>
+              <div className={styles.metric}>
+                <strong>{metrics.median != null ? metrics.median + "ms" : "--"}</strong>
+                <span>Median response</span>
               </div>
             </div>
-
-            {services.length === 0 ? (
-              <ul>
-                <li className="text-sm text-slate-400 py-1 font-mono">No service data available.</li>
-              </ul>
-            ) : (
-              <ul>
-                {services.map((s) => {
-                  const statusColor =
-                    s.status === "operational" ? "bg-emerald-400 shadow-[0_0_8px_rgba(52,211,153,0.6)]" :
-                    s.status === "down" ? "bg-red-400 animate-pulse" :
-                    "bg-slate-500";
-                  return (
-                    <li key={s.id} className="flex items-center gap-2 py-1 text-sm">
-                      <span className={"w-2 h-2 rounded-full flex-shrink-0 " + statusColor} />
-                      <span className="text-slate-300">{s.name}</span>
-                      <span className={"text-xs ml-auto capitalize " +
-                        (s.status === "operational" ? "text-emerald-400" :
-                         s.status === "down" ? "text-red-400" :
-                         "text-slate-500")}>
-                        {s.status}
-                      </span>
-                      {s.latency_ms != null && (
-                        <span className="text-xs text-slate-600 font-mono">{s.latency_ms}ms</span>
-                      )}
-                    </li>
-                  );
-                })}
-              </ul>
-            )}
           </div>
         </div>
 
+        <div className={styles.signals}>
+          <div className={styles.signalHeader}>
+            <div>
+              <p>Service signals</p>
+              <span>{lastChecked ? "updated " + lastChecked : "waiting for live data"}</span>
+            </div>
+            <button
+              className={styles.iconButton}
+              type="button"
+              onClick={fetchServices}
+              disabled={refreshing}
+              aria-label="Refresh service status"
+              title="Refresh service status"
+            >
+              <RefreshCw className={refreshing ? styles.spinning : undefined} size={15} />
+            </button>
+          </div>
+
+          {services.length ? (
+            <ul className={styles.signalList}>
+              {services.map((service) => (
+                <li className={styles.signalRow} key={service.id}>
+                  <div className={styles.signalIdentity}>
+                    <span
+                      className={styles.statusBadge + " " + statusClass(service.status)}
+                      aria-hidden="true"
+                    >
+                      <span className={styles.statusDot} />
+                    </span>
+                    <div>
+                      <strong>{service.name}</strong>
+                      <span>{service.id.toUpperCase()} / LIVE CHECK</span>
+                    </div>
+                  </div>
+                  <div className={styles.signalState}>
+                    <span className={styles.signalLatency}>
+                      {service.latency_ms != null ? service.latency_ms + "ms" : "--"}
+                    </span>
+                    <span className={styles.statusBadge + " " + statusClass(service.status)}>
+                      {service.status}
+                    </span>
+                  </div>
+                </li>
+              ))}
+            </ul>
+          ) : (
+            <p className={styles.emptyState}>Collecting service signals...</p>
+          )}
+        </div>
       </div>
-      </div>
-    </MotionSection>
+    </div>
   );
 }

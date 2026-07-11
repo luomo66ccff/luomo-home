@@ -1,11 +1,15 @@
 .next/
 node_modules/
 .env
+.env.*
+!.env.example
 *.local
 .DS_Store
 *.log
 out/
 coverage/
+.vercel/
+.turbo/
 tsconfig.tsbuildinfo
 session-*.md
 app-backup-*

@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useRef, useCallback } from "react";
+import { SquareTerminal } from "lucide-react";
 import { useEasterEgg } from "./EasterEgg";
 import EasterEggOverlay from "./EasterEgg";
 import type { ThemeMode } from "@/hooks/useLuomoPreferences";
@@ -50,12 +51,12 @@ const COMMANDS: Command[] = [
   { label: "lock debug forms", action: "luomo", arg: "lock-debug" },
   { label: "clear", action: "clear" },
   { label: "jump hero", action: "scroll", id: "hero" },
-  { label: "jump visual", action: "scroll", id: "visual-world" },
-  { label: "jump services", action: "scroll", id: "service-constellation" },
-  { label: "jump cockpit", action: "scroll", id: "operations-cockpit" },
-  { label: "jump orbit", action: "scroll", id: "infrastructure-orbit" },
-  { label: "jump log", action: "scroll", id: "build-log" },
-  { label: "jump gate", action: "scroll", id: "enter-cloud" },
+  { label: "jump visual", action: "scroll", id: "worlds" },
+  { label: "jump services", action: "scroll", id: "services" },
+  { label: "jump cockpit", action: "scroll", id: "operations" },
+  { label: "jump orbit", action: "scroll", id: "operations" },
+  { label: "jump log", action: "scroll", id: "build" },
+  { label: "jump gate", action: "scroll", id: "enter" },
 ];
 
 const HELP_TEXT = `Available commands:
@@ -117,7 +118,7 @@ export default function CommandPalette({ onToggleParticles, onSetTheme, particle
       case "help": setOutput(HELP_TEXT); window.dispatchEvent(new CustomEvent("luomo:mood", { detail: { mood: "focused" } })); break;
       case "whoami": setOutput(WHOAMI_TEXT); break;
       case "ls": setOutput(LS_TEXT); break;
-      case "cd": document.getElementById("build-log")?.scrollIntoView({ behavior: "smooth" }); setOutput("cd ~/projects"); break;
+      case "cd": document.getElementById("build")?.scrollIntoView({ behavior: "smooth" }); setOutput("cd ~/projects"); break;
       case "open":
         if (cmd.url) window.open(cmd.url, "_blank");
         setOutput(`Opening ${cmd.arg || "service"}...`);
@@ -205,7 +206,7 @@ export default function CommandPalette({ onToggleParticles, onSetTheme, particle
         aria-label="Open command palette"
         style={{ minHeight: "44px", minWidth: "44px" }}
       >
-        <svg className="w-4 h-4 sm:hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16m-7 6h7"/></svg>
+        <SquareTerminal className="h-4 w-4 sm:hidden" aria-hidden="true" />
         <span className="hidden sm:inline text-white/50">Ctrl K</span>
       </button>
     );

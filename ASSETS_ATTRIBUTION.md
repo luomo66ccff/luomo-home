@@ -52,33 +52,6 @@ Created for Luomo Cloud in this conversation.
 - License: CC0
 - Usage: Star map / constellation background
 
-### OpenGameArt: Starfield background
-
-- Local: /assets/backgrounds/oga-starfield-seamless-cc0.webp
-- Source: OpenGameArt
-- Original URL: https://opengameart.org/content/starfield-background
-- Author: Sauer2
-- License: CC0
-- Usage: Lightweight starfield texture
-
-### OpenGameArt: Space Nebulas Skybox
-
-- Local: /assets/backgrounds/oga-space-nebulas-back-cc-by-sa.webp
-- Source: OpenGameArt
-- Original URL: https://opengameart.org/content/space-nebulas-skybox
-- Author: NoLogoGames
-- License: CC-BY-SA 3.0 (ShareAlike)
-- Usage: Optional deep-space background (replaceable)
-
-### OpenGameArt: glow circle
-
-- Local: /assets/particles/oga-glow-circle-cc0.png
-- Source: OpenGameArt
-- Original URL: https://opengameart.org/content/glow-circle
-- Author: oglsdl
-- License: CC0
-- Usage: Cursor glow / service node glow
-
 ## Licensing notes
 
 - All assets are used locally only (no hotlinking).
@@ -87,3 +60,22 @@ Created for Luomo Cloud in this conversation.
 - CC-BY-SA assets require derivative works to use the same license.
 - Original generated assets are intended as replaceable visual placeholders.
 - Adding new assets requires documenting source, author, and license.
+
+## Live2D models and character IP
+
+The repository's MIT license applies to source code only. Live2D model binaries,
+textures, motions, expressions, names and character artwork under `public/live2d/`
+are not relicensed under MIT. Their original authors and rights holders retain all
+applicable rights.
+
+Downstream users must replace these files unless they independently hold permission
+for web use and redistribution. Inclusion of a path in the character registry is
+not evidence of a content license. Pull requests must not add game or anime character
+models without verifiable redistribution terms.
+
+## Live2D Cubism runtime
+
+`public/live2d/core/live2dcubismcore.min.js` is Live2D Cubism Core software and
+is not covered by this repository's MIT license. Use and redistribution are
+subject to Live2D's SDK and Core licensing terms. See:
+https://www.live2d.com/en/sdk/license/
