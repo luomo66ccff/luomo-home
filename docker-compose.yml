@@ -7,6 +7,8 @@ services:
       - .env
     ports:
       - "127.0.0.1:${LUOMO_HOME_HOST_PORT:-7891}:7891"
+    volumes:
+      - "${LUOMO_HOME_LIVE2D_PATH:-./private-assets/live2d}:/app/public/live2d:ro"
     networks:
       - luomocore_default
 

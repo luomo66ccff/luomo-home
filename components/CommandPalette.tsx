@@ -5,7 +5,7 @@ import { SquareTerminal } from "lucide-react";
 import { useEasterEgg } from "./EasterEgg";
 import EasterEggOverlay from "./EasterEgg";
 import type { ThemeMode } from "@/hooks/useLuomoPreferences";
-import type { AtriBrainResponse } from "@/lib/atri-brain/types";
+import type { AtriFormId } from "@/lib/live2d/atriForms";
 
 interface Command {
   label: string;
@@ -58,6 +58,21 @@ const COMMANDS: Command[] = [
   { label: "jump log", action: "scroll", id: "build" },
   { label: "jump gate", action: "scroll", id: "enter" },
 ];
+
+type PublicServiceStatus = { status?: string };
+
+function openTrustedService(rawUrl: string): boolean {
+  try {
+    const target = new URL(rawUrl);
+    const trustedHost =
+      target.hostname === "luomo.moe" || target.hostname.endsWith(".luomo.moe");
+    if (target.protocol !== "https:" || !trustedHost) return false;
+    window.open(target.href, "_blank", "noopener,noreferrer");
+    return true;
+  } catch {
+    return false;
+  }
+}
 
 const HELP_TEXT = `Available commands:
 
@@ -120,8 +135,11 @@ export default function CommandPalette({ onToggleParticles, onSetTheme, particle
       case "ls": setOutput(LS_TEXT); break;
       case "cd": document.getElementById("build")?.scrollIntoView({ behavior: "smooth" }); setOutput("cd ~/projects"); break;
       case "open":
-        if (cmd.url) window.open(cmd.url, "_blank");
-        setOutput(`Opening ${cmd.arg || "service"}...`);
+        setOutput(
+          cmd.url && openTrustedService(cmd.url)
+            ? `Opening ${cmd.arg || "service"}...`
+            : "Blocked an untrusted external URL."
+        );
         window.dispatchEvent(new CustomEvent("luomo:mood", { detail: { mood: "excited" } }));
         break;
       case "theme":
@@ -134,7 +152,7 @@ export default function CommandPalette({ onToggleParticles, onSetTheme, particle
         break;
       case "luomo":
         if (cmd.arg?.startsWith("form-")) {
-          const fid = cmd.arg.replace("form-", "") as any;
+          const fid = cmd.arg.replace("form-", "") as AtriFormId;
           setOutput("ATRI form: " + fid);
           window.dispatchEvent(new CustomEvent("luomo:mood", { detail: { mood: "system", form: fid } }));
         } else if (cmd.arg === "unlock-secret") {
@@ -174,8 +192,8 @@ export default function CommandPalette({ onToggleParticles, onSetTheme, particle
         fetch("/api/services")
           .then((r) => r.json())
           .then((d) => {
-            const svcs = d.services || [];
-            const ops = svcs.filter((s: any) => s.status === "operational");
+            const svcs = (d.services || []) as PublicServiceStatus[];
+            const ops = svcs.filter((service) => service.status === "operational");
             setOutput(`Cloud Pulse: ${svcs.length} linked · ${ops.length} operational · ${new Date().toLocaleTimeString()}`);
           })
           .catch(() => setOutput("Status: degraded / unknown"));

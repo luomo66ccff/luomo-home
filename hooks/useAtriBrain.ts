@@ -1,6 +1,7 @@
 "use client";
-import { useState, useCallback, useRef } from "react";
-import type { AtriBrainResponse } from "@/lib/atri-brain/types";
+
+import { useCallback, useRef, useState } from "react";
+import type { AtriBrainRequest, AtriBrainResponse } from "@/lib/atri-brain/types";
 import { releaseModelChatLock, tryAcquireModelChatLock } from "@/lib/modelChatLock";
 
 export function useAtriBrain() {
@@ -9,28 +10,46 @@ export function useAtriBrain() {
   const [lastResponse, setLastResponse] = useState<AtriBrainResponse | null>(null);
   const abortRef = useRef<AbortController | null>(null);
 
-  const askAtri = useCallback(async (message: string, context?: any) => {
+  const askAtri = useCallback(async (
+    message: string,
+    context?: AtriBrainRequest["context"]
+  ): Promise<AtriBrainResponse> => {
     if (!tryAcquireModelChatLock()) {
-      return { ok: false, source: "client-locked", text: "ATRI 正在回复中，请稍等一下。", mood: "focused" };
+      return {
+        ok: false,
+        source: "fallback",
+        text: "ATRI is already responding. Please wait a moment.",
+        mood: "focused",
+      };
     }
 
-    const ctrl = new AbortController();
-    abortRef.current = ctrl;
-    setLoading(true); setError(null);
+    const controller = new AbortController();
+    abortRef.current = controller;
+    setLoading(true);
+    setError(null);
     try {
-      const res = await fetch("/api/atri/brain", {
-        method: "POST", headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ message, context }), signal: ctrl.signal,
+      const response = await fetch("/api/atri/brain", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ message, context }),
+        signal: controller.signal,
       });
-      const data = await res.json();
+      const data = (await response.json()) as AtriBrainResponse;
       setLastResponse(data);
       return data;
-    } catch (e: any) {
-      if (e.name !== "AbortError") { setError(e.message); }
-      return { ok: false, source: "fallback", text: "模型暂时没有回应，请稍后再试。", mood: "idle" };
+    } catch (caught: unknown) {
+      if (!(caught instanceof DOMException && caught.name === "AbortError")) {
+        setError(caught instanceof Error ? caught.message : "Unknown request error");
+      }
+      return {
+        ok: false,
+        source: "fallback",
+        text: "ATRI is temporarily unavailable. Please try again later.",
+        mood: "idle",
+      };
     } finally {
       setLoading(false);
-      if (abortRef.current === ctrl) abortRef.current = null;
+      if (abortRef.current === controller) abortRef.current = null;
       releaseModelChatLock();
     }
   }, []);

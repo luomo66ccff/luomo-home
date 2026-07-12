@@ -2,8 +2,16 @@
 import { useEffect, useState } from "react";
 import { useAtriBrain } from "@/hooks/useAtriBrain";
 import { isModelChatLocked } from "@/lib/modelChatLock";
+import type { AtriBrainRequest, AtriBrainResponse } from "@/lib/atri-brain/types";
 
-interface Props { onResponse?: (r: any) => void; onThinking?: (r: any) => void; onLoadingChange?: (loading: boolean) => void; context?: Record<string, any>; }
+type ThinkingState = { text: string; mood: AtriBrainResponse["mood"]; source: "thinking" };
+
+interface Props {
+  onResponse?: (response: AtriBrainResponse) => void;
+  onThinking?: (state: ThinkingState) => void;
+  onLoadingChange?: (loading: boolean) => void;
+  context?: AtriBrainRequest["context"];
+}
 
 export default function ATRIChatPanel({ onResponse, onThinking, onLoadingChange, context }: Props) {
   const [input, setInput] = useState("");

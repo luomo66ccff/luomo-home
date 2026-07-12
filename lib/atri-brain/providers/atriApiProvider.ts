@@ -37,7 +37,7 @@ export async function callAtriApiProvider(
       throw new Error(`ATRI API returned ${response.status}`);
     }
 
-    const data = await response.json();
+    const data = (await response.json()) as Record<string, unknown>;
     if (!data || typeof data !== "object") {
       throw new Error("ATRI API returned non-object response");
     }
@@ -46,7 +46,7 @@ export async function callAtriApiProvider(
       ok: Boolean(data.ok ?? true),
       source: "ai",
       text: String(data.answer || data.text || data.response || data.message || data.content || ""),
-      mood: (String(data.mood || "system") as any),
+      mood: String(data.mood || "system") as AtriBrainResponse["mood"],
       form: data.form ? String(data.form) : undefined,
       expression: data.expression ? String(data.expression) : undefined,
       motion: data.motion ? String(data.motion) : undefined,

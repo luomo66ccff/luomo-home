@@ -35,6 +35,7 @@ npm run dev
 
 ```bash
 npm run check:no-secrets
+npm test
 npm run build
 npm run start
 ```
@@ -89,6 +90,7 @@ MIT 许可证覆盖代码，不自动覆盖 `public/live2d` 中的模型、纹�
 
 ```bash
 npm run check:no-secrets
+npm test
 npm run build
 npm run smoke
 node scripts/inspect-live2d-models.mjs

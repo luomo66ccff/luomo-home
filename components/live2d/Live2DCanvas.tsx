@@ -95,14 +95,14 @@ export default function Live2DCanvas({ characterId = "atri", mood = "idle", form
   useEffect(() => {
     if (typeof window === "undefined") return;
     window.__LUOMO_LIVE2D_CANVAS_COUNT__ = (window.__LUOMO_LIVE2D_CANVAS_COUNT__ || 0) + 1;
-    console.info("[Live2D instance] mounted", {
+    pushLive2DDebug("info", "instance mounted", {
       count: window.__LUOMO_LIVE2D_CANVAS_COUNT__,
       companionId: characterId,
       modelPath: resolvedModelPath,
     });
     return () => {
       window.__LUOMO_LIVE2D_CANVAS_COUNT__ = Math.max((window.__LUOMO_LIVE2D_CANVAS_COUNT__ || 1) - 1, 0);
-      console.info("[Live2D instance] unmounted", {
+      pushLive2DDebug("info", "instance unmounted", {
         count: window.__LUOMO_LIVE2D_CANVAS_COUNT__,
         companionId: characterId,
         modelPath: resolvedModelPath,
@@ -178,7 +178,7 @@ export default function Live2DCanvas({ characterId = "atri", mood = "idle", form
 
     return () => {
       disposed = true;
-      console.info("[Live2D lifecycle] canvas unmount destroy app");
+      pushLive2DDebug("info", "canvas unmount destroy app");
       try { if (modelRef.current) modelRef.current.destroy({ children: true, texture: false, baseTexture: false }); } catch (e) {}
       try { if (appRef.current) appRef.current.destroy(true, { children: true, texture: false, baseTexture: false }); } catch (e) {}
       modelRef.current = null;
@@ -202,7 +202,7 @@ export default function Live2DCanvas({ characterId = "atri", mood = "idle", form
       const app = appRef.current;
       const Live2DModelCls = Live2DModelRef.current;
 
-      console.info("[Live2D lifecycle] model load start", {
+      pushLive2DDebug("info", "model load start", {
         token,
         companionId: characterId,
         modelPath: resolvedModelPath,
@@ -215,7 +215,7 @@ export default function Live2DCanvas({ characterId = "atri", mood = "idle", form
           try { app.stage.removeChild(oldModel); } catch (e) {}
           try { oldModel.destroy?.({ children: true, texture: false, baseTexture: false }); } catch (e) {}
           if (modelRef.current === oldModel) modelRef.current = null;
-          console.info("[Live2D lifecycle] old model destroyed", { token, companionId: characterId });
+          pushLive2DDebug("info", "old model destroyed", { token, companionId: characterId });
         }
 
         // Load new model
@@ -260,7 +260,7 @@ export default function Live2DCanvas({ characterId = "atri", mood = "idle", form
           try { captureAtriBaseline(model); } catch (e) {}
         }
 
-        console.info("[Live2D lifecycle] model ready", {
+        pushLive2DDebug("info", "model ready", {
           token, companionId: characterId, modelPath: resolvedModelPath, stageChildren: app.stage.children.length,
         });
 
@@ -282,7 +282,7 @@ export default function Live2DCanvas({ characterId = "atri", mood = "idle", form
     // Cleanup: do NOT destroy modelRef.current, only cancel this load
     return () => {
       cancelled = true;
-      console.info("[Live2D lifecycle] model load effect cleanup", {
+      pushLive2DDebug("info", "model load effect cleanup", {
         token,
         companionId: characterId,
         modelPath: resolvedModelPath,

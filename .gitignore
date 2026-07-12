@@ -8,6 +8,10 @@ node_modules/
 *.log
 out/
 coverage/
+private-assets/
+public/live2d/atri/
+public/live2d/companions/
+public/live2d/core/
 .vercel/
 .turbo/
 tsconfig.tsbuildinfo

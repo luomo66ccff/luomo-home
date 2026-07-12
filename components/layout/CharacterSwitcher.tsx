@@ -33,10 +33,7 @@ export function CharacterSwitcher({
               key={id}
               type="button"
               disabled={disabled}
-              onClick={() => {
-                console.info("[CompanionSwitcher] click", id);
-                onChange(id);
-              }}
+              onClick={() => onChange(id)}
               className={[ "min-w-0 truncate",
                 "min-w-0 truncate rounded-xl px-2 py-1.5 text-[11px] font-semibold transition sm:text-xs",
                 "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-200/60",

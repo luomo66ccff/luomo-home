@@ -1,8 +1,8 @@
-export type AtriMood = "idle" | "welcome" | "curious" | "focused" | "excited" | "sleepy" | "secret" | "system" | "warning";
+export type AtriMood = "idle" | "welcome" | "curious" | "focused" | "excited" | "sleepy" | "secret" | "system" | "warning" | "greeting";
 
 export type AtriBrainRequest = {
   message: string;
-  context?: { currentSection?: string; currentMood?: string; currentForm?: string; pageTitle?: string; servicesCount?: number; };
+  context?: { companionId?: string; currentSection?: string; currentMood?: string; currentForm?: string; pageTitle?: string; servicesCount?: number; };
 };
 
 export type AtriBrainResponse = {

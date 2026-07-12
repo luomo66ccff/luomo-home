@@ -43,9 +43,7 @@ export async function runAtriBrain(
         Boolean(options.allowSecretForms),
         Boolean(options.allowDebugForms)
       );
-      // Ensure source is "ai" after normalization
-      (result as any).source = "ai";
-      return result;
+      return { ...result, source: "ai" };
     } catch (error) {
       console.warn("[ATRI Brain] atri-api provider fallback", {
         reason: error instanceof Error ? error.message : String(error),

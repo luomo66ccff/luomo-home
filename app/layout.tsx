@@ -13,6 +13,9 @@ export const metadata: Metadata = {
   keywords: ["Luomo", "洛墨", "个人主页", "云服务", "API", "运维", "开发项目", "数字空间"],
   authors: [{ name: "luomo" }],
   creator: "luomo",
+  alternates: {
+    canonical: "/",
+  },
   openGraph: {
     title: "Luomo / 洛墨 - 个人云服务与数字宇宙入口",
     description: "连接云服务、API、文件、运维、终端与开发项目的个人数字空间。",
@@ -52,12 +55,30 @@ export const viewport: Viewport = {
   themeColor: "#020617",
 };
 
+const structuredData = {
+  "@context": "https://schema.org",
+  "@type": "WebSite",
+  name: "Luomo",
+  url: "https://luomo.moe",
+  author: {
+    "@type": "Person",
+    name: "Luomo",
+    url: "https://luomo.moe",
+  },
+};
+
 export default function RootLayout({
   children,
 }: Readonly<{ children: ReactNode }>) {
   return (
     <html lang="zh-CN">
       <head>
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify(structuredData).replace(/</g, "\\u003c"),
+          }}
+        />
         <link rel="manifest" href="/manifest.webmanifest" />
         <meta name="theme-color" content="#020617" />
         <meta name="apple-mobile-web-app-capable" content="yes" />

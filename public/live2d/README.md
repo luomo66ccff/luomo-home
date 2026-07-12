@@ -1,21 +1,21 @@
-# Live2D Model Directory
+# Private Live2D asset mount
 
-Place Live2D Cubism 4 model files here.
+Model binaries, textures, sounds, character artwork, and Live2D Cubism Core are
+not distributed in this repository. Put assets that you are licensed to use in
+`private-assets/live2d/`; Docker Compose mounts that directory at
+`/app/public/live2d` at runtime.
 
-## Requirements
-- Model must be original, commissioned, self-made, or explicitly licensed for web use.
-- Do NOT place copyrighted game/anime character models here without permission.
+Expected paths for the default registry are:
 
-## Directory Structure
-```
-live2d/
-  luomo-chan/              # Your model directory
-    your-model.model3.json  # Entry point
-    your-model.moc3         # Model binary
-    textures/               # Texture files
-    motions/                # Motion files (optional)
-    expressions/            # Expression files (optional)
+```text
+private-assets/live2d/
+  core/live2dcubismcore.min.js
+  atri/atri_8.model3.json
+  companions/murasame/Murasame.model3.json
+  companions/allium/ariu/ariu.model3.json
 ```
 
-## Supported Format
-- Live2D Cubism 4 (.model3.json / .moc3)
+You may instead update `lib/live2d/characterRegistry.ts` and
+`lib/companions/companionRegistry.ts` to reference your own model layout. Only
+use original, commissioned, or explicitly licensed web assets. The UI falls
+back to a static companion state when model loading fails.

@@ -61,21 +61,13 @@ Created for Luomo Cloud in this conversation.
 - Original generated assets are intended as replaceable visual placeholders.
 - Adding new assets requires documenting source, author, and license.
 
-## Live2D models and character IP
+## Live2D models and Cubism runtime
 
-The repository's MIT license applies to source code only. Live2D model binaries,
-textures, motions, expressions, names and character artwork under `public/live2d/`
-are not relicensed under MIT. Their original authors and rights holders retain all
-applicable rights.
+The public repository intentionally excludes all Live2D model binaries,
+textures, motions, sounds, character artwork, and Live2D Cubism Core. They are
+runtime-only private assets and are not covered by the MIT license.
 
-Downstream users must replace these files unless they independently hold permission
-for web use and redistribution. Inclusion of a path in the character registry is
-not evidence of a content license. Pull requests must not add game or anime character
-models without verifiable redistribution terms.
-
-## Live2D Cubism runtime
-
-`public/live2d/core/live2dcubismcore.min.js` is Live2D Cubism Core software and
-is not covered by this repository's MIT license. Use and redistribution are
-subject to Live2D's SDK and Core licensing terms. See:
-https://www.live2d.com/en/sdk/license/
+Downstream users must supply models they are independently licensed to use and
+redistribute. Inclusion of a path or character name in a registry is not
+evidence of a content license. Cubism SDK and Core use remains subject to
+Live2D's terms: https://www.live2d.com/en/sdk/license/

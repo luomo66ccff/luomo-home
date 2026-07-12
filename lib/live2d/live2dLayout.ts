@@ -1,5 +1,7 @@
 "use client";
 
+import { pushLive2DDebug } from "./live2dDebug";
+
 export function clamp(value: number, min: number, max: number): number {
   return Math.min(max, Math.max(min, value));
 }
@@ -59,7 +61,7 @@ export function applyCompanionModelLayout(
   model.x = screenW * xR + oX;
   model.y = screenH * yR + oY;
 
-  console.info("[Live2D] layout applied", {
+  pushLive2DDebug("info", "layout applied", {
     companionId,
     boundsSource: size.source,
     screenW, screenH, modelWidth, modelHeight,

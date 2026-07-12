@@ -4,7 +4,7 @@ import { useState, useEffect, useRef, useCallback } from "react";
 import StardustBurst from "@/components/effects/StardustBurst";
 import Live2DShell from "@/components/live2d/Live2DShell";
 import ATRIChatPanel from "@/components/atri/ATRIChatPanel";
-import { atriForms, type AtriActiveForms } from "@/lib/live2d/atriForms";
+import { atriForms, type AtriActiveForms, type AtriFormId } from "@/lib/live2d/atriForms";
 import type { CharacterId } from "@/lib/live2d/characterRegistry";
 import type { CompanionId } from "@/lib/companions/companionRegistry";
 import { getCompanionProfile } from "@/lib/companions/companionRegistry";
@@ -13,8 +13,11 @@ import { CharacterSwitcher } from "@/components/layout/CharacterSwitcher";
 import { SECTIONS } from "@/content/sections";
 import { releaseModelChatLock, tryAcquireModelChatLock } from "@/lib/modelChatLock";
 import { getCompanionTouchReaction, pickTouchLine, type CompanionTouchArea } from "@/lib/companions/companionTouch";
+import type { AtriBrainResponse } from "@/lib/atri-brain/types";
 
 type LuomoMood = "idle" | "welcome" | "curious" | "focused" | "excited" | "secret" | "system" | "greeting" | "sleepy" | "warning";
+type ThinkingPayload = { text?: string; mood?: LuomoMood; source?: string };
+type CompanionBrainResponse = Omit<Partial<AtriBrainResponse>, "source"> & { source?: string };
 
 const sectionIds = SECTIONS.map((s) => s.id);
 
@@ -87,11 +90,6 @@ export default function LuomoCompanionDock({ onCollapsedChange, initialCollapsed
   const clickTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => { if (!hydrated) return; try { localStorage.setItem("luomochan_folded", String(!expanded)); } catch {} }, [expanded, hydrated]);
-
-  // Diagnostics
-  useEffect(() => {
-    console.info("[ATRI\u00b7HomepageDock] render", { collapsed: !expanded, isMobile, mood, companionForm });
-  }, [expanded, mood, companionForm]);
 
   useEffect(() => {
     const handler = (e: Event) => {
@@ -195,7 +193,7 @@ const handleNextLine = useCallback(() => {
     return !atriLoading && Date.now() > manualUntil;
   }, [atriLoading, manualUntil]);
 
-  const applyAtriThinking = useCallback((payload: any = {}) => {
+  const applyAtriThinking = useCallback((payload: ThinkingPayload = {}) => {
     const text = payload.text || "ATRI \u6b63\u5728\u601d\u8003\u4e2d\u2026\u2026\u8bb0\u5fc6\u56de\u8def\u6b63\u5728\u5fae\u5fae\u53d1\u5149\u3002";
     setAtriLoading(true);
     setDialogueSource("thinking");
@@ -206,7 +204,7 @@ const handleNextLine = useCallback(() => {
     setManualUntil(Date.now() + 20000);
   }, []);
 
-  const applyAtriBrainResponse = useCallback((response: any) => {
+  const applyAtriBrainResponse = useCallback((response: CompanionBrainResponse) => {
     if (!response) return;
     setAtriLoading(false);
     const source = response.source === "ai" || response.source === "scripted" ? "brain" : response.source === "fallback" ? "fallback" : "brain";
@@ -218,7 +216,10 @@ const handleNextLine = useCallback(() => {
     setDisplayedText(pages[0] || text);
     setIsTyping(false);
     if (response.mood) setMood(response.mood);
-    if (response.form) { try { setActiveForms((prev) => ({ ...prev, outfit: response.form })); } catch {}
+    if (response.form && response.form in atriForms) {
+      const formId = response.form as AtriFormId;
+      const slot = atriForms[formId].slot;
+      setActiveForms((previous) => ({ ...previous, [slot]: formId }));
     }
     if (response.expression) setCompanionExpression(response.expression);
     if (response.motion) setCompanionMotion(response.motion);
@@ -296,11 +297,6 @@ const handleNextLine = useCallback(() => {
   const close = useCallback(() => { setExpanded(false); onCollapsedChange?.(true); }, [onCollapsedChange]);
 
   const handleCompanionChange = useCallback((nextId: CompanionId) => {
-    console.info("[Companion] change request", {
-      from: character,
-      to: nextId,
-    });
-
     if (nextId === character) return;
 
     const nextProfile = getCompanionProfile(nextId);
@@ -321,10 +317,6 @@ const handleNextLine = useCallback(() => {
     setMood("welcome");
     setManualUntil(Date.now() + 12000);
 
-    console.info("[Companion] changed", {
-      nextId,
-      modelPath: nextProfile.modelPath,
-    });
     playRandomCompanionReaction("switch");
   }, [character]);
 
@@ -437,8 +429,6 @@ const handleNextLine = useCallback(() => {
               currentMood: mood,
               currentForm: companionForm,
               servicesCount: 5,
-              allowSecret,
-              allowDebug,
             }}
             onThinking={applyAtriThinking}
             onResponse={applyAtriBrainResponse}

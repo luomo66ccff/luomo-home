@@ -3,10 +3,12 @@ export function normalizeMotionRef(motion?: string): { group?: string; index: nu
   return { group: motion, index: 0 };
 }
 
-function log(level: string, msg: string, data: any) {
+function log(level: string, msg: string, data: unknown) {
   if (level === "error") console.error("[Live2D] " + msg, data);
-  else if (level === "warn") console.warn("[Live2D] " + msg, data);
-  else console.info("[Live2D] " + msg, data);
+  else if (process.env.NODE_ENV !== "production" || process.env.NEXT_PUBLIC_ENABLE_DEBUG_LOGS === "true") {
+    if (level === "warn") console.warn("[Live2D] " + msg, data);
+    else console.info("[Live2D] " + msg, data);
+  }
 }
 
 export function applyCompanionExpression(model: any, companionId: string, expression?: string) {
