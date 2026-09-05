@@ -1,0 +1,1158 @@
+{
+  "release": "home-upgrade-t005",
+  "date": "2026-09-05",
+  "unit": {
+    "passed": 40,
+    "platforms": [
+      "Windows / Node 24",
+      "Linux x86_64 / Node 22.23.2"
+    ]
+  },
+  "homepage": {
+    "baseUrl": "https://luomo.moe",
+    "runId": "t009",
+    "screenshots": [
+      "desktop-hero.png",
+      "desktop-full.png",
+      "gallery-dialog.png",
+      "desktop-light.png",
+      "command-dialog.png",
+      "companion-fallback.png",
+      "mobile-390.png",
+      "mobile-services-390.png",
+      "mobile-full.png",
+      "mobile-320.png",
+      "mobile-services-320.png",
+      "mobile-768.png",
+      "mobile-services-768.png",
+      "companion-standard.png"
+    ],
+    "checks": [
+      "Homepage HTTP 200",
+      "One accessible page title",
+      "desktop: no horizontal overflow",
+      "First visit keeps companion closed",
+      "All homepage anchors resolve",
+      "All external new-window links isolate opener",
+      "Images decode successfully",
+      "Service dialog opens",
+      "Service dialog restores focus",
+      "All six worlds expand",
+      "Gallery navigation advances",
+      "Gallery restores its trigger focus",
+      "Build tabs support arrow-key selection",
+      "Light theme is applied",
+      "Theme survives reload",
+      "Repeated particle off stays off",
+      "Status command updates after its refresh",
+      "ATRI command opens companion",
+      "ATRI command focuses its input",
+      "Chat releases input after reply",
+      "Homepage HTTP 200",
+      "One accessible page title",
+      "390px: no horizontal overflow",
+      "390px mobile navigation expands",
+      "390px navigation closes after selection",
+      "390px services: no horizontal overflow",
+      "390px service dialog: no horizontal overflow",
+      "390px companion opens",
+      "390px companion: no horizontal overflow",
+      "Homepage HTTP 200",
+      "One accessible page title",
+      "320px: no horizontal overflow",
+      "320px mobile navigation expands",
+      "320px navigation closes after selection",
+      "320px services: no horizontal overflow",
+      "320px service dialog: no horizontal overflow",
+      "320px companion opens",
+      "320px companion: no horizontal overflow",
+      "Homepage HTTP 200",
+      "One accessible page title",
+      "768px: no horizontal overflow",
+      "768px mobile navigation expands",
+      "768px navigation closes after selection",
+      "768px services: no horizontal overflow",
+      "768px service dialog: no horizontal overflow",
+      "768px companion opens",
+      "768px companion: no horizontal overflow",
+      "Failed status request leaves loading and offers retry",
+      "Status retry recovers",
+      "All-down snapshot displays zero, not endless loading",
+      "Homepage HTTP 200",
+      "One accessible page title",
+      "IME Enter does not send an unfinished message",
+      "Chat HTTP error preserves the draft",
+      "Chat error releases the input lock",
+      "Chat can retry after an HTTP error",
+      "No unexpected browser errors in real-data flows"
+    ],
+    "errors": []
+  },
+  "models": {
+    "base": "https://luomo.moe",
+    "checks": [
+      "1440 no bordered image reference",
+      "1440 atri single active canvas",
+      "1440 atri canvas has dimensions",
+      "1440 atri no horizontal overflow",
+      "1440 atri touch responds",
+      "1440 murasame single active canvas",
+      "1440 murasame canvas has dimensions",
+      "1440 murasame no horizontal overflow",
+      "1440 murasame touch responds",
+      "1440 allium single active canvas",
+      "1440 allium canvas has dimensions",
+      "1440 allium no horizontal overflow",
+      "1440 allium touch responds",
+      "1440 closes and releases model",
+      "390 no bordered image reference",
+      "390 atri single active canvas",
+      "390 atri canvas has dimensions",
+      "390 atri no horizontal overflow",
+      "390 atri touch responds",
+      "390 murasame single active canvas",
+      "390 murasame canvas has dimensions",
+      "390 murasame no horizontal overflow",
+      "390 murasame touch responds",
+      "390 allium single active canvas",
+      "390 allium canvas has dimensions",
+      "390 allium no horizontal overflow",
+      "390 allium touch responds",
+      "390 closes and releases model",
+      "No browser errors"
+    ],
+    "errors": [],
+    "models": [
+      {
+        "width": 1440,
+        "id": "atri",
+        "count": 1,
+        "canvas": [
+          {
+            "width": 360,
+            "height": 520
+          }
+        ],
+        "entries": [
+          {
+            "time": "11:52:38",
+            "level": "info",
+            "step": "instance mounted",
+            "detail": {
+              "count": 1,
+              "companionId": "atri",
+              "modelPath": "/live2d/atri/atri_8.model3.json"
+            }
+          },
+          {
+            "time": "11:52:39",
+            "level": "success",
+            "step": "Cubism Core script loaded"
+          },
+          {
+            "time": "11:52:39",
+            "level": "success",
+            "step": "Cubism Core global",
+            "detail": {
+              "hasCore": true
+            }
+          },
+          {
+            "time": "11:52:39",
+            "level": "success",
+            "step": "pixi imported"
+          },
+          {
+            "time": "11:52:39",
+            "level": "success",
+            "step": "pixi-live2d-display/cubism4 imported"
+          },
+          {
+            "time": "11:52:39",
+            "level": "success",
+            "step": "PIXI Application ready",
+            "detail": {
+              "width": 360,
+              "height": 520
+            }
+          },
+          {
+            "time": "11:52:39",
+            "level": "info",
+            "step": "model load start",
+            "detail": {
+              "token": 1,
+              "companionId": "atri",
+              "modelPath": "/live2d/atri/atri_8.model3.json"
+            }
+          },
+          {
+            "time": "11:52:49",
+            "level": "info",
+            "step": "layout applied",
+            "detail": {
+              "companionId": "atri",
+              "boundsSource": "localBounds",
+              "screenW": 360,
+              "screenH": 520,
+              "modelWidth": 2048,
+              "modelHeight": 2048,
+              "currentScaleX": 1,
+              "currentScaleY": 1,
+              "targetHeightRatio": 0.72,
+              "rawScale": 0.1828125,
+              "scale": 0.1828125,
+              "x": 208.79999999999998,
+              "y": 499.2
+            }
+          },
+          {
+            "time": "11:52:49",
+            "level": "info",
+            "step": "model ready",
+            "detail": {
+              "token": 1,
+              "companionId": "atri",
+              "modelPath": "/live2d/atri/atri_8.model3.json",
+              "stageChildren": 1
+            }
+          },
+          {
+            "time": "11:52:49",
+            "level": "success",
+            "step": "model loaded and ready",
+            "detail": {
+              "companionId": "atri"
+            }
+          },
+          {
+            "time": "11:52:49",
+            "level": "success",
+            "step": "ATRI active forms apply",
+            "detail": {
+              "ok": true,
+              "applied": []
+            }
+          },
+          {
+            "time": "11:52:50",
+            "level": "success",
+            "step": "companion motion apply",
+            "detail": {
+              "ok": true,
+              "companionId": "atri",
+              "motion": "model",
+              "api": "model.motion(group,0)"
+            }
+          },
+          {
+            "time": "11:52:50",
+            "level": "success",
+            "step": "companion expression apply",
+            "detail": {
+              "ok": true,
+              "companionId": "atri",
+              "expression": "expression1",
+              "api": "model.expression(name)"
+            }
+          }
+        ],
+        "overflow": false
+      },
+      {
+        "width": 1440,
+        "id": "murasame",
+        "count": 1,
+        "canvas": [
+          {
+            "width": 360,
+            "height": 520
+          }
+        ],
+        "entries": [
+          {
+            "time": "11:52:51",
+            "level": "info",
+            "step": "instance unmounted",
+            "detail": {
+              "count": 0,
+              "companionId": "atri",
+              "modelPath": "/live2d/atri/atri_8.model3.json"
+            }
+          },
+          {
+            "time": "11:52:51",
+            "level": "info",
+            "step": "canvas unmount destroy app"
+          },
+          {
+            "time": "11:52:51",
+            "level": "info",
+            "step": "model load effect cleanup",
+            "detail": {
+              "token": 1,
+              "companionId": "atri",
+              "modelPath": "/live2d/atri/atri_8.model3.json"
+            }
+          },
+          {
+            "time": "11:52:51",
+            "level": "info",
+            "step": "instance mounted",
+            "detail": {
+              "count": 1,
+              "companionId": "murasame",
+              "modelPath": "/live2d/companions/murasame/Murasame.model3.json"
+            }
+          },
+          {
+            "time": "11:52:51",
+            "level": "info",
+            "step": "instance unmounted",
+            "detail": {
+              "count": 0,
+              "companionId": "murasame",
+              "modelPath": "/live2d/companions/murasame/Murasame.model3.json"
+            }
+          },
+          {
+            "time": "11:52:51",
+            "level": "info",
+            "step": "canvas unmount destroy app"
+          },
+          {
+            "time": "11:52:51",
+            "level": "info",
+            "step": "instance mounted",
+            "detail": {
+              "count": 1,
+              "companionId": "murasame",
+              "modelPath": "/live2d/companions/murasame/Murasame.model3.json"
+            }
+          },
+          {
+            "time": "11:52:52",
+            "level": "success",
+            "step": "Cubism Core script loaded"
+          },
+          {
+            "time": "11:52:52",
+            "level": "success",
+            "step": "Cubism Core global",
+            "detail": {
+              "hasCore": true
+            }
+          },
+          {
+            "time": "11:52:52",
+            "level": "success",
+            "step": "pixi imported"
+          },
+          {
+            "time": "11:52:52",
+            "level": "success",
+            "step": "pixi-live2d-display/cubism4 imported"
+          },
+          {
+            "time": "11:52:52",
+            "level": "success",
+            "step": "PIXI Application ready",
+            "detail": {
+              "width": 360,
+              "height": 520
+            }
+          },
+          {
+            "time": "11:52:52",
+            "level": "info",
+            "step": "model load start",
+            "detail": {
+              "token": 1,
+              "companionId": "murasame",
+              "modelPath": "/live2d/companions/murasame/Murasame.model3.json"
+            }
+          },
+          {
+            "time": "11:52:56",
+            "level": "info",
+            "step": "layout applied",
+            "detail": {
+              "companionId": "murasame",
+              "boundsSource": "localBounds",
+              "screenW": 360,
+              "screenH": 520,
+              "modelWidth": 1500,
+              "modelHeight": 3000,
+              "currentScaleX": 1,
+              "currentScaleY": 1,
+              "targetHeightRatio": 0.66,
+              "rawScale": 0.1144,
+              "scale": 0.1144,
+              "x": 224,
+              "y": 526.8
+            }
+          },
+          {
+            "time": "11:52:56",
+            "level": "info",
+            "step": "model ready",
+            "detail": {
+              "token": 1,
+              "companionId": "murasame",
+              "modelPath": "/live2d/companions/murasame/Murasame.model3.json",
+              "stageChildren": 1
+            }
+          },
+          {
+            "time": "11:52:56",
+            "level": "success",
+            "step": "model loaded and ready",
+            "detail": {
+              "companionId": "murasame"
+            }
+          },
+          {
+            "time": "11:52:56",
+            "level": "success",
+            "step": "companion motion apply",
+            "detail": {
+              "ok": true,
+              "companionId": "murasame",
+              "motion": "Idle",
+              "api": "model.motion(group,0)"
+            }
+          },
+          {
+            "time": "11:52:56",
+            "level": "success",
+            "step": "companion expression apply",
+            "detail": {
+              "ok": true,
+              "companionId": "murasame",
+              "expression": "exp2.exp3",
+              "api": "model.expression(name)"
+            }
+          }
+        ],
+        "overflow": false
+      },
+      {
+        "width": 1440,
+        "id": "allium",
+        "count": 1,
+        "canvas": [
+          {
+            "width": 360,
+            "height": 520
+          }
+        ],
+        "entries": [
+          {
+            "time": "11:52:57",
+            "level": "info",
+            "step": "instance unmounted",
+            "detail": {
+              "count": 0,
+              "companionId": "murasame",
+              "modelPath": "/live2d/companions/murasame/Murasame.model3.json"
+            }
+          },
+          {
+            "time": "11:52:57",
+            "level": "info",
+            "step": "canvas unmount destroy app"
+          },
+          {
+            "time": "11:52:57",
+            "level": "info",
+            "step": "model load effect cleanup",
+            "detail": {
+              "token": 1,
+              "companionId": "murasame",
+              "modelPath": "/live2d/companions/murasame/Murasame.model3.json"
+            }
+          },
+          {
+            "time": "11:52:57",
+            "level": "info",
+            "step": "instance mounted",
+            "detail": {
+              "count": 1,
+              "companionId": "allium",
+              "modelPath": "/live2d/companions/allium/ariu/ariu.model3.json"
+            }
+          },
+          {
+            "time": "11:52:57",
+            "level": "info",
+            "step": "instance unmounted",
+            "detail": {
+              "count": 0,
+              "companionId": "allium",
+              "modelPath": "/live2d/companions/allium/ariu/ariu.model3.json"
+            }
+          },
+          {
+            "time": "11:52:57",
+            "level": "info",
+            "step": "canvas unmount destroy app"
+          },
+          {
+            "time": "11:52:58",
+            "level": "info",
+            "step": "instance mounted",
+            "detail": {
+              "count": 1,
+              "companionId": "allium",
+              "modelPath": "/live2d/companions/allium/ariu/ariu.model3.json"
+            }
+          },
+          {
+            "time": "11:52:58",
+            "level": "success",
+            "step": "Cubism Core script loaded"
+          },
+          {
+            "time": "11:52:58",
+            "level": "success",
+            "step": "Cubism Core global",
+            "detail": {
+              "hasCore": true
+            }
+          },
+          {
+            "time": "11:52:58",
+            "level": "success",
+            "step": "pixi imported"
+          },
+          {
+            "time": "11:52:58",
+            "level": "success",
+            "step": "pixi-live2d-display/cubism4 imported"
+          },
+          {
+            "time": "11:52:58",
+            "level": "success",
+            "step": "PIXI Application ready",
+            "detail": {
+              "width": 360,
+              "height": 520
+            }
+          },
+          {
+            "time": "11:52:58",
+            "level": "info",
+            "step": "model load start",
+            "detail": {
+              "token": 1,
+              "companionId": "allium",
+              "modelPath": "/live2d/companions/allium/ariu/ariu.model3.json"
+            }
+          },
+          {
+            "time": "11:53:10",
+            "level": "info",
+            "step": "layout applied",
+            "detail": {
+              "companionId": "allium",
+              "boundsSource": "localBounds",
+              "screenW": 360,
+              "screenH": 520,
+              "modelWidth": 2846,
+              "modelHeight": 5482,
+              "currentScaleX": 1,
+              "currentScaleY": 1,
+              "targetHeightRatio": 0.54,
+              "rawScale": 0.05122218168551624,
+              "scale": 0.05122218168551624,
+              "x": 235.2,
+              "y": 526.8
+            }
+          },
+          {
+            "time": "11:53:10",
+            "level": "info",
+            "step": "model ready",
+            "detail": {
+              "token": 1,
+              "companionId": "allium",
+              "modelPath": "/live2d/companions/allium/ariu/ariu.model3.json",
+              "stageChildren": 1
+            }
+          },
+          {
+            "time": "11:53:10",
+            "level": "success",
+            "step": "model loaded and ready",
+            "detail": {
+              "companionId": "allium"
+            }
+          }
+        ],
+        "overflow": false
+      },
+      {
+        "width": 390,
+        "id": "atri",
+        "count": 1,
+        "canvas": [
+          {
+            "width": 180,
+            "height": 260
+          }
+        ],
+        "entries": [
+          {
+            "time": "11:53:16",
+            "level": "info",
+            "step": "instance mounted",
+            "detail": {
+              "count": 1,
+              "companionId": "atri",
+              "modelPath": "/live2d/atri/atri_8.model3.json"
+            }
+          },
+          {
+            "time": "11:53:17",
+            "level": "success",
+            "step": "Cubism Core script loaded"
+          },
+          {
+            "time": "11:53:17",
+            "level": "success",
+            "step": "Cubism Core global",
+            "detail": {
+              "hasCore": true
+            }
+          },
+          {
+            "time": "11:53:17",
+            "level": "success",
+            "step": "pixi imported"
+          },
+          {
+            "time": "11:53:17",
+            "level": "success",
+            "step": "pixi-live2d-display/cubism4 imported"
+          },
+          {
+            "time": "11:53:17",
+            "level": "success",
+            "step": "PIXI Application ready",
+            "detail": {
+              "width": 180,
+              "height": 260
+            }
+          },
+          {
+            "time": "11:53:17",
+            "level": "info",
+            "step": "model load start",
+            "detail": {
+              "token": 1,
+              "companionId": "atri",
+              "modelPath": "/live2d/atri/atri_8.model3.json"
+            }
+          },
+          {
+            "time": "11:53:24",
+            "level": "info",
+            "step": "layout applied",
+            "detail": {
+              "companionId": "atri",
+              "boundsSource": "localBounds",
+              "screenW": 180,
+              "screenH": 260,
+              "modelWidth": 2048,
+              "modelHeight": 2048,
+              "currentScaleX": 1,
+              "currentScaleY": 1,
+              "targetHeightRatio": 0.58,
+              "rawScale": 0.07363281249999999,
+              "scale": 0.07363281249999999,
+              "x": 104.39999999999999,
+              "y": 262.79999999999995
+            }
+          },
+          {
+            "time": "11:53:24",
+            "level": "info",
+            "step": "model ready",
+            "detail": {
+              "token": 1,
+              "companionId": "atri",
+              "modelPath": "/live2d/atri/atri_8.model3.json",
+              "stageChildren": 1
+            }
+          },
+          {
+            "time": "11:53:24",
+            "level": "success",
+            "step": "model loaded and ready",
+            "detail": {
+              "companionId": "atri"
+            }
+          },
+          {
+            "time": "11:53:24",
+            "level": "success",
+            "step": "ATRI active forms apply",
+            "detail": {
+              "ok": true,
+              "applied": []
+            }
+          },
+          {
+            "time": "11:53:24",
+            "level": "success",
+            "step": "companion expression apply",
+            "detail": {
+              "ok": true,
+              "companionId": "atri",
+              "expression": "expression1",
+              "api": "model.expression(name)"
+            }
+          },
+          {
+            "time": "11:53:24",
+            "level": "success",
+            "step": "companion motion apply",
+            "detail": {
+              "ok": true,
+              "companionId": "atri",
+              "motion": "model",
+              "api": "model.motion(group,0)"
+            }
+          }
+        ],
+        "overflow": false
+      },
+      {
+        "width": 390,
+        "id": "murasame",
+        "count": 1,
+        "canvas": [
+          {
+            "width": 180,
+            "height": 260
+          }
+        ],
+        "entries": [
+          {
+            "time": "11:53:25",
+            "level": "info",
+            "step": "instance unmounted",
+            "detail": {
+              "count": 0,
+              "companionId": "atri",
+              "modelPath": "/live2d/atri/atri_8.model3.json"
+            }
+          },
+          {
+            "time": "11:53:25",
+            "level": "info",
+            "step": "canvas unmount destroy app"
+          },
+          {
+            "time": "11:53:25",
+            "level": "info",
+            "step": "model load effect cleanup",
+            "detail": {
+              "token": 1,
+              "companionId": "atri",
+              "modelPath": "/live2d/atri/atri_8.model3.json"
+            }
+          },
+          {
+            "time": "11:53:25",
+            "level": "info",
+            "step": "instance mounted",
+            "detail": {
+              "count": 1,
+              "companionId": "murasame",
+              "modelPath": "/live2d/companions/murasame/Murasame.model3.json"
+            }
+          },
+          {
+            "time": "11:53:25",
+            "level": "info",
+            "step": "instance unmounted",
+            "detail": {
+              "count": 0,
+              "companionId": "murasame",
+              "modelPath": "/live2d/companions/murasame/Murasame.model3.json"
+            }
+          },
+          {
+            "time": "11:53:25",
+            "level": "info",
+            "step": "canvas unmount destroy app"
+          },
+          {
+            "time": "11:53:26",
+            "level": "info",
+            "step": "instance mounted",
+            "detail": {
+              "count": 1,
+              "companionId": "murasame",
+              "modelPath": "/live2d/companions/murasame/Murasame.model3.json"
+            }
+          },
+          {
+            "time": "11:53:26",
+            "level": "success",
+            "step": "Cubism Core script loaded"
+          },
+          {
+            "time": "11:53:26",
+            "level": "success",
+            "step": "Cubism Core global",
+            "detail": {
+              "hasCore": true
+            }
+          },
+          {
+            "time": "11:53:26",
+            "level": "success",
+            "step": "pixi imported"
+          },
+          {
+            "time": "11:53:26",
+            "level": "success",
+            "step": "pixi-live2d-display/cubism4 imported"
+          },
+          {
+            "time": "11:53:26",
+            "level": "success",
+            "step": "PIXI Application ready",
+            "detail": {
+              "width": 180,
+              "height": 260
+            }
+          },
+          {
+            "time": "11:53:26",
+            "level": "info",
+            "step": "model load start",
+            "detail": {
+              "token": 1,
+              "companionId": "murasame",
+              "modelPath": "/live2d/companions/murasame/Murasame.model3.json"
+            }
+          },
+          {
+            "time": "11:53:30",
+            "level": "info",
+            "step": "layout applied",
+            "detail": {
+              "companionId": "murasame",
+              "boundsSource": "localBounds",
+              "screenW": 180,
+              "screenH": 260,
+              "modelWidth": 1500,
+              "modelHeight": 3000,
+              "currentScaleX": 1,
+              "currentScaleY": 1,
+              "targetHeightRatio": 0.56,
+              "rawScale": 0.04853333333333334,
+              "scale": 0.04853333333333334,
+              "x": 104.39999999999999,
+              "y": 270
+            }
+          },
+          {
+            "time": "11:53:30",
+            "level": "info",
+            "step": "model ready",
+            "detail": {
+              "token": 1,
+              "companionId": "murasame",
+              "modelPath": "/live2d/companions/murasame/Murasame.model3.json",
+              "stageChildren": 1
+            }
+          },
+          {
+            "time": "11:53:30",
+            "level": "success",
+            "step": "model loaded and ready",
+            "detail": {
+              "companionId": "murasame"
+            }
+          },
+          {
+            "time": "11:53:30",
+            "level": "warn",
+            "step": "companion motion apply",
+            "detail": {
+              "ok": false,
+              "companionId": "murasame",
+              "motion": "Idle",
+              "reason": "motion manager rejected motion"
+            }
+          },
+          {
+            "time": "11:53:30",
+            "level": "success",
+            "step": "companion expression apply",
+            "detail": {
+              "ok": true,
+              "companionId": "murasame",
+              "expression": "exp2.exp3",
+              "api": "model.expression(name)"
+            }
+          }
+        ],
+        "overflow": false
+      },
+      {
+        "width": 390,
+        "id": "allium",
+        "count": 1,
+        "canvas": [
+          {
+            "width": 180,
+            "height": 260
+          }
+        ],
+        "entries": [
+          {
+            "time": "11:53:31",
+            "level": "info",
+            "step": "instance unmounted",
+            "detail": {
+              "count": 0,
+              "companionId": "murasame",
+              "modelPath": "/live2d/companions/murasame/Murasame.model3.json"
+            }
+          },
+          {
+            "time": "11:53:31",
+            "level": "info",
+            "step": "canvas unmount destroy app"
+          },
+          {
+            "time": "11:53:32",
+            "level": "info",
+            "step": "model load effect cleanup",
+            "detail": {
+              "token": 1,
+              "companionId": "murasame",
+              "modelPath": "/live2d/companions/murasame/Murasame.model3.json"
+            }
+          },
+          {
+            "time": "11:53:32",
+            "level": "info",
+            "step": "instance mounted",
+            "detail": {
+              "count": 1,
+              "companionId": "allium",
+              "modelPath": "/live2d/companions/allium/ariu/ariu.model3.json"
+            }
+          },
+          {
+            "time": "11:53:32",
+            "level": "info",
+            "step": "instance unmounted",
+            "detail": {
+              "count": 0,
+              "companionId": "allium",
+              "modelPath": "/live2d/companions/allium/ariu/ariu.model3.json"
+            }
+          },
+          {
+            "time": "11:53:32",
+            "level": "info",
+            "step": "canvas unmount destroy app"
+          },
+          {
+            "time": "11:53:32",
+            "level": "info",
+            "step": "instance mounted",
+            "detail": {
+              "count": 1,
+              "companionId": "allium",
+              "modelPath": "/live2d/companions/allium/ariu/ariu.model3.json"
+            }
+          },
+          {
+            "time": "11:53:33",
+            "level": "success",
+            "step": "Cubism Core script loaded"
+          },
+          {
+            "time": "11:53:33",
+            "level": "success",
+            "step": "Cubism Core global",
+            "detail": {
+              "hasCore": true
+            }
+          },
+          {
+            "time": "11:53:33",
+            "level": "success",
+            "step": "pixi imported"
+          },
+          {
+            "time": "11:53:33",
+            "level": "success",
+            "step": "pixi-live2d-display/cubism4 imported"
+          },
+          {
+            "time": "11:53:33",
+            "level": "success",
+            "step": "PIXI Application ready",
+            "detail": {
+              "width": 180,
+              "height": 260
+            }
+          },
+          {
+            "time": "11:53:33",
+            "level": "info",
+            "step": "model load start",
+            "detail": {
+              "token": 1,
+              "companionId": "allium",
+              "modelPath": "/live2d/companions/allium/ariu/ariu.model3.json"
+            }
+          },
+          {
+            "time": "11:53:46",
+            "level": "info",
+            "step": "layout applied",
+            "detail": {
+              "companionId": "allium",
+              "boundsSource": "localBounds",
+              "screenW": 180,
+              "screenH": 260,
+              "modelWidth": 2846,
+              "modelHeight": 5482,
+              "currentScaleX": 1,
+              "currentScaleY": 1,
+              "targetHeightRatio": 0.46,
+              "rawScale": 0.02181685516234951,
+              "scale": 0.03,
+              "x": 108,
+              "y": 270
+            }
+          },
+          {
+            "time": "11:53:46",
+            "level": "info",
+            "step": "model ready",
+            "detail": {
+              "token": 1,
+              "companionId": "allium",
+              "modelPath": "/live2d/companions/allium/ariu/ariu.model3.json",
+              "stageChildren": 1
+            }
+          },
+          {
+            "time": "11:53:46",
+            "level": "success",
+            "step": "model loaded and ready",
+            "detail": {
+              "companionId": "allium"
+            }
+          }
+        ],
+        "overflow": false
+      }
+    ]
+  },
+  "delayedExpressions": {
+    "base": "https://luomo.moe",
+    "completed": 6,
+    "errors": [],
+    "delayedRequests": 6
+  },
+  "http": {
+    "base": "https://luomo.moe",
+    "checks": [
+      "/ HTTP",
+      "Bordered source absent",
+      "Canonical URL",
+      "nosniff header",
+      "/health HTTP",
+      "/api/health HTTP",
+      "/api/status HTTP",
+      "/api/services HTTP",
+      "Public DTO omits internal probe URLs",
+      "/api/companions HTTP",
+      "/robots.txt HTTP",
+      "/sitemap.xml HTTP",
+      "/live2d-test HTTP",
+      "/atri-brain-test HTTP",
+      "www redirects to canonical HTTPS"
+    ],
+    "statuses": [
+      {
+        "path": "/",
+        "status": 200
+      },
+      {
+        "path": "/health",
+        "status": 200
+      },
+      {
+        "path": "/api/health",
+        "status": 200
+      },
+      {
+        "path": "/api/status",
+        "status": 200
+      },
+      {
+        "path": "/api/services",
+        "status": 200
+      },
+      {
+        "path": "/api/companions",
+        "status": 200
+      },
+      {
+        "path": "/robots.txt",
+        "status": 200
+      },
+      {
+        "path": "/sitemap.xml",
+        "status": 200
+      },
+      {
+        "path": "/live2d-test",
+        "status": 404
+      },
+      {
+        "path": "/atri-brain-test",
+        "status": 404
+      }
+    ],
+    "services": [
+      {
+        "id": "ops",
+        "status": "operational"
+      },
+      {
+        "id": "file",
+        "status": "operational"
+      },
+      {
+        "id": "api",
+        "status": "operational"
+      },
+      {
+        "id": "terminal",
+        "status": "operational"
+      },
+      {
+        "id": "atri",
+        "status": "down"
+      }
+    ]
+  },
+  "regressionBaseline": {
+    "completed": 6,
+    "unhandledErrors": 6
+  }
+}
