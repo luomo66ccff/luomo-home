@@ -6,7 +6,8 @@ export async function callAtriApiProvider(
   const baseUrl = process.env.ATRI_API_BASE_URL;
   const token = process.env.ATRI_API_TOKEN;
   const brainPath = process.env.ATRI_API_BRAIN_PATH || "/coze/atri/chat";
-  const timeoutMs = Number(process.env.ATRI_API_TIMEOUT_MS || 8000);
+  const rawTimeout = Number(process.env.ATRI_API_TIMEOUT_MS || 8000);
+  const timeoutMs = Number.isFinite(rawTimeout) ? Math.max(1000, Math.min(15000, rawTimeout)) : 8000;
 
   if (!baseUrl) {
     throw new Error("ATRI_API_BASE_URL is not configured");

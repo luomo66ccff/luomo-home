@@ -3369,3 +3369,71 @@ canvas + br,
 [data-ext="pixi"] {
   display: none !important;
 }
+/* Shared overlays use the native dialog top layer for focus trapping and background inertness. */
+body { cursor: auto; }
+:focus-visible { outline: 2px solid #afd9cc; outline-offset: 4px; }
+@media(prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
+.luomo-modal { border: 1px solid var(--home-line,#334155); border-radius: 12px; padding: 28px; margin: auto; background: var(--home-bg,#0b1017); color: var(--home-text,#edf1f6); width: min(500px,calc(100% - 32px)); max-height: min(88dvh,900px); overflow-y: auto; box-shadow: 0 30px 100px #0006; }
+.luomo-modal::backdrop { background: #030812bb; backdrop-filter: blur(7px); }
+.modal-heading { display: flex; align-items: center; justify-content: space-between; gap: 15px; margin-bottom: 20px; }
+.modal-heading p,.modal-heading span { margin-bottom: 0 !important; }
+.luomo-modal .modal-title { font-size: 25px; font-weight: 500; line-height: 1.35; letter-spacing: -.5px; background: none; color: var(--home-text,#edf1f6); }
+.modal-subtitle { margin-top: 8px !important; font-size: 12px; color: var(--home-muted,#a3adbd); }
+.modal-status { display: flex; align-items: center; gap: 8px; margin-top: 17px !important; font-size: 12px; }
+.modal-description { font-size: 13px; color: var(--home-muted,#a3adbd); line-height: 1.9; margin-top: 18px !important; }
+.modal-note { font-size: 11px; line-height: 1.8; color: var(--home-dim,#8490a2); margin: 20px 0 !important; }
+.gallery-modal { width: min(980px,calc(100% - 32px)); }
+.lightbox-image { position: relative; width: 100%; height: min(58dvh,620px); border-radius: 6px; overflow: hidden; }
+.lightbox-image > span { display: grid; position: absolute; inset: 0; place-items: center; color: white; font-size: 14px; }
+.lightbox-footer { display: flex; align-items: center; justify-content: space-between; gap: 25px; margin-top: 20px; }
+.lightbox-footer .modal-description { margin-top: 6px !important; font-size: 12px; }
+.lightbox-controls { display: flex; gap: 12px; flex-shrink: 0; }
+.command-modal { padding: 0; width: min(590px,calc(100% - 28px)); }
+.command-search { display: flex; align-items: center; gap: 12px; padding: 14px 18px; border-bottom: 1px solid var(--home-line); color: var(--home-muted); }
+.command-search input { background: transparent; border: 0; color: var(--home-text); min-width: 0; flex: 1; outline: none; font-size: 13px; min-height: 42px; }
+.command-search input::placeholder { color: var(--home-dim); }
+.command-results { max-height: min(48dvh,400px); overflow-y: auto; padding: 9px; }
+.command-option { display: flex; align-items: center; justify-content: space-between; gap: 18px; border-radius: 5px; padding: 13px 15px; color: var(--home-muted); cursor: pointer; }
+.command-option strong { font-weight: 450; font-size: 13px; display: block; }
+.command-option small { font-size: 10px; color: var(--home-dim); display: block; margin-top: 5px; font-family: var(--font-mono); }
+.command-option.selected,.command-option:hover { color: var(--home-accent); background: var(--home-surface); }
+.command-output { font-size: 12px; white-space: pre-wrap; padding: 18px; margin: 10px !important; border: 1px solid var(--home-line); border-radius: 5px; color: var(--home-accent); line-height: 1.9; }
+.command-empty { font-size: 13px; color: var(--home-dim); padding: 35px 20px; text-align: center; }
+.command-footer { display: flex; justify-content: space-between; border-top: 1px solid var(--home-line); padding: 14px 22px; font-size: 10px; color: var(--home-dim); }
+@media(max-width:760px) { .luomo-modal { padding: 20px; } .command-modal { padding: 0; } .lightbox-footer { align-items: flex-start; gap: 12px; } .lightbox-footer .modal-title { font-size: 20px; } .lightbox-controls { gap: 0; } .lightbox-image { height: 47dvh; } }
+.scroll-progress { height: 2px; background: #afd9cc; }
+.luomo-back-top { position: fixed; right: 23px; bottom: 88px; width: 44px; height: 44px; display: grid; place-items: center; border: 1px solid var(--home-line,#334155); border-radius: 50%; background: var(--home-surface,#111822); color: var(--home-muted,#a3adbd); z-index: 35; }
+.luomo-back-top:hover { color: var(--home-accent,#afd9cc); }
+.luomo-starfield { position: fixed; inset: 0; width: 100%; height: 100%; pointer-events: none; z-index: 2; }
+.route-message { min-height: 100dvh; background: #0b1017; color: #ecf0f4; display: grid; place-items: center; padding: 40px 24px; }
+.route-message > div { max-width: 580px; }
+.route-message svg { color: #afd9cc; }
+.route-message .route-eyebrow { color: #8d9cad; font: 10px var(--font-mono); letter-spacing: 2px; margin-top: 25px; }
+.route-message h1 { background: none; color: #ecf0f4; font-size: clamp(40px,7vw,62px); font-weight: 500; line-height: 1.35; margin-top: 23px; text-shadow: none; }
+.route-message p:not(.route-eyebrow) { color: #a3adbd; font-size: 13px; line-height: 2; margin-top: 22px; }
+.route-message a,.route-message button { display: inline-flex; align-items: center; gap: 14px; margin-top: 32px; padding: 13px 20px; border: 1px solid #46605a; border-radius: 5px; font-size: 13px; background: #15231f; color: #cce4da; cursor: pointer; }
+.luomo-companion-dock { position: fixed; bottom: 20px; right: 20px; z-index: 90; width: min(360px, calc(100vw - 32px)); pointer-events: none; }
+.companion-launcher { margin-left: auto; display: grid; place-items: center; width: 52px; height: 52px; border: 1px solid var(--home-line); border-radius: 50%; background: var(--home-raised); color: var(--home-accent); box-shadow: 0 8px 28px #0003; pointer-events: auto; }
+.companion-launcher span { font-size: 27px; }
+.companion-panel { position: relative; z-index: 2; background: var(--home-surface); color: var(--home-text); border: 1px solid var(--home-line); border-radius: 18px; padding: 20px; box-shadow: 0 20px 70px #0005; pointer-events: auto; max-height: calc(100dvh - 120px); overflow-y: auto; }
+.companion-heading { display: flex; align-items: start; justify-content: space-between; gap: 12px; }
+.companion-heading strong { font-size: 14px; letter-spacing: .1em; }
+.companion-heading strong span { color: var(--home-accent); }
+.companion-heading small { display: block; margin-top: 6px; font-size: 11px; color: var(--home-muted); }
+.companion-close { width: 36px; height: 36px; border: 1px solid var(--home-line); border-radius: 50%; color: var(--home-muted); font-size: 22px !important; background: var(--home-bg); }
+.companion-panel .companion-dialogue { margin-top: 18px; font-size: 13px; line-height: 1.9; min-height: 48px; overflow-wrap: anywhere; }
+.companion-next { font-size: 11px !important; min-height: 38px; color: var(--home-accent); }
+.companion-panel .companion-note { color: var(--home-muted); font-size: 12px; line-height: 1.7; margin-top: 12px; }
+.companion-panel .companion-switcher > div:first-child { color: var(--home-muted); }
+.companion-panel .companion-switcher > div:last-child { background: var(--home-bg); border-color: var(--home-line); border-radius: 10px; }
+.companion-panel .companion-switcher button { color: var(--home-muted); font-size: 12px; min-height: 34px; box-shadow: none; border-radius: 6px; }
+.companion-panel .companion-switcher button[aria-pressed="true"] { background: var(--home-raised); color: var(--home-accent); }
+.companion-panel [data-model-chat-input] { background: var(--home-bg); color: var(--home-text); border-color: var(--home-line); height: 42px; font-size: 12px; }
+.companion-panel [data-model-chat-input]::placeholder { color: var(--home-dim); }
+.companion-panel [data-model-chat-send] { background: var(--home-accent); color: var(--home-bg); border: none; height: 42px; font-size: 12px; }
+.companion-panel [data-model-chat-send]:hover { background: var(--home-accent); filter: brightness(1.08); }
+.companion-panel [role="alert"] { color: var(--home-danger); }
+.companion-model { position: absolute; right: 0; bottom: calc(100% - 14px); width: 360px; height: 520px; pointer-events: none; }
+.companion-model[data-model-ready="false"] { visibility: hidden; }
+.companion-model[data-model-ready="false"] * { pointer-events: none !important; }
+@media (max-width: 767px) { .luomo-companion-dock { bottom: max(16px, env(safe-area-inset-bottom)); right: 16px; } .companion-panel { max-height: 65dvh; padding: 16px; } .companion-model { width: 180px; height: 260px; } }

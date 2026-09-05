@@ -1,11 +1,11 @@
 export const SECTIONS = [
-  { id: "hero",                   label: "Cloud Core",          navLabel: "Hero",         companionLine: "欢迎抵达 Luomo Cloud。ATRI 已在云端灯塔下苏醒。" },
-  { id: "visual-world",           label: "Visual World",        navLabel: "Visual World",  companionLine: "这里收藏着星光、樱花、海风和未完成的梦。" },
-  { id: "service-constellation",  label: "Service Gates",       navLabel: "Constellation", companionLine: "五道星门围绕云核运转，航路全部校准完成。" },
-  { id: "operations-cockpit",     label: "Operations Cockpit",  navLabel: "Ops Cockpit",   companionLine: "状态信号正在同步。ATRI 会守住这片安静的云海。" },
-  { id: "infrastructure-orbit",   label: "Infrastructure Orbit",navLabel: "Infra Orbit",   companionLine: "底层轨道正在缓慢运行，就像海面下的发电机。" },
-  { id: "build-log",              label: "Build Chronicle",     navLabel: "Build Log",     companionLine: "每一条构建记录，都是写进记忆日志的一页。" },
-  { id: "enter-cloud",            label: "Final Gate",          navLabel: "Enter Cloud",   companionLine: "Final Gate 已展开。请选择你的下一段航路。" },
+  { id: "hero", label: "云端首页", navLabel: "首页", companionLine: "欢迎抵达 Luomo Cloud，云端的灯为你亮着。" },
+  { id: "services", label: "服务入口", navLabel: "服务", companionLine: "在这里，选择你的下一站。" },
+  { id: "projects", label: "项目手记", navLabel: "项目", companionLine: "把一个小小的想法，慢慢做成可以使用的作品。" },
+  { id: "operations", label: "运行状态", navLabel: "状态", companionLine: "服务信号正在同步，我们一起看看吧。" },
+  { id: "worlds", label: "视觉漫游", navLabel: "漫游", companionLine: "这里收藏着星光、樱花、海风和未完成的梦。" },
+  { id: "about", label: "关于洛墨", navLabel: "关于", companionLine: "代码之外，也要给喜欢的事物留一个位置。" },
+  { id: "build", label: "构建记录", navLabel: "构建", companionLine: "每一条构建记录，都是写进记忆的一页。" },
+  { id: "enter", label: "下一站", navLabel: "出发", companionLine: "下一段旅程，由你来选择。" },
 ] as const;
-
 export type SectionId = typeof SECTIONS[number]["id"];

@@ -1,294 +1,68 @@
 "use client";
-
-import { useState, useEffect, useRef, useCallback } from "react";
-import { SquareTerminal } from "lucide-react";
-import { useEasterEgg } from "./EasterEgg";
-import EasterEggOverlay from "./EasterEgg";
+import { useState, useEffect, useRef } from "react";
+import { Search, ArrowUpRight, X } from "lucide-react";
+import Modal from "./ui/Modal";
+import EasterEggOverlay, { useEasterEgg } from "./EasterEgg";
+import { SERVICES } from "@/lib/services";
+import { SECTIONS } from "@/content/sections";
+import { atriForms } from "@/lib/live2d/atriForms";
 import type { ThemeMode } from "@/hooks/useLuomoPreferences";
-import type { AtriFormId } from "@/lib/live2d/atriForms";
-
-interface Command {
-  label: string;
-  action: "help" | "whoami" | "status" | "ls" | "cd" | "open" | "theme" | "particles" | "luomo" | "easter" | "clear" | "scroll" | "ask";
-  url?: string;
-  id?: string;
-  arg?: string;
-}
-
-const COMMANDS: Command[] = [
-  { label: "help", action: "help" },
-  { label: "whoami", action: "whoami" },
-  { label: "status", action: "status" },
-  { label: "ls", action: "ls" },
-  { label: "cd projects", action: "cd" },
-  { label: "open ops", action: "open", url: "https://ops.luomo.moe", arg: "ops" },
-  { label: "open file", action: "open", url: "https://file.luomo.moe", arg: "file" },
-  { label: "open api", action: "open", url: "https://api.luomo.moe", arg: "api" },
-  { label: "open terminal", action: "open", url: "https://terminal.luomo.moe", arg: "terminal" },
-  { label: "open bot", action: "open", url: "https://atri-api.luomo.moe", arg: "bot" },
-  { label: "theme dark", action: "theme", arg: "dark" },
-  { label: "theme light", action: "theme", arg: "light" },
-  { label: "theme system", action: "theme", arg: "system" },
-  { label: "particles on", action: "particles", arg: "on" },
-  { label: "particles off", action: "particles", arg: "off" },
-  { label: "luomo", action: "luomo" },
-  { label: "companion", action: "luomo" },
-  { label: "ask atri", action: "ask" },
-  { label: "atri", action: "ask" },
-  { label: "easter egg", action: "easter" },
-  { label: "form default", action: "luomo", arg: "form-default" },
-  { label: "form pajama", action: "luomo", arg: "form-pajama" },
-  { label: "form pajama-pants", action: "luomo", arg: "form-pajamaPants" },
-  { label: "form sandals", action: "luomo", arg: "form-sandals" },
-  { label: "form shoes", action: "luomo", arg: "form-shoes" },
-  { label: "form bird", action: "luomo", arg: "form-bird" },
-  { label: "form kani", action: "luomo", arg: "form-kani" },
-  { label: "form pillow-left", action: "luomo", arg: "form-pillowLeft" },
-  { label: "form pillow-right", action: "luomo", arg: "form-pillowRight" },
-  { label: "unlock secret forms", action: "luomo", arg: "unlock-secret" },
-  { label: "lock secret forms", action: "luomo", arg: "lock-secret" },
-  { label: "unlock debug forms", action: "luomo", arg: "unlock-debug" },
-  { label: "lock debug forms", action: "luomo", arg: "lock-debug" },
-  { label: "clear", action: "clear" },
-  { label: "jump hero", action: "scroll", id: "hero" },
-  { label: "jump visual", action: "scroll", id: "worlds" },
-  { label: "jump services", action: "scroll", id: "services" },
-  { label: "jump cockpit", action: "scroll", id: "operations" },
-  { label: "jump orbit", action: "scroll", id: "operations" },
-  { label: "jump log", action: "scroll", id: "build" },
-  { label: "jump gate", action: "scroll", id: "enter" },
-];
-
-type PublicServiceStatus = { status?: string };
-
-function openTrustedService(rawUrl: string): boolean {
-  try {
-    const target = new URL(rawUrl);
-    const trustedHost =
-      target.hostname === "luomo.moe" || target.hostname.endsWith(".luomo.moe");
-    if (target.protocol !== "https:" || !trustedHost) return false;
-    window.open(target.href, "_blank", "noopener,noreferrer");
-    return true;
-  } catch {
-    return false;
-  }
-}
-
-const HELP_TEXT = `Available commands:
-
-  help          Show this help
-  whoami        Who built this cloud
-  status        Fetch service constellation status
-  ls            List accessible services
-  cd projects   Scroll to build log
-  jump <sec>    Jump to section: hero | visual | services | cockpit | orbit | log | gate
-  open <svc>    Open service: ops | file | api | terminal | bot
-  theme <mode>  Set theme: dark | light | system
-  particles <on|off>  Toggle particle effects
-  luomo         Special ATRI greeting
-  easter egg    ???
-  clear         Clear terminal output
-
-Ctrl+K to toggle · Esc to close · ↑↓ to navigate`;
-
-const WHOAMI_TEXT = "Luomo — 五道星门的建造者，云端灯塔的守夜人。The keeper of five glowing gates and the dream beneath the stars.";
-const LS_TEXT = "  ops/  file/  api/  terminal/  atri-api/";
-const LUOMO_TEXT = "ATRI says: \"Hidden star route activated. The cloud knows you were here. ✦\"";
-
-interface Props {
-  onToggleParticles?: () => void;
-  onSetTheme?: (theme: ThemeMode) => void;
-  particlesEnabled?: boolean;
-}
-
-export default function CommandPalette({ onToggleParticles, onSetTheme, particlesEnabled }: Props) {
+import { useServiceStatus } from "./ServiceStatusProvider";
+import styles from "./HomeExperience.module.css";
+type Command = { label: string; description: string; run: () => void };
+export default function CommandPalette({ onToggleParticles, onSetTheme, particlesEnabled }: { onToggleParticles?: () => void; onSetTheme?: (theme: ThemeMode) => void; particlesEnabled?: boolean }) {
   const [open, setOpen] = useState(false);
   const [query, setQuery] = useState("");
-  const [selectedIndex, setSelectedIndex] = useState(0);
-  const [output, setOutput] = useState<string | null>(null);
-  const [easterActive, setEasterActive] = useState(false);
-  const inputRef = useRef<HTMLInputElement>(null);
-
-  useEasterEgg(() => setEasterActive(true));
-
+  const [selected, setSelected] = useState(0);
+  const [output, setOutput] = useState("");
+  const [showStatus, setShowStatus] = useState(false);
+  const [easter, setEaster] = useState(false);
+  const input = useRef<HTMLInputElement>(null);
+  const { data, metrics, refresh, loading, error } = useServiceStatus();
+  useEasterEgg(() => setEaster(true));
   useEffect(() => {
-    const handler = (e: KeyboardEvent) => {
-      if ((e.metaKey || e.ctrlKey) && e.key === "k") {
-        e.preventDefault();
-        setOpen((v) => !v);
-      }
-    };
-    document.addEventListener("keydown", handler);
-    return () => document.removeEventListener("keydown", handler);
+    const toggle = (event: KeyboardEvent) => { if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === "k") { event.preventDefault(); setOpen(v => !v); } };
+    const show = () => setOpen(true);
+    document.addEventListener("keydown", toggle); window.addEventListener("luomo:command", show);
+    return () => { document.removeEventListener("keydown", toggle); window.removeEventListener("luomo:command", show); };
   }, []);
-
-  useEffect(() => { if (open) { setQuery(""); setSelectedIndex(0); setOutput(null); setTimeout(() => inputRef.current?.focus(), 50); } }, [open]);
-
-  const filtered = query.length > 0
-    ? COMMANDS.filter((c) => c.label.toLowerCase().includes(query.toLowerCase()))
-    : COMMANDS;
-
-  const execute = useCallback((cmd: Command) => {
-    switch (cmd.action) {
-      case "help": setOutput(HELP_TEXT); window.dispatchEvent(new CustomEvent("luomo:mood", { detail: { mood: "focused" } })); break;
-      case "whoami": setOutput(WHOAMI_TEXT); break;
-      case "ls": setOutput(LS_TEXT); break;
-      case "cd": document.getElementById("build")?.scrollIntoView({ behavior: "smooth" }); setOutput("cd ~/projects"); break;
-      case "open":
-        setOutput(
-          cmd.url && openTrustedService(cmd.url)
-            ? `Opening ${cmd.arg || "service"}...`
-            : "Blocked an untrusted external URL."
-        );
-        window.dispatchEvent(new CustomEvent("luomo:mood", { detail: { mood: "excited" } }));
-        break;
-      case "theme":
-        onSetTheme?.(cmd.arg as ThemeMode);
-        setOutput(`Theme set to ${cmd.arg}`);
-        break;
-      case "particles":
-        onToggleParticles?.();
-        setOutput(`Particles ${cmd.arg === "on" ? "enabled" : "disabled"}`);
-        break;
-      case "luomo":
-        if (cmd.arg?.startsWith("form-")) {
-          const fid = cmd.arg.replace("form-", "") as AtriFormId;
-          setOutput("ATRI form: " + fid);
-          window.dispatchEvent(new CustomEvent("luomo:mood", { detail: { mood: "system", form: fid } }));
-        } else if (cmd.arg === "unlock-secret") {
-          setOutput("Secret forms unlocked.");
-          window.dispatchEvent(new CustomEvent("luomo:mood", { detail: { mood: "system", allowSecret: true } }));
-        } else if (cmd.arg === "lock-secret") {
-          setOutput("Secret forms locked.");
-          window.dispatchEvent(new CustomEvent("luomo:mood", { detail: { mood: "system", allowSecret: false, form: "default" } }));
-        } else if (cmd.arg === "unlock-debug") {
-          setOutput("Debug forms unlocked.");
-          window.dispatchEvent(new CustomEvent("luomo:mood", { detail: { mood: "system", allowDebug: true } }));
-        } else if (cmd.arg === "lock-debug") {
-          setOutput("Debug forms locked.");
-          window.dispatchEvent(new CustomEvent("luomo:mood", { detail: { mood: "system", allowDebug: false, form: "default" } }));
-        } else {
-          setOutput(LUOMO_TEXT);
-          setEasterActive(true);
-          window.dispatchEvent(new CustomEvent("luomo:mood", { detail: { mood: "secret" } }));
-        }
-        break;
-      case "easter":
-        setOutput("Hidden route unlocked: /march7th");
-        setEasterActive(true);
-        window.dispatchEvent(new CustomEvent("luomo:mood", { detail: { mood: "secret" } }));
-        break;
-      case "clear":
-        setOutput(null);
-        setQuery("");
-        break;
-      case "scroll":
-        if (cmd.id) document.getElementById(cmd.id)?.scrollIntoView({ behavior: "smooth" });
-        setOutput(`Jumping to ${cmd.id}...`);
-        window.dispatchEvent(new CustomEvent("luomo:mood", { detail: { mood: "focused" } }));
-        break;
-      case "status":
-        window.dispatchEvent(new CustomEvent("luomo:mood", { detail: { mood: "system" } }));
-        fetch("/api/services")
-          .then((r) => r.json())
-          .then((d) => {
-            const svcs = (d.services || []) as PublicServiceStatus[];
-            const ops = svcs.filter((service) => service.status === "operational");
-            setOutput(`Cloud Pulse: ${svcs.length} linked · ${ops.length} operational · ${new Date().toLocaleTimeString()}`);
-          })
-          .catch(() => setOutput("Status: degraded / unknown"));
-        break;
-    }
-  }, [onToggleParticles, onSetTheme]);
-
-  const handleKeyDown = (e: React.KeyboardEvent) => {
-    if (e.key === "Escape") { setOpen(false); return; }
-    if (e.key === "ArrowDown") { e.preventDefault(); setSelectedIndex((i) => Math.min(i + 1, filtered.length - 1)); return; }
-    if (e.key === "ArrowUp") { e.preventDefault(); setSelectedIndex((i) => Math.max(i - 1, 0)); return; }
-    if (e.key === "Enter") {
-      const line = query.trim();
-      const match = COMMANDS.find((c) => c.label === line);
-      if (match) { execute(match); setQuery(""); return; }
-      if (filtered.length > 0) { execute(filtered[Math.min(selectedIndex, filtered.length - 1)]); setQuery(""); return; }
-      setOutput(`command not found: ${line}`);
-    }
-  };
-
-  if (!open) {
-    return (
-      <button
-        onClick={() => setOpen(true)}
-        className="fixed bottom-6 left-6 z-40 flex items-center gap-2 px-4 py-2.5 rounded-full
-          glass border border-white/10 text-white/70 hover:text-white hover:border-cyan-300/30
-          transition-all text-xs font-mono active:scale-95"
-        aria-label="Open command palette"
-        style={{ minHeight: "44px", minWidth: "44px" }}
-      >
-        <SquareTerminal className="h-4 w-4 sm:hidden" aria-hidden="true" />
-        <span className="hidden sm:inline text-white/50">Ctrl K</span>
-      </button>
-    );
-  }
-
-  return (
-    <>
-      <EasterEggOverlay active={easterActive} onClose={() => setEasterActive(false)} />
-      <div
-        className="fixed inset-0 z-50 flex items-start justify-center pt-[10vh] bg-black/60 backdrop-blur-sm"
-        onClick={(e) => { if (e.target === e.currentTarget) setOpen(false); }}
-      >
-        <div className="glass-strong rounded-2xl w-full max-w-lg overflow-hidden shadow-2xl border-white/5 flex flex-col" style={{ maxHeight: "min(80vh, 600px)" }}>
-          {/* Input */}
-          <div className="p-3 border-b border-white/5 flex items-center gap-2">
-            <span className="text-cyan-400 font-mono text-xs shrink-0">luomo@cloud-core:~$</span>
-            <input
-              ref={inputRef}
-              type="text"
-              placeholder="type a command..."
-              value={query}
-              onChange={(e) => { setQuery(e.target.value); setSelectedIndex(0); }}
-              onKeyDown={handleKeyDown}
-              className="flex-1 bg-transparent text-white placeholder-slate-600 outline-none text-sm font-mono"
-              autoComplete="off"
-            />
-          </div>
-
-          {/* Suggestions or Command List */}
-          {query.length > 0 && !output && (
-            <div className="max-h-52 overflow-y-auto p-2">
-              {filtered.length === 0 && (
-                <p className="text-slate-500 text-sm p-3 text-center font-mono">command not found: {query}</p>
-              )}
-              {filtered.map((cmd, i) => (
-                <button
-                  key={cmd.label}
-                  onClick={() => { execute(cmd); setQuery(""); }}
-                  className={"w-full text-left px-3 py-2 rounded-lg text-sm transition-all duration-150 flex items-center gap-3 font-mono "
-                    + (i === selectedIndex ? "bg-cyan-500/10 text-cyan-100 border border-cyan-400/20" : "text-slate-400 hover:bg-white/5")}
-                >
-                  <span className="text-cyan-500">{">"}</span>
-                  {cmd.label}
-                </button>
-              ))}
-            </div>
-          )}
-
-          {/* Output */}
-          {output && (
-            <div className="flex-1 overflow-y-auto p-4">
-              <pre className="cmd-feedback whitespace-pre-wrap break-words text-sm">{output}</pre>
-            </div>
-          )}
-
-          {/* Footer */}
-          <div className="p-2 border-t border-white/5 flex gap-4 text-xs text-slate-600 px-3 py-2 font-mono">
-            <span>Esc close</span>
-            <span>↑↓ nav</span>
-            <span>Enter run</span>
-            <span className="ml-auto text-cyan-500/50">v4</span>
-          </div>
-        </div>
-      </div>
-    </>
-  );
+  useEffect(() => { if (open) { setQuery(""); setSelected(0); setOutput(""); setShowStatus(false); input.current?.focus(); } }, [open]);
+  const jump = (id: string) => { setOpen(false); requestAnimationFrame(() => { const target = document.getElementById(id); target?.scrollIntoView({ behavior: "auto" }); }); };
+  const ask = (message = "") => { setOpen(false); setTimeout(() => window.dispatchEvent(new CustomEvent("atri:ask", { detail: { message } })), 0); };
+  const commands: Command[] = [
+    ...SERVICES.map(s => ({ label: "open " + (s.id === "atri" ? "bot" : s.id), description: s.name + " · " + s.worldName, run: () => { window.open(s.url, "_blank", "noopener,noreferrer"); setOpen(false); } })),
+    ...SECTIONS.map(s => ({ label: "jump " + s.id, description: "前往" + s.label, run: () => jump(s.id) })),
+    { label: "ask atri", description: "和 ATRI 聊聊 · 可在指令后输入内容", run: () => ask() },
+    { label: "atri", description: "打开 ATRI 对话", run: () => ask() },
+    { label: "companion", description: "打开云端伙伴", run: () => ask() },
+    { label: "luomo", description: "向云端伙伴打个招呼", run: () => ask() },
+    { label: "status", description: "查看服务状态", run: () => { setShowStatus(true); void refresh(); } },
+    { label: "cd projects", description: "前往项目手记", run: () => jump("projects") },
+    ...(["dark", "light", "system"] as const).map(mode => ({ label: "theme " + mode, description: { dark: "深色主题", light: "浅色主题", system: "跟随系统主题" }[mode], run: () => { onSetTheme?.(mode); setOutput("主题已设置：" + mode); } })),
+    ...(["on", "off"] as const).map(mode => ({ label: "particles " + mode, description: mode === "on" ? "开启星光效果" : "关闭星光效果", run: () => { if (particlesEnabled !== (mode === "on")) onToggleParticles?.(); setOutput(mode === "on" ? "星光已开启（尊重减少动态效果设置）" : "星光已关闭"); } })),
+    ...Object.values(atriForms).filter(f => f.safety === "normal").map(f => ({ label: "form " + ({ leatherShoes: "shoes", pajamaPants: "pajama-pants", pillowLeft: "pillow-left", pillowRight: "pillow-right" }[f.id as string] ?? f.id), description: "ATRI 形态 · " + f.label, run: () => { window.dispatchEvent(new CustomEvent("luomo:mood", { detail: { mood: "system", form: f.id } })); setOutput("已选择 " + f.label + "，安装对应模型后可见。"); } })),
+    { label: "help", description: "快捷指令使用方法", run: () => setOutput("搜索服务、页面或指令。↑↓ 选择，Enter 执行，Esc 关闭。可使用 open ops、theme light、particles off、ask atri 你好。") },
+    { label: "whoami", description: "关于洛墨", run: () => setOutput("洛墨 / Luomo · 学生开发者，好奇心长期持有者。") },
+    { label: "ls", description: "列出服务", run: () => setOutput(SERVICES.map(s => s.name).join(" / ")) },
+    { label: "easter egg", description: "拾起一颗藏起来的星星", run: () => { setEaster(true); setOutput("星光已送达，旅途愉快。"); } },
+    { label: "clear", description: "清除输出", run: () => setOutput("") },
+  ];
+  const normalized = query.trim().toLowerCase();
+  const filtered = commands.filter(c => (c.label + " " + c.description).toLowerCase().includes(normalized))
+    .sort((a, b) => Number(b.label.toLowerCase() === normalized) - Number(a.label.toLowerCase() === normalized));
+  if (/^ask atri\s+\S/i.test(query)) filtered.unshift({ label: query.trim(), description: "发送给 ATRI", run: () => ask(query.trim().replace(/^ask atri\s+/i, "")) });
+  const statusOutput = loading ? "正在获取最新状态…" : error ? error : data ? metrics.operational + " / " + data.services.length + " 项服务正常。" : "暂时没有服务状态。";
+  const visibleOutput = showStatus ? statusOutput : output;
+  const run = (command: Command) => { setShowStatus(false); command.run(); setQuery(""); setSelected(0); input.current?.focus(); };
+  return <><EasterEggOverlay active={easter} onClose={() => setEaster(false)} />{open && <Modal onClose={() => setOpen(false)} label="快捷指令" className="command-modal">
+    <div className="command-search"><Search size={19} /><input ref={input} autoFocus aria-label="搜索快捷指令" aria-controls="command-results" aria-activedescendant={filtered[selected] ? "command-option-" + selected : undefined} role="combobox" aria-expanded="true" aria-autocomplete="list" placeholder="搜索服务、页面，或输入一条指令…" value={query} autoComplete="off" onChange={event => { setQuery(event.target.value); setSelected(0); setOutput(""); setShowStatus(false); }} onKeyDown={event => {
+      if (event.nativeEvent.isComposing) return;
+      if (event.key === "ArrowDown") { event.preventDefault(); setSelected(i => filtered.length ? (i + 1) % filtered.length : 0); }
+      if (event.key === "ArrowUp") { event.preventDefault(); setSelected(i => filtered.length ? (i - 1 + filtered.length) % filtered.length : 0); }
+      if (event.key === "Enter") { event.preventDefault(); if (filtered[selected]) run(filtered[selected]); }
+    }} /><button className={styles.iconButton} onClick={() => setOpen(false)} aria-label="关闭快捷指令"><X size={18} /></button></div>
+    {visibleOutput && <p className="command-output" role="status">{visibleOutput}</p>}
+    <div id="command-results" role="listbox" aria-label="匹配的指令" className="command-results">{filtered.length ? filtered.map((c, i) => <div role="option" aria-selected={i === selected} id={"command-option-" + i} key={c.label} className={"command-option " + (i === selected ? "selected" : "")} onMouseDown={event => event.preventDefault()} onClick={() => run(c)} ref={element => { if (i === selected) element?.scrollIntoView({ block: "nearest" }); }}><span><strong>{c.description}</strong><small>{c.label}</small></span><ArrowUpRight size={14} /></div>) : <p className="command-empty">没有匹配的指令，试试「服务」或「theme」。</p>}</div>
+    <div className="command-footer"><span>↑↓ 选择 · Enter 执行</span><span>Esc 关闭</span></div>
+  </Modal>}</>;
 }

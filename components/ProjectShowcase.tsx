@@ -1,69 +1,24 @@
-"use client";
-
-import { ArrowUpRight } from "lucide-react";
+import Image from "next/image";
+import { ArrowUpRight, Code2 } from "lucide-react";
 import { HOME_PROJECTS } from "@/lib/home-content";
 import styles from "./HomeExperience.module.css";
 
+const covers = ["/assets/gallery/gallery-sci-fi-cockpit-generated.webp", "/assets/gallery/gallery-ocean-memory-generated.webp", "/assets/gallery/gallery-cyber-stage-generated.webp"];
 export default function ProjectShowcase() {
-  return (
-    <div className={styles.sectionInner}>
-      <header className={styles.sectionHeader}>
-        <div>
-          <p className={styles.eyebrow}>Project archive</p>
-          <h2 className={styles.sectionTitle}>一些正在发光的云端造物。</h2>
-        </div>
-        <p className={styles.sectionDescription}>
-          不是作品集橱窗，而是一组持续运行、持续修补、持续长出新枝条的个人项目。
-        </p>
-      </header>
-
-      <div className={styles.projectBoard}>
-        {HOME_PROJECTS.map((project, index) => {
-          const Icon = project.icon;
-          return (
-            <article
-              className={`${styles.projectCard} ${styles[`project-${project.accent}`]}`}
-              key={project.title}
-            >
-              <div className={styles.projectChrome} aria-hidden="true">
-                <span />
-                <span />
-                <span />
-              </div>
-              <div className={styles.projectHeader}>
-                <div className={styles.projectIcon}>
-                  <Icon size={20} />
-                </div>
-                <div>
-                  <span>{project.status}</span>
-                  <h3>{project.title}</h3>
-                  <p>{project.subtitle}</p>
-                </div>
-              </div>
-              <p className={styles.projectDescription}>{project.description}</p>
-              <div className={styles.projectPreview} aria-label={`${project.title} terminal preview`}>
-                {project.preview.map((line) => (
-                  <code key={line}>
-                    <span>{index + 1}</span>
-                    {line}
-                  </code>
-                ))}
-              </div>
-              <div className={styles.projectFooter}>
-                <div className={styles.projectStack}>
-                  {project.stack.map((item) => (
-                    <span key={item}>{item}</span>
-                  ))}
-                </div>
-                <a href={project.href} target="_blank" rel="noopener noreferrer">
-                  Visit
-                  <ArrowUpRight size={14} />
-                </a>
-              </div>
-            </article>
-          );
-        })}
-      </div>
-    </div>
-  );
+  return <div className={styles.sectionInner}>
+    <header className={styles.sectionHeader}><div><p className={styles.eyebrow}>02 / SELECTED WORK</p><h2 className={styles.sectionTitle}>想法落地，<span>就有了形状。</span></h2></div><a href="https://github.com/luomo66ccff" target="_blank" rel="noopener noreferrer" className={styles.textLink}>更多开源项目 <ArrowUpRight size={15} /></a></header>
+    <div className={styles.projectBoard}>{HOME_PROJECTS.map((project, index) => {
+      const Icon = project.icon;
+      return <article className={styles.projectCard} key={project.title}>
+        <a href={project.href} target="_blank" rel="noopener noreferrer" className={styles.projectCover} aria-label={"探索 " + project.title}>
+          <Image src={covers[index]} alt="" fill sizes="(max-width: 760px) 100vw, 33vw" />
+          <span className={styles.projectCoverShade} />
+          <span className={styles.projectIndex}>0{index + 1} / PERSONAL PROJECT</span>
+          <span className={styles.projectEmblem}><Icon size={32} strokeWidth={1.25} /></span>
+          <span className={styles.projectCoverName}>{project.title.replace("Luomo", "")}<ArrowUpRight size={24} /></span>
+        </a>
+        <div className={styles.projectContent}><div className={styles.projectHeader}><h3>{project.title}</h3><span>{project.subtitle}</span></div><p className={styles.projectDescription}>{project.description}</p><div className={styles.projectFooter}><span><Code2 size={14} />{project.stack.join(" / ")}</span><a href={project.href} target="_blank" rel="noopener noreferrer" aria-label={"访问 " + project.title}><ArrowUpRight size={18} /></a></div></div>
+      </article>;
+    })}</div>
+  </div>;
 }

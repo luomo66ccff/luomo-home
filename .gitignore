@@ -21,3 +21,4 @@ app-backup-*
 .backup-*
 __pycache__/
 *.pyc
+output/

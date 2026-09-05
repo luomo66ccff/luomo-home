@@ -2,15 +2,15 @@
 
 <div align="center">
 
-![Luomo Home](https://luomo.moe/assets/hero/hero-witch-journey-generated.webp)
+![Luomo Home](docs/preview-desktop-t003.png)
 
 **个人云服务的首页，也是一个可交互的角色与项目陈列空间。**
 
-[Website](https://luomo.moe) · [Deployment](docs/DEPLOYMENT.md) · [Assets](ASSETS_ATTRIBUTION.md) · [MIT License](LICENSE)
+[升级报告](docs/UPGRADE-t003.md) · [Website](https://luomo.moe) · [Deployment](docs/DEPLOYMENT.md) · [Assets](ASSETS_ATTRIBUTION.md) · [MIT License](LICENSE)
 
 </div>
 
-Luomo Home 用 Next.js 16 把项目入口、服务状态、视觉世界和 Live2D 伙伴收进同一个响应式页面。它不是一张静态导航页：状态卡会读取后端探针，角色系统有独立触摸区域、语音队列和全局聊天锁，移动端则会收束成更轻的浏览体验。
+Luomo Home 用 Next.js 16、React 19 和 TypeScript 把项目入口、服务状态、视觉世界和 Live2D 伙伴收进同一个响应式页面。它不是一张静态导航页：状态卡会读取后端探针，角色系统有独立触摸区域、语音队列和全局聊天锁，移动端则会收束成更轻的浏览体验。
 
 ## Current experience
 
@@ -28,6 +28,7 @@ git clone https://github.com/luomo66ccff/luomo-home.git
 cd luomo-home
 cp .env.example .env.local
 npm ci
+npm run typecheck
 npm run dev
 ```
 
@@ -35,6 +36,7 @@ npm run dev
 
 ```bash
 npm run check:no-secrets
+npm run typecheck
 npm test
 npm run build
 npm run start
@@ -55,17 +57,21 @@ curl http://127.0.0.1:7891/health
 | --- | --- |
 | `NEXT_PUBLIC_SITE_NAME` | 页面品牌名 |
 | `NEXT_PUBLIC_SITE_URL` | canonical、站点地图和分享地址 |
-| `LUOMO_OPS_URL` | 状态与运维入口 |
-| `LUOMO_FILE_URL` | 文件服务入口 |
-| `LUOMO_API_URL` | API Hub 入口 |
-| `LUOMO_TERMINAL_URL` | 私人终端入口 |
-| `LUOMO_ATRI_API_URL` | 可选角色对话后端 |
+| `LUOMO_OPS_URL` | 运维服务的服务端探针地址 |
+| `LUOMO_FILE_URL` | 文件服务的服务端探针地址 |
+| `LUOMO_API_URL` | API Hub 的服务端探针地址 |
+| `LUOMO_TERMINAL_URL` | 终端服务的服务端探针地址 |
+| `LUOMO_ATRI_API_URL` | 角色 API 的服务端探针地址 |
 | `ATRI_BRAIN_PROVIDER` | `scripted`（默认）或显式配置的 `atri-api` |
 | `ATRI_API_TOKEN` | 仅服务端读取的可选桥接 token，不得公开 |
-| `STATUS_FETCH_TIMEOUT_SECONDS` | 单个健康探针超时 |
-| `STATUS_CACHE_SECONDS` | 服务端状态缓存时间 |
+| `STATUS_FETCH_TIMEOUT_SECONDS` | 单次探针超时，1–15 秒，默认 5 秒 |
+| `STATUS_CACHE_SECONDS` | 服务端状态缓存，0–300 秒，默认 30 秒 |
 
 以 `NEXT_PUBLIC_` 开头的值会进入客户端包；不要把 token、密码或内部凭据放进这些变量。
+
+公开服务入口统一在 `lib/services.ts` 配置。`LUOMO_*_URL` 只覆盖服务端探针来源，
+不会作为内部地址返回给浏览器。首页各处共享一次状态请求；状态失败时显示重试入口，
+保留上次有效数据，全部服务离线也会如实显示。
 
 ## Repository map
 
@@ -90,13 +96,38 @@ MIT 许可证覆盖代码，不自动覆盖 `public/live2d` 中的模型、纹�
 
 ```bash
 npm run check:no-secrets
+npm run typecheck
 npm test
 npm run build
 npm run smoke
+npx playwright install chromium
+npm run visual:check
 node scripts/inspect-live2d-models.mjs
 ```
 
-`smoke` 需要已启动的服务。视觉改动应同时检查宽屏、窄屏、减少动态效果模式和角色面板互斥。
+`smoke` 和 `visual:check` 需要已启动的服务，默认地址是
+`http://127.0.0.1:7891`。视觉检查每次运行都会创建新的
+`output/playwright/tNNN/` 目录；也可以用 `VISUAL_CHECK_RUN_ID` 指定一次性
+目录名。默认使用 Playwright 管理的 Chromium；也可以用
+`PLAYWRIGHT_EXECUTABLE_PATH` 指定已安装的兼容浏览器。视觉改动应同时检查
+宽屏、窄屏、减少动态效果模式和角色面板互斥。
+
+如果默认端口已被占用，可以使用备用回环端口：
+
+```bash
+npx next dev -H 127.0.0.1 -p 37891
+BASE_URL=http://127.0.0.1:37891 npm run smoke
+VISUAL_CHECK_URL=http://127.0.0.1:37891 npm run visual:check
+```
+
+GitHub Actions 保留现有秘密扫描、Vitest 和生产构建。
+新增生产 HTTP/浏览器检查的配置见 [CI 补丁](docs/ci-upgrade-t003.patch)；
+当前推送凭据缺少工作流写权限，因此该补丁尚未应用到远端工作流。
+本地浏览器回归覆盖主题持久化、弹窗焦点恢复、画廊、移动导航、快捷指令、聊天与状态错误恢复。
+
+仓库只提交 `public/live2d/README.md`；模型与 Cubism Core 通过私有只读挂载
+提供。`node scripts/inspect-live2d-models.mjs` 会把缺失模型明确标记为
+`MISSING` 并以非零状态退出，避免把只有 README 的目录当成可用模型。
 
 ## Contributing
 

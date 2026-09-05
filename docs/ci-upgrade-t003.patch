@@ -1,0 +1,37 @@
+diff --git a/.github/workflows/ci.yml b/.github/workflows/ci.yml
+index 4dd4567..b52953d 100644
+--- a/.github/workflows/ci.yml
++++ b/.github/workflows/ci.yml
+@@ -19,5 +19,32 @@ jobs:
+           cache: npm
+       - run: npm ci
+       - run: npm run check:no-secrets
++      - run: npm run typecheck
+       - run: npm test
+       - run: npm run build
++      - run: npm run check:no-secrets
++      - run: npx playwright install --with-deps chromium
++      - name: Verify the production server
++        env:
++          BASE_URL: http://127.0.0.1:37891
++          VISUAL_CHECK_URL: http://127.0.0.1:37891
++          VISUAL_CHECK_RUN_ID: ci
++        run: |
++          cp -r public .next/standalone/public
++          cp -r .next/static .next/standalone/.next/static
++          HOSTNAME=127.0.0.1 PORT=37891 node .next/standalone/server.js > /tmp/luomo-home-server.log 2>&1 &
++          server_pid=$!
++          trap 'kill "$server_pid" 2>/dev/null || true' EXIT
++          for attempt in $(seq 1 30); do
++            if curl --fail --silent "$BASE_URL/health" > /dev/null; then break; fi
++            sleep 1
++          done
++          npm run smoke
++          npm run visual:check
++      - name: Keep browser verification evidence
++        if: always()
++        uses: actions/upload-artifact@v4
++        with:
++          name: browser-verification
++          path: output/playwright/ci
++          if-no-files-found: ignore

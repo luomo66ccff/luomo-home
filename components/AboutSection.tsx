@@ -1,36 +1,9 @@
-import { ABOUT_SIGNALS } from "@/lib/home-content";
+import { ArrowUpRight, Code2, Heart, Sparkles } from "lucide-react";
 import styles from "./HomeExperience.module.css";
 
 export default function AboutSection() {
-  return (
-    <div className={styles.sectionInner}>
-      <div className={styles.aboutPanel}>
-        <div className={styles.aboutCopy}>
-          <p className={styles.eyebrow}>About Luomo</p>
-          <h2 className={styles.sectionTitle}>在现实之外，给兴趣搭一座可登录的云端基地。</h2>
-          <p>
-            洛墨是一个学生开发者维护的个人数字空间。这里收纳云服务、API、文件、运维入口、
-            自动化工具和看板娘陪伴，也记录那些从兴趣慢慢变成真实项目的过程。
-          </p>
-          <p>
-            它不想像企业官网，也不想只做漂亮壳子。更像一间漂浮在星空里的工作室：
-            有服务心跳，有终端回声，也有一点二次元灵魂。
-          </p>
-        </div>
-
-        <div className={styles.aboutSignals} aria-label="Luomo keywords">
-          {ABOUT_SIGNALS.map((item) => {
-            const Icon = item.icon;
-            return (
-              <article className={styles.aboutSignal} key={item.label}>
-                <Icon size={17} aria-hidden="true" />
-                <h3>{item.label}</h3>
-                <p>{item.body}</p>
-              </article>
-            );
-          })}
-        </div>
-      </div>
-    </div>
-  );
+  return <div className={styles.sectionInner}><div className={styles.aboutPanel}>
+    <div className={styles.aboutIdentity}><div className={styles.avatarTile}><span>洛</span><small>LUOMO</small><Sparkles size={22} /></div><div><strong>洛墨 / Luomo</strong><p>学生开发者 · 好奇心长期持有者</p></div><span className={styles.aboutLocation}>SOMEWHERE BETWEEN CODE & DREAMS</span></div>
+    <div className={styles.aboutCopy}><p className={styles.eyebrow}>05 / THE HUMAN BEHIND THE CLOUD</p><h2 className={styles.sectionTitle}>认真折腾，<br /><span>也认真喜欢。</span></h2><p>你好呀，我是洛墨。喜欢写代码，也喜欢二次元。日常在服务器、前端、AI 和自动化之间来回穿梭，把脑海里的「要是有这个就好了」一点点变成现实。</p><p>这片云端没有宏大的使命，只是想为喜欢的事物留一个位置。工具可以实用，界面可以漂亮，而技术始终可以有温度。</p><div className={styles.interests}><span><Code2 size={14} /> Build things</span><span><Sparkles size={14} /> Stay curious</span><span><Heart size={14} /> Love the little things</span></div><a href="https://github.com/luomo66ccff" target="_blank" rel="noopener noreferrer" className={styles.textLink}>在 GitHub 找到我 <ArrowUpRight size={15} /></a></div>
+  </div></div>;
 }

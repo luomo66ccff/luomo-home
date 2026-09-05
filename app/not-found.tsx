@@ -1,16 +1,5 @@
 import Link from "next/link";
-
+import { ArrowLeft, Sparkles } from "lucide-react";
 export default function NotFound() {
-  return (
-    <main className="not-found">
-      <div className="luomo-card not-found-card">
-        <p className="eyebrow">Signal Lost</p>
-        <h1>404 · Cloud gate not found</h1>
-        <p className="page-subtitle">The constellation has no route for this little star.</p>
-        <Link className="btn btn-primary" href="/">
-          Return to Luomo Cloud
-        </Link>
-      </div>
-    </main>
-  );
+  return <main className="route-message"><div><Sparkles size={28} /><p className="route-eyebrow">404 / A LITTLE OFF COURSE</p><h1>这颗星星，<br />还没有航线。</h1><p>这个页面可能已经搬走，或地址里藏了一个小小的笔误。<br />先回到云端基地，再选一个目的地吧。</p><Link href="/"><ArrowLeft size={17} /> 返回洛墨首页</Link></div></main>;
 }

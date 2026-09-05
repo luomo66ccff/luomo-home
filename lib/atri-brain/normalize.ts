@@ -45,9 +45,9 @@ export function normalizeBrainOutput(
   const source: AtriBrainResponse["source"] =
     rawSource === "ai" || rawSource === "fallback" ? rawSource : "scripted";
   return {
-    ok: true,
-    source,
-    text: String(raw.text || "").slice(0, 200),
+    ok: raw.ok !== false && typeof raw.text === "string" && raw.text.trim().length > 0,
+    source: raw.ok === false ? "fallback" : source,
+    text: typeof raw.text === "string" && raw.text.trim() ? raw.text.trim().slice(0, 200) : "暂时没有收到有效回复，请稍后再试。",
     mood: sanitizeMood(String(raw.mood || "idle")),
     form: sanitizeForm(raw.form ? String(raw.form) : undefined, allowSecret, allowDebug),
     expression: sanitizeExpression(raw.expression ? String(raw.expression) : undefined),

@@ -1,14 +1,11 @@
 import { NextResponse } from "next/server";
 import { getServicesStatus } from "@/lib/status";
 
+export const dynamic = "force-dynamic";
 export async function GET() {
   try {
-    const payload = await getServicesStatus();
-    return NextResponse.json(payload);
+    return NextResponse.json(await getServicesStatus(), { headers: { "Cache-Control": "no-store" } });
   } catch {
-    return NextResponse.json({
-      services: [],
-      updated_at: new Date().toISOString()
-    });
+    return NextResponse.json({ services: [], updated_at: new Date().toISOString(), error: "status_unavailable" }, { status: 503, headers: { "Cache-Control": "no-store" } });
   }
 }

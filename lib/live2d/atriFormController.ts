@@ -9,7 +9,9 @@ export const knownAtriParameterIds = [
   "Param37", "Param38", "Param39", "Param10",
 ];
 
-let baselineParams: Record<string, number> | null = null;
+// A model can be replaced while the dock remains mounted. Keep each model's
+// baseline separate so a later model never receives parameters from an older one.
+const baselineParamsByModel = new WeakMap<object, Record<string, number>>();
 
 export function getLive2DParameter(model: any, id: string): number | undefined {
   try {
@@ -48,7 +50,9 @@ export function trySetLive2DParam(model: any, id: string, value: number): boolea
 
 export function captureAtriBaseline(model: any) {
   const coreModel = model?.internalModel?.coreModel;
-  if (!coreModel) return { ok: false, reason: "core model missing" };
+  if (!coreModel || (typeof model !== "object" && typeof model !== "function") || model === null) {
+    return { ok: false, reason: "core model missing" };
+  }
 
   const result: Record<string, number> = {};
   for (const paramId of knownAtriParameterIds) {
@@ -56,11 +60,15 @@ export function captureAtriBaseline(model: any) {
     if (typeof value === "number") result[paramId] = value;
   }
 
-  baselineParams = result;
+  baselineParamsByModel.set(model, result);
   return { ok: true, baseline: result };
 }
 
 export function resetAtriFormsToBaseline(model: any) {
+  if (!model || (typeof model !== "object" && typeof model !== "function")) {
+    return { ok: false, reason: "model missing" };
+  }
+  const baselineParams = baselineParamsByModel.get(model);
   if (!baselineParams) return { ok: false, reason: "baseline not captured" };
   for (const [id, value] of Object.entries(baselineParams)) {
     setLive2DParameter(model, id, value);
@@ -82,7 +90,7 @@ export function applyAtriActiveFormsToModel(
     if (!formId) continue;
     const form = (atriForms as Record<string, any>)[formId];
     if (!form) continue;
-    if (form.safety === "secret" && !options.allowSecret && !options.allowDebug) continue;
+    if (form.safety === "secret" && !options.allowSecret) continue;
     if (form.safety === "debug" && !options.allowDebug) continue;
     for (const [param, value] of Object.entries(form.params || {})) {
       if (typeof value === "number") { setLive2DParameter(model, param, value); }
@@ -101,7 +109,7 @@ export function applyAtriForm(model: any, formId: string, allowSecret = false, a
   const formConfig = (atriForms as Record<string, any>)[formId];
   if (!formConfig) return { ok: false, reason: "Unknown form: " + formId };
   const form = formConfig;
-  if (form.safety === "secret" && !allowSecret && !allowDebug) return { ok: false, reason: "secret forms locked" };
+  if (form.safety === "secret" && !allowSecret) return { ok: false, reason: "secret forms locked" };
   if (form.safety === "debug" && !allowDebug) return { ok: false, reason: "debug forms locked" };
 
   const failed: string[] = [];

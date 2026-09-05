@@ -1,96 +1,57 @@
 "use client";
 
-import { useState } from "react";
-import { Activity, Command, Menu, X } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
+import { ArrowUpRight, Command, Menu, Moon, Sun, X } from "lucide-react";
+import { SECTIONS } from "@/content/sections";
+import type { ThemeMode } from "@/hooks/useLuomoPreferences";
 import styles from "./HomeExperience.module.css";
 
-const links = [
-  { label: "Home", href: "#hero" },
-  { label: "Services", href: "#services" },
-  { label: "Projects", href: "#projects" },
-  { label: "About", href: "#about" },
-  { label: "Operations", href: "#operations" },
-  { label: "Build", href: "#build" },
-];
-
-export default function HomeNavigation() {
+const links = SECTIONS.filter(s => ["services", "projects", "worlds", "about"].includes(s.id));
+export default function HomeNavigation({ theme, onSetTheme }: { theme: ThemeMode; onSetTheme: (theme: ThemeMode) => void }) {
   const [open, setOpen] = useState(false);
-
-  const openCommandPalette = () => {
-    document.dispatchEvent(new KeyboardEvent("keydown", { key: "k", ctrlKey: true }));
+  const [active, setActive] = useState("hero");
+  const menuButton = useRef<HTMLButtonElement>(null);
+  const menu = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    const observer = new IntersectionObserver(entries => {
+      const visible = entries.filter(e => e.isIntersecting).sort((a, b) => a.boundingClientRect.top - b.boundingClientRect.top);
+      if (visible[0]) setActive(visible[0].target.id);
+    }, { rootMargin: "-15% 0px -55% 0px" });
+    SECTIONS.forEach(s => { const el = document.getElementById(s.id); if (el) observer.observe(el); });
+    return () => observer.disconnect();
+  }, []);
+  useEffect(() => {
+    if (!open) return;
+    menu.current?.querySelector<HTMLAnchorElement>("a")?.focus();
+    const close = (event: KeyboardEvent) => {
+      if (event.key === "Escape") { setOpen(false); menuButton.current?.focus(); }
+    };
+    const outside = (event: PointerEvent) => {
+      if (!menu.current?.contains(event.target as Node) && !menuButton.current?.contains(event.target as Node)) setOpen(false);
+    };
+    const resize = () => { if (window.innerWidth > 900) setOpen(false); };
+    document.addEventListener("keydown", close);
+    document.addEventListener("pointerdown", outside);
+    window.addEventListener("resize", resize);
+    return () => { document.removeEventListener("keydown", close); document.removeEventListener("pointerdown", outside); window.removeEventListener("resize", resize); };
+  }, [open]);
+  const toggleTheme = () => {
+    const currentlyLight = document.documentElement.dataset.theme === "light";
+    onSetTheme(currentlyLight ? "dark" : "light");
   };
-
   return (
-    <div className={styles.navWrap}>
-      <nav className={styles.nav} aria-label="Primary navigation">
-        <a className={styles.brand} href="#hero" aria-label="Luomo Cloud home">
-          <span className={styles.brandMark}>洛</span>
-          <span className={styles.brandText}>
-            <strong>Luomo</strong>
-            <span>DIGITAL BASE</span>
-          </span>
-        </a>
-
-        <div className={styles.navLinks}>
-          {links.map((link) => (
-            <a className={styles.navLink} href={link.href} key={link.href}>
-              {link.label}
-            </a>
-          ))}
-        </div>
-
+    <header className={styles.navWrap}>
+      <nav className={styles.nav} aria-label="主要导航">
+        <a className={styles.brand} href="#hero" aria-label="Luomo 洛墨首页"><span className={styles.brandMark}>L<span>✳</span></span><strong>luomo<span>.</span></strong><span className={styles.brandNote}>PERSONAL UNIVERSE</span></a>
+        <div className={styles.navLinks}>{links.map(link => <a className={styles.navLink} href={"#" + link.id} key={link.id} aria-current={active === link.id ? "location" : undefined}>{link.label}</a>)}</div>
         <div className={styles.navActions}>
-          <span className={styles.liveLabel}>
-            <Activity size={13} />
-            LIVE
-          </span>
-          <a
-            className={styles.navCta}
-            href="https://ops.luomo.moe"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            进入云端
-          </a>
-          <button
-            className={styles.commandButton}
-            type="button"
-            onClick={openCommandPalette}
-            aria-label="Open command palette"
-            title="Open command palette"
-          >
-            <Command size={16} />
-          </button>
-          <button
-            className={styles.menuButton}
-            type="button"
-            onClick={() => setOpen((value) => !value)}
-            aria-expanded={open}
-            aria-label={open ? "Close navigation" : "Open navigation"}
-            title={open ? "Close navigation" : "Open navigation"}
-          >
-            {open ? <X size={17} /> : <Menu size={17} />}
-          </button>
+          <button className={styles.iconButton} type="button" onClick={toggleTheme} aria-label="切换明暗主题" title={"主题：" + theme}><Sun size={17} className={styles.sunIcon} /><Moon size={17} className={styles.moonIcon} /></button>
+          <button className={styles.commandButton} type="button" onClick={() => window.dispatchEvent(new Event("luomo:command"))} aria-label="打开快捷指令"><Command size={15} /><kbd>K</kbd></button>
+          <a className={styles.navCta} href="#services">进入云端 <ArrowUpRight size={15} /></a>
+          <button ref={menuButton} className={styles.menuButton} type="button" onClick={() => setOpen(v => !v)} aria-expanded={open} aria-controls="mobile-navigation" aria-label={open ? "关闭导航" : "打开导航"}>{open ? <X size={20} /> : <Menu size={20} />}</button>
         </div>
-
-        {open && (
-          <div className={styles.mobileMenu}>
-            {links.map((link) => (
-              <a
-                className={styles.navLink}
-                href={link.href}
-                key={link.href}
-                onClick={() => setOpen(false)}
-              >
-                {link.label}
-              </a>
-            ))}
-            <a className={styles.navLink} href="#enter" onClick={() => setOpen(false)}>
-              进入云端
-            </a>
-          </div>
-        )}
+        {open && <div ref={menu} id="mobile-navigation" className={styles.mobileMenu}>{SECTIONS.map(link => <a href={"#" + link.id} key={link.id} onClick={() => setOpen(false)}>{link.label}<ArrowUpRight size={14} /></a>)}</div>}
       </nav>
-    </div>
+    </header>
   );
 }
