@@ -23,7 +23,7 @@ export const galleryItems: GalleryItem[] = [
     key: "cyber-stage",
     title: "Cyber Stage",
     description: "Neon waveforms echo through the livehouse of the cloud.",
-    src: "/assets/gallery/gallery-cyber-stage-generated.webp",
+    src: "/assets/gallery/gallery-sci-fi-cockpit-generated.webp",
     fallback: "linear-gradient(135deg, #020617, #4c1d95, #0f172a)",
     tags: ["livehouse", "neon", "waveform"],
   },
