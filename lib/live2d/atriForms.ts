@@ -20,7 +20,7 @@ export type AtriActiveForms = Partial<Record<AtriFormSlot, AtriFormId>>;
 export const defaultAtriActiveForms: AtriActiveForms = {};
 
 export const atriForms: Record<AtriFormId, AtriFormConfig> = {
-  default:        { id: "default",        label: "Default",        slot: "outfit",    safety: "normal", params: {},                                         description: "????????" },
+  default:        { id: "default",        label: "Default",        slot: "outfit",    safety: "normal", params: {},                                         description: "恢复模型默认形态" },
   pajama:         { id: "pajama",         label: "Pajama",         slot: "outfit",    safety: "normal", params: { Param18: 30 } },
   pajamaPants:    { id: "pajamaPants",    label: "Pajama Pants",   slot: "bottom",    safety: "normal", params: { Param9: 30 } },
   sandals:        { id: "sandals",        label: "Sandals",        slot: "footwear",  safety: "normal", params: { Param19: 30 } },

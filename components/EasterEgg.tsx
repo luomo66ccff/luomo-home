@@ -1,10 +1,6 @@
 "use client";
 
-import { useEffect, useState, useCallback } from "react";
-
-interface Props {
-  onTrigger?: () => void;
-}
+import { useEffect, useState } from "react";
 
 export function useEasterEgg(onTrigger?: () => void) {
   const [konamiIndex, setKonamiIndex] = useState(0);
@@ -12,6 +8,8 @@ export function useEasterEgg(onTrigger?: () => void) {
 
   useEffect(() => {
     const handler = (e: KeyboardEvent) => {
+      const target = e.target as HTMLElement | null;
+      if (e.isComposing || target?.closest("input, textarea, [contenteditable='true']")) return;
       const next = e.key === konami[konamiIndex] ? konamiIndex + 1 : (e.key === konami[0] ? 1 : 0);
       setKonamiIndex(next);
       if (next === konami.length) {
@@ -38,10 +36,10 @@ export default function EasterEggOverlay({ active, onClose }: { active: boolean;
       <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" />
       <div className="relative z-10 text-center space-y-3">
         <p className="text-2xl font-bold bg-gradient-to-r from-cyan-300 via-pink-300 to-yellow-300 bg-clip-text text-transparent animate-pulse">
-          ✦ Hidden route unlocked ✦
+          ✦ 你发现了一颗隐藏的星星 ✦
         </p>
         <p className="text-sm text-slate-400 font-mono">
-          /march7th — a secret path through the stars
+          愿你的下一次探索，也有意想不到的惊喜。
         </p>
         {/* Star burst particles */}
         <div className="flex gap-1 justify-center mt-4">

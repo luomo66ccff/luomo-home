@@ -1,6 +1,9 @@
 "use client";
 
 let isModelReplying = false;
+let activeLockToken: symbol | null = null;
+
+export type ModelChatLockToken = symbol;
 
 export function isModelChatLocked() {
   return isModelReplying;
@@ -30,16 +33,27 @@ export function setModelChatDisabled(disabled: boolean) {
   });
 }
 
-export function tryAcquireModelChatLock() {
-  if (isModelReplying) return false;
+export function acquireModelChatLock(): ModelChatLockToken | null {
+  if (isModelReplying || typeof window === "undefined") return null;
+  const token = Symbol("model-chat-lock");
   isModelReplying = true;
+  activeLockToken = token;
   setModelChatDisabled(true);
   window.dispatchEvent(new CustomEvent("model-chat:lock-change", { detail: { locked: true } }));
-  return true;
+  return token;
 }
 
-export function releaseModelChatLock() {
+export function tryAcquireModelChatLock() {
+  return acquireModelChatLock() !== null;
+}
+
+export function releaseModelChatLock(token?: ModelChatLockToken) {
+  if (!isModelReplying || (token && activeLockToken !== token)) return false;
   isModelReplying = false;
+  activeLockToken = null;
   setModelChatDisabled(false);
-  window.dispatchEvent(new CustomEvent("model-chat:lock-change", { detail: { locked: false } }));
+  if (typeof window !== "undefined") {
+    window.dispatchEvent(new CustomEvent("model-chat:lock-change", { detail: { locked: false } }));
+  }
+  return true;
 }

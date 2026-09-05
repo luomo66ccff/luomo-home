@@ -59,5 +59,5 @@ export function sanitizePublicPayload(input: unknown): Record<string, PublicValu
 
 export function getTimeoutMs() {
   const seconds = Number(process.env.STATUS_FETCH_TIMEOUT_SECONDS || "5");
-  return Math.max(1000, Math.min(15000, seconds * 1000));
+  return Math.max(1000, Math.min(15000, (Number.isFinite(seconds) ? seconds : 5) * 1000));
 }

@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { runAtriBrain } from "@/lib/atri-brain/provider";
 import type { AtriBrainRequest } from "@/lib/atri-brain/types";
+import { readJsonObject, RequestBodyError } from "@/lib/request-body";
 import {
   consumeAtriRateLimit,
   getClientIdentifier,
@@ -44,8 +45,11 @@ export async function POST(request: Request) {
   }
 
   try {
-    const body = (await request.json()) as Record<string, unknown>;
-    const message = String(body.message || "").trim().slice(0, 500);
+    const body = await readJsonObject(request);
+    if (typeof body.message !== "string" || body.message.length > 500) {
+      return json({ ok: false, source: "fallback", text: "请输入不超过 500 字的消息。", mood: "warning" }, 400);
+    }
+    const message = body.message.trim();
 
     if (!message) {
       return json({
@@ -69,6 +73,9 @@ export async function POST(request: Request) {
 
     return json(result);
   } catch (error) {
+    if (error instanceof RequestBodyError) {
+      return json({ ok: false, error: error.message, source: "fallback", text: "消息格式无效，请重新输入。", mood: "warning" }, error.status);
+    }
     console.error("[ATRI Brain] route error", {
       reason: error instanceof Error ? error.message : "unknown_error",
     });

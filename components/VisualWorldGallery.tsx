@@ -1,7 +1,7 @@
 "use client";
-
+import Image from "next/image";
 import { useState } from "react";
-import { ChevronUp, LayoutGrid } from "lucide-react";
+import { ArrowUpRight, Minus, Plus } from "lucide-react";
 import { galleryItems } from "@/lib/visual-assets";
 import GalleryLightbox from "./GalleryLightbox";
 import styles from "./HomeExperience.module.css";
@@ -9,69 +9,13 @@ import styles from "./HomeExperience.module.css";
 export default function VisualWorldGallery() {
   const [selectedIndex, setSelectedIndex] = useState<number | null>(null);
   const [expanded, setExpanded] = useState(false);
-  const visibleItems = expanded ? galleryItems : galleryItems.slice(0, 3);
-
-  return (
-    <div className={styles.sectionInner}>
-      <div className={styles.galleryToolbar}>
-        <header className={styles.sectionHeader}>
-          <div>
-            <p className={styles.eyebrow}>Visual worlds</p>
-            <h2 className={styles.sectionTitle}>The atmosphere behind the interface.</h2>
-          </div>
-          <p className={styles.sectionDescription}>
-            Original Luomo Cloud scenes give each utility a shared place to belong,
-            without turning the dashboard into a wall of effects.
-          </p>
-        </header>
-        <button
-          className={styles.galleryToggle}
-          type="button"
-          onClick={() => setExpanded((value) => !value)}
-          aria-expanded={expanded}
-        >
-          {expanded ? <ChevronUp size={14} /> : <LayoutGrid size={14} />}
-          {expanded ? "Show less" : "View all worlds"}
-        </button>
-      </div>
-
-      <div className={styles.galleryGrid} aria-label="Luomo Cloud visual gallery">
-        {visibleItems.map((item, index) => (
-          <button
-            className={styles.galleryCard}
-            type="button"
-            key={item.key}
-            onClick={() => setSelectedIndex(index)}
-            aria-label={"Open gallery image: " + item.title}
-          >
-            <div className={styles.galleryImageWrap}>
-              <img
-                className={styles.galleryImage}
-                src={item.src}
-                alt={item.title}
-                loading="lazy"
-                decoding="async"
-              />
-              <span className={styles.galleryIndex}>
-                {String(index + 1).padStart(2, "0")}
-              </span>
-            </div>
-            <div className={styles.galleryCopy}>
-              <div className={styles.galleryTags}>
-                {item.tags.slice(0, 3).map((tag) => (
-                  <span key={tag}>#{tag}</span>
-                ))}
-              </div>
-              <h3>{item.title}</h3>
-              <p>{item.description}</p>
-            </div>
-          </button>
-        ))}
-      </div>
-
-      {selectedIndex !== null && (
-        <GalleryLightbox index={selectedIndex} onClose={() => setSelectedIndex(null)} />
-      )}
-    </div>
-  );
+  return <div className={styles.sectionInner}>
+    <header className={styles.sectionHeader}><div><p className={styles.eyebrow}>04 / SOMEWHERE ELSE</p><h2 className={styles.sectionTitle}>偶尔，也去<span>别的世界走走。</span></h2></div><div className={styles.sectionSide}><p className={styles.sectionDescription}>把月色、海风与一点点不切实际，<br />收进这本持续更新的视觉手记。</p><button className={styles.textLink} onClick={() => setExpanded(v => !v)} aria-expanded={expanded} aria-controls="world-gallery">{expanded ? "收起画廊" : "浏览全部 " + galleryItems.length + " 个世界"}{expanded ? <Minus size={15} /> : <Plus size={15} />}</button></div></header>
+    <div id="world-gallery" className={styles.galleryGrid}>{(expanded ? galleryItems : galleryItems.slice(0, 3)).map((item, index) => <button className={styles.galleryCard} key={item.key} onClick={() => setSelectedIndex(index)} aria-label={"查看场景：" + item.title}>
+      <Image src={item.src} alt={item.title} fill sizes="(max-width: 760px) 100vw, 50vw" />
+      <span className={styles.galleryShade} /><span className={styles.galleryIndex}>WORLD / 0{index + 1}</span><span className={styles.galleryArrow}><ArrowUpRight size={19} /></span>
+      <span className={styles.galleryCopy}><small>{item.tags.slice(0, 2).join(" · ")}</small><strong>{item.title}</strong><span>{item.description}</span></span>
+    </button>)}</div>
+    {selectedIndex !== null && <GalleryLightbox index={selectedIndex} onClose={() => setSelectedIndex(null)} />}
+  </div>;
 }

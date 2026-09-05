@@ -31,7 +31,11 @@ export function isDangerousRequest(message: string): boolean {
   const compact = lower.replace(/\s+/g, "");
   return DANGER_KEYWORDS.some((keyword) => {
     const normalized = keyword.toLowerCase().replace(/\s+/g, "");
-    return lower.includes(keyword.toLowerCase()) || compact.includes(normalized);
+    if (/[^\x00-\x7F]/.test(keyword)) return compact.includes(normalized);
+    const escaped = keyword.trim().replace(/[.*+?^${}()|[\]\\]/g, "\\$&").replace(/\s+/g, "\\s+");
+    const start = /^[a-z0-9_]/i.test(keyword) ? "\\b" : "";
+    const end = /[a-z0-9_]$/i.test(keyword.trim()) ? "\\b" : "";
+    return new RegExp(start + escaped + end, "i").test(lower);
   });
 }
 

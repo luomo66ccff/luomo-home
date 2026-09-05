@@ -1,92 +1,26 @@
 import type { Metadata, Viewport } from "next";
 import type { ReactNode } from "react";
+import { getSiteName, getSiteUrl } from "@/lib/site-config";
 import "./globals.css";
 
+const siteUrl = getSiteUrl();
+const siteName = getSiteName();
 export const metadata: Metadata = {
-  metadataBase: new URL("https://luomo.moe"),
-  title: {
-    default: "Luomo / 洛墨 - 个人云服务与数字宇宙入口",
-    template: "%s · Luomo",
-  },
-  description:
-    "Luomo 是洛墨维护的个人数字空间，连接云服务、API、文件、运维、终端、开发项目与 Live2D 看板娘。",
-  keywords: ["Luomo", "洛墨", "个人主页", "云服务", "API", "运维", "开发项目", "数字空间"],
-  authors: [{ name: "luomo" }],
-  creator: "luomo",
-  alternates: {
-    canonical: "/",
-  },
-  openGraph: {
-    title: "Luomo / 洛墨 - 个人云服务与数字宇宙入口",
-    description: "连接云服务、API、文件、运维、终端与开发项目的个人数字空间。",
-    url: "https://luomo.moe",
-    siteName: "Luomo",
-    images: [
-      {
-        url: "/assets/hero/hero-starry-control-room-generated.webp",
-        width: 1200,
-        height: 630,
-        alt: "Luomo personal cloud portal",
-      },
-    ],
-    locale: "zh_CN",
-    type: "website",
-  },
-  twitter: {
-    card: "summary_large_image",
-    title: "Luomo / 洛墨",
-    description: "个人云服务与数字宇宙入口。",
-    images: ["/assets/hero/hero-starry-control-room-generated.webp"],
-  },
-  robots: {
-    index: true,
-    follow: true,
-  },
-  icons: {
-    icon: "/favicon.svg",
-    apple: "/icons/icon-192.svg",
-  },
+  metadataBase: siteUrl,
+  title: { default: siteName + " · 在云端，让热爱发生", template: "%s · " + siteName },
+  description: "洛墨的个人数字基地。探索云服务、开发项目与视觉世界，和 Live2D 伙伴相遇，让好奇心与热爱在云端发生。",
+  authors: [{ name: "Luomo" }], creator: "Luomo",
+  alternates: { canonical: "/" },
+  openGraph: { title: siteName + " · 个人数字宇宙", description: "写一点代码，造一些小工具，收藏沿途的星光。", url: siteUrl, siteName, locale: "zh_CN", type: "website", images: [{ url: "/assets/hero/hero-starry-control-room-generated.webp", width: 1448, height: 1086, alt: "Luomo Cloud 星空观测站" }] },
+  twitter: { card: "summary_large_image", title: siteName, description: "在云端，让热爱发生。", images: ["/assets/hero/hero-starry-control-room-generated.webp"] },
+  robots: { index: true, follow: true },
+  icons: { icon: "/favicon.svg", apple: "/icons/icon-192.svg" },
   manifest: "/manifest.webmanifest",
+  appleWebApp: { capable: true, statusBarStyle: "black-translucent", title: "Luomo" },
 };
-
-export const viewport: Viewport = {
-  width: "device-width",
-  initialScale: 1,
-  themeColor: "#020617",
-};
-
-const structuredData = {
-  "@context": "https://schema.org",
-  "@type": "WebSite",
-  name: "Luomo",
-  url: "https://luomo.moe",
-  author: {
-    "@type": "Person",
-    name: "Luomo",
-    url: "https://luomo.moe",
-  },
-};
-
-export default function RootLayout({
-  children,
-}: Readonly<{ children: ReactNode }>) {
-  return (
-    <html lang="zh-CN">
-      <head>
-        <script
-          type="application/ld+json"
-          dangerouslySetInnerHTML={{
-            __html: JSON.stringify(structuredData).replace(/</g, "\\u003c"),
-          }}
-        />
-        <link rel="manifest" href="/manifest.webmanifest" />
-        <meta name="theme-color" content="#020617" />
-        <meta name="apple-mobile-web-app-capable" content="yes" />
-        <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-        <meta name="apple-mobile-web-app-title" content="Luomo" />
-        <link rel="apple-touch-icon" href="/icons/icon-192.svg" />
-      </head>
-      <body>{children}</body>
-    </html>
-  );
+export const viewport: Viewport = { width: "device-width", initialScale: 1, themeColor: "#0b1017" };
+const structuredData = { "@context": "https://schema.org", "@type": "WebSite", name: siteName, url: siteUrl.href, author: { "@type": "Person", name: "Luomo", url: siteUrl.href } };
+const themeInit = `try{var p=JSON.parse(localStorage.getItem('luomo_prefs_v4')||'{}');var t=p&&p.theme;document.documentElement.dataset.theme=t==='light'?'light':t==='system'&&matchMedia('(prefers-color-scheme: light)').matches?'light':'dark'}catch(e){document.documentElement.dataset.theme='dark'}`;
+export default function RootLayout({ children }: Readonly<{ children: ReactNode }>) {
+  return <html lang="zh-CN" suppressHydrationWarning><head><script dangerouslySetInnerHTML={{ __html: themeInit }} /><script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData).replace(/</g, "\\u003c") }} /></head><body>{children}</body></html>;
 }

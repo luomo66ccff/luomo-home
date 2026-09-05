@@ -18,9 +18,9 @@ export function CharacterSwitcher({
   disabled = false,
 }: Props) {
   return (
-    <div className="my-3 w-full">
+    <div className="companion-switcher my-3 w-full">
       <div className="mb-1 text-[10px] font-semibold uppercase tracking-[0.18em] text-cyan-100/55">
-        Companion
+        选择伙伴
       </div>
 
       <div className="grid w-full grid-cols-3 gap-1.5 rounded-2xl border border-cyan-200/15 bg-black/25 p-1.5">
@@ -33,6 +33,7 @@ export function CharacterSwitcher({
               key={id}
               type="button"
               disabled={disabled}
+              aria-pressed={active}
               onClick={() => onChange(id)}
               className={[ "min-w-0 truncate",
                 "min-w-0 truncate rounded-xl px-2 py-1.5 text-[11px] font-semibold transition sm:text-xs",

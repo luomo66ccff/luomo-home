@@ -1,159 +1,52 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
-import {
-  ArrowUpRight,
-  Bot,
-  Code2,
-  Files,
-  Gauge,
-  Info,
-  Terminal,
-} from "lucide-react";
+import { useState } from "react";
+import { ArrowUpRight, Bot, Code2, Files, Gauge, Info, Terminal } from "lucide-react";
 import ServiceQuickView from "./ServiceQuickView";
-import { SERVICES, type ServiceMeta } from "@/lib/services";
+import { SERVICES } from "@/lib/services";
+import { SIGNAL_LABELS } from "@/lib/service-signals";
+import { useServiceStatus } from "./ServiceStatusProvider";
 import styles from "./HomeExperience.module.css";
 
-type ApiService = {
-  id: string;
-  name: string;
-  status: string;
-  latency_ms: number | null;
-  source: string;
+const icons = { ops: Gauge, file: Files, api: Code2, terminal: Terminal, atri: Bot };
+const copy: Record<string, [string, string]> = {
+  ops: ["云端驾驶舱", "服务状态、日常运维与事件记录，一眼掌握。"],
+  file: ["私人文件星港", "收好重要文件，让临时分享轻松一点。"],
+  api: ["开发者入口", "把分散的接口，连接成顺手的工具。"],
+  terminal: ["远程终端桥", "从浏览器出发，连接你的远程工作台。"],
+  atri: ["自动化伙伴", "连接机器人与自动化，让灵感持续运行。"],
 };
-
-type QuickViewService = ServiceMeta & { status: string };
-
-const icons = {
-  ops: Gauge,
-  file: Files,
-  api: Code2,
-  terminal: Terminal,
-  atri: Bot,
-} as const;
-
-function statusClass(status: string) {
-  if (status === "operational") return styles.statusOperational;
-  if (status === "degraded") return styles.statusDegraded;
-  if (status === "down") return styles.statusDown;
-  return styles.statusUnknown;
-}
-
 export default function ServiceConstellation() {
-  const [statuses, setStatuses] = useState<Record<string, ApiService>>({});
+  const { data, error, loading, refresh } = useServiceStatus();
   const [selectedId, setSelectedId] = useState<string | null>(null);
-
-  useEffect(() => {
-    let active = true;
-    fetch("/api/services")
-      .then((response) => response.json())
-      .then((data) => {
-        if (!active) return;
-        const next: Record<string, ApiService> = {};
-        (data.services || []).forEach((service: ApiService) => {
-          next[service.id] = service;
-        });
-        setStatuses(next);
-      })
-      .catch(() => {});
-
-    return () => {
-      active = false;
-    };
-  }, []);
-
-  const quickViewService: QuickViewService | null = useMemo(() => {
-    if (!selectedId) return null;
-    const service = SERVICES.find((item) => item.id === selectedId);
-    if (!service) return null;
-    return { ...service, status: statuses[selectedId]?.status || "unknown" };
-  }, [selectedId, statuses]);
-
-  const readyCount = Object.values(statuses).filter(
-    (service) => service.status === "operational",
-  ).length;
-
+  const selected = SERVICES.find(s => s.id === selectedId);
+  const signals = data?.services ?? [];
   return (
     <div className={styles.sectionInner}>
       <header className={styles.sectionHeader}>
-        <div>
-          <p className={styles.eyebrow}>Live network</p>
-          <h2 className={styles.sectionTitle}>Every service, one clear signal.</h2>
-        </div>
-        <div className={styles.sectionSummary}>
-          <span className={styles.liveDot} aria-hidden="true" />
-          <strong className={styles.summaryNumber}>
-            {Object.keys(statuses).length ? readyCount + "/" + SERVICES.length : "--"}
-          </strong>
-          <span className={styles.summaryLabel}>services operating normally right now</span>
-        </div>
+        <div><p className={styles.eyebrow}>01 / CONNECTED SERVICES</p><h2 className={styles.sectionTitle}>你的下一站，<span>都在这里。</span></h2></div>
+        <div className={styles.sectionSide}><p className={styles.sectionDescription}>从文件到终端，让每一次连接都有清晰的目的地。</p><a href="#operations" className={styles.textLink}>查看运行状态 <ArrowUpRight size={14} /></a></div>
       </header>
-
+      {error && <div className={styles.inlineNotice} role="status">{data ? "状态更新失败，下方为上次记录。" : error}<button onClick={() => void refresh()} disabled={loading}>{loading ? "重试中…" : "重新获取"}</button></div>}
       <div className={styles.serviceGrid}>
-        {SERVICES.map((service) => {
-          const live = statuses[service.id];
-          const state = live?.status || "unknown";
-          const Icon = icons[service.id as keyof typeof icons] || Code2;
-
-          return (
-            <article className={styles.serviceCard} key={service.id}>
-              <div className={styles.serviceTop}>
-                <span className={styles.serviceCode}>{service.code}</span>
-                <span className={styles.statusBadge + " " + statusClass(state)}>
-                  <span className={styles.statusDot} aria-hidden="true" />
-                  {state}
-                  {live?.latency_ms != null ? " / " + live.latency_ms + "ms" : ""}
-                </span>
-              </div>
-
-              <div className={styles.serviceIcon}>
-                <Icon size={19} aria-hidden="true" />
-              </div>
-              <h3 className={styles.serviceName}>{service.name}</h3>
-              <p className={styles.serviceWorld}>{service.worldName}</p>
-              <p className={styles.serviceDescription}>{service.description}</p>
-
-              <div className={styles.serviceBottom}>
-                <div className={styles.serviceMeta}>
-                  {service.tags.slice(0, 2).map((tag) => (
-                    <span className={styles.serviceTag} key={tag}>
-                      {tag}
-                    </span>
-                  ))}
-                </div>
-                <div className={styles.serviceLinks}>
-                  <button
-                    className={styles.serviceDetail}
-                    type="button"
-                    onClick={() => setSelectedId(service.id)}
-                    aria-label={"View " + service.name + " details"}
-                    title="View details"
-                  >
-                    <Info size={15} />
-                  </button>
-                  <a
-                    className={styles.serviceLink}
-                    href={service.url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    aria-label={"Open " + service.name}
-                    title={"Open " + service.name}
-                  >
-                    <ArrowUpRight size={15} />
-                  </a>
-                </div>
-              </div>
-            </article>
-          );
+        {SERVICES.map(service => {
+          const live = signals.find(s => s.id === service.id);
+          const state = live?.status ?? "unknown";
+          const Icon = icons[service.id as keyof typeof icons] ?? Code2;
+          return <article className={styles.serviceCard} key={service.id}>
+            <div className={styles.serviceTop}><span className={styles.serviceIcon} data-accent={service.accent}><Icon size={21} /></span><span className={styles.serviceCode}>{service.code}</span></div>
+            <h3 className={styles.serviceName}>{service.name}</h3>
+            <p className={styles.serviceWorld}>{copy[service.id]?.[0] ?? service.worldName}</p>
+            <p className={styles.serviceDescription}>{copy[service.id]?.[1] ?? service.description}</p>
+            <div className={styles.serviceBottom}>
+              <span className={styles.statusBadge} data-state={state}><span className={styles.statusDot} />{!data && loading ? "检测中" : SIGNAL_LABELS[state]}</span>
+              <div className={styles.serviceLinks}><button className={styles.serviceDetail} onClick={() => setSelectedId(service.id)} aria-label={"查看 " + service.name + " 详情"}><Info size={16} /></button><a className={styles.serviceLink} href={service.url} target="_blank" rel="noopener noreferrer" aria-label={"打开 " + service.name}><ArrowUpRight size={19} /></a></div>
+            </div>
+          </article>;
         })}
       </div>
-
-      {quickViewService && (
-        <ServiceQuickView
-          service={quickViewService}
-          onClose={() => setSelectedId(null)}
-        />
-      )}
+      <p className={styles.sectionFootnote}>状态来自最近一次服务探测 · 每分钟自动更新 · 私有服务可能需要登录</p>
+      {selected && <ServiceQuickView service={{ ...selected, status: signals.find(s => s.id === selectedId)?.status ?? "unknown" }} onClose={() => setSelectedId(null)} />}
     </div>
   );
 }
