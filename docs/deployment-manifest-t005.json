@@ -1,0 +1,33 @@
+{
+  "release": "home-upgrade-t005",
+  "sourceCommit": "8370cae5ee1b13bd12b20c1451c405fba84081c7",
+  "url": "https://luomo.moe",
+  "deployedAt": "2026-09-05T03:51:50.479252+00:00",
+  "region": "Tokyo",
+  "image": "luomo-home:home-upgrade-t005",
+  "imageId": "sha256:97443e34500430540ace4a8212927747cda0b0bf55e6c88265a4c6632a66fbb3",
+  "containerId": "369a83ffbb3644d78cc2a50c8b3df2b7f0a02b9629a8ca19ca7a0a9438e6b799",
+  "artifacts": [
+    {
+      "name": "source-t005.tar.gz",
+      "bytes": 4833324,
+      "sha256": "487354c025aac251a7d2e1e0540adfe366a355f85abd2f281f0559254df3b144"
+    },
+    {
+      "name": "runtime-t005.tar.gz",
+      "bytes": 27047544,
+      "sha256": "475a91d7eda6c4a539b0f810211ac9fa8d76da65d3517217d595a005d3c1137a"
+    }
+  ],
+  "runtime": {
+    "platform": "linux/amd64",
+    "user": "node",
+    "restart": "unless-stopped",
+    "modelMountReadOnly": true,
+    "health": "healthy"
+  },
+  "ci": {
+    "run": 33942870609,
+    "conclusion": "success"
+  }
+}

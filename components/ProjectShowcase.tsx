@@ -3,7 +3,7 @@ import { ArrowUpRight, Code2 } from "lucide-react";
 import { HOME_PROJECTS } from "@/lib/home-content";
 import styles from "./HomeExperience.module.css";
 
-const covers = ["/assets/gallery/gallery-sci-fi-cockpit-generated.webp", "/assets/gallery/gallery-ocean-memory-generated.webp", "/assets/gallery/gallery-cyber-stage-generated.webp"];
+const covers = ["/assets/gallery/gallery-sci-fi-cockpit-generated.webp", "/assets/gallery/gallery-ocean-memory-generated.webp", "/assets/gallery/gallery-starry-constellation-generated.webp"];
 export default function ProjectShowcase() {
   return <div className={styles.sectionInner}>
     <header className={styles.sectionHeader}><div><p className={styles.eyebrow}>02 / SELECTED WORK</p><h2 className={styles.sectionTitle}>想法落地，<span>就有了形状。</span></h2></div><a href="https://github.com/luomo66ccff" target="_blank" rel="noopener noreferrer" className={styles.textLink}>更多开源项目 <ArrowUpRight size={15} /></a></header>
