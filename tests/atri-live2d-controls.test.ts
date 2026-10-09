@@ -89,7 +89,7 @@ describe("ATRI Live2D controls", () => {
       manager.destroyed = true;
       model.internalModel.motionManager.destroyed = true;
       reject(new TypeError("Cannot set properties of undefined (setting '1')"));
-      await expect(result).resolves.toMatchObject({ ok: false, cancelled: true });
+      await expect(result).resolves.toMatchObject({ ok: false, reason: "model disposed" });
       expect(errorLog).not.toHaveBeenCalled();
     } finally { errorLog.mockRestore(); }
   });

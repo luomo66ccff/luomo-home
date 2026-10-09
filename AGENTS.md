@@ -11,7 +11,7 @@
 | `npm test` | Vitest suite |
 | `npm run smoke` | HTTP smoke test (needs dev server running) |
 | `npm run check:no-secrets` | Scans source/config directories and `.next/server` + `.next/static` for secret markers, skipping `.env*` files |
-| `npm run visual:check` | Playwright screenshots in `output/playwright/tNNN/` (needs dev server + Chromium) |
+| `npm run visual:check` | Playwright screenshots in `output/playwright/tNNN/` (needs a running server + Chromium, or `PLAYWRIGHT_CHANNEL=msedge`) |
 | `node scripts/inspect-live2d-models.mjs` | Reports mounted Live2D capabilities; missing private assets exit non-zero |
 
 The read-only workflow at `.github/workflows/ci.yml` runs the secret scan,
@@ -23,9 +23,12 @@ configuration.
 - **Next.js 16** App Router, **React 19**, TypeScript, Tailwind CSS, PostCSS
 - **Vitest** for the test suite; GitHub Actions runs the read-only CI checks
 - **Path alias**: `@/*` → project root
-- **Single-page app** with 8 scroll sections orchestrated by `components/HomeShell.tsx` and `content/sections.ts`
-- **Homepage section metadata** single source of truth: `content/sections.ts`; `lib/scenes.ts` is retained for legacy scene components.
-- **Homepage styling**: `components/HomeExperience.module.css`; native dialog and companion styles in `app/globals.css`.
+- **Single-page app** with 8 scroll sections orchestrated by `components/home/HomeShell.tsx` and `content/sections.ts`
+- **Homepage section metadata** single source of truth: `content/sections.ts` (ids are anchors, nav labels and companion lines)
+- **Homepage styling**: CSS Modules next to each component in `components/home/`; design tokens (night + `[data-theme="light"]` summer theme), buttons, native dialog and companion panel styles in `app/globals.css`.
+- **Client state**: localStorage keys live in `KEYS` (`lib/home/store.ts`); components talk through `window` CustomEvents (`luomo:toast`, `luomo:achievement`, `luomo:progress-reset`, `luomo:companion-open`, …). Pure logic in `lib/home/*` is unit-tested in `tests/home-logic.test.ts`.
+- **SSR determinism**: anything rendered on the server must not depend on unrounded `Math.sin/cos` output or `Math.random`; use the seeded LCG + 0.1 rounding pattern in `LineMap.tsx` / `BannerArt.tsx`, or render after mount.
+- **Fonts**: `app/fonts/*.woff2` are generated subsets (OFL, licenses in `app/fonts/licenses/`). New CJK copy needs `node subset-fonts.mjs` in the external `tools/` directory, otherwise new glyphs fall back to system fonts. The Smiley Sans subset must keep its renamed family (*Luomo Station Display*) because of its Reserved Font Names.
 
 ### Directory layout
 
@@ -33,14 +36,14 @@ configuration.
 |---|---|
 | `app/` | Pages + API routes |
 | `app/api/*/route.ts` | 5 API routes: `health`, `status`, `services`, `companions`, `atri/brain` |
-| `components/` | React components (ui/, effects/, visual/, live2d/, atri/, layout/, motion/) |
+| `components/home/` | Homepage shell, sections (`sections/`), system layer (`system/`), code-drawn art (`art/`) |
+| `components/` | Companion dock, Live2D, ATRI, `ui/Modal.tsx`, `ServiceStatusProvider.tsx` |
+| `lib/home/` | Wish pity, moon phase, omikuji, affection, achievements, quick save, sound, storage |
 | `lib/` | Business logic (status checking, ATRI brain, Live2D controls, companion registry) |
-| `content/` | Copy text (`copy.ts`) and section metadata (`sections.ts`) |
+| `content/` | Section metadata (`sections.ts`), stations, wish banners/pool, CG gallery, backlog, companions |
 | `scripts/` | Utility scripts (smoke test, secret scan, visual check, model inspection) |
-| `styles/tokens.css` | CSS custom properties design tokens |
 | `public/live2d/` | README plus optional private Live2D runtime assets (ATRI, Murasame, Allium) |
 | `docs/live2d-model-capabilities.md` | Model parameter reference |
-| `app-backup-20260622/` | Old backup, ignore |
 
 ### Debug pages
 
@@ -80,7 +83,8 @@ VISUAL_CHECK_URL=http://127.0.0.1:37891 npm run visual:check
 - **`pixi.js` and `pixi-live2d-display` are transpiled** via `transpilePackages` in next.config.js
 - **Docker**: `docker compose up` exposes port 7891 on `127.0.0.1` only, uses external network `luomocore_default`
 - **ATRI Brain**: falls back to scripted responses when `ATRI_BRAIN_PROVIDER` is unset or remote fails; safety filter blocks dangerous requests server-side
-- **InfrastructureOrbit RAF animation**: uses `transform` (not `left`/`top`) for smooth orbit — always prefer `transform` for RAF-driven positioning
+- **Animation**: prefer `transform`/`opacity` for animated positioning; every looping animation needs a `prefers-reduced-motion` fallback
+- **Hidden references**: homepage copy alludes to games/anime without naming them; keep new copy in the same implicit style
 
 ## Deployed at
 

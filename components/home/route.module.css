@@ -1,0 +1,84 @@
+.page {
+  position: relative;
+  display: grid;
+  place-items: center;
+  min-height: 100dvh;
+  padding: 48px 20px;
+  overflow: hidden;
+}
+.sky {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background:
+    radial-gradient(1px 1px at 12% 18%, rgba(255, 255, 255, 0.8), transparent 60%),
+    radial-gradient(1px 1px at 72% 12%, rgba(255, 255, 255, 0.7), transparent 60%),
+    radial-gradient(1.5px 1.5px at 86% 46%, rgba(255, 240, 200, 0.8), transparent 60%),
+    radial-gradient(1px 1px at 30% 70%, rgba(255, 255, 255, 0.55), transparent 60%),
+    radial-gradient(1px 1px at 58% 84%, rgba(255, 255, 255, 0.6), transparent 60%),
+    radial-gradient(120% 70% at 50% 110%, rgba(138, 124, 255, 0.3), transparent 70%),
+    var(--ink-0);
+}
+:global([data-theme="light"]) .sky {
+  background:
+    radial-gradient(120% 80% at 50% -10%, #ffffff, transparent 60%),
+    linear-gradient(180deg, #cfe9fb, #eef7fd 70%);
+}
+
+.notice {
+  display: grid;
+  justify-items: center;
+  gap: 12px;
+  width: min(560px, 100%);
+  padding: 22px clamp(20px, 5vw, 44px) 26px;
+  border: 1px solid var(--line-2);
+  border-radius: 18px;
+  text-align: center;
+  background: color-mix(in srgb, var(--ink-2) 88%, transparent);
+  box-shadow: var(--shadow-soft);
+}
+:global([data-theme="light"]) .notice { background: rgba(255, 255, 255, 0.88); }
+
+.head {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  justify-self: stretch;
+  padding-bottom: 12px;
+  border-bottom: 1px dashed var(--line-2);
+  color: var(--gold);
+  font: 500 12px/1 var(--font-mono);
+  letter-spacing: 0.16em;
+}
+.head span { color: var(--text-2); }
+.head b { margin-left: auto; padding: 4px 8px; border-radius: 6px; background: var(--gold); color: var(--ink-0); font-weight: 700; }
+
+.art { display: grid; place-items: center; min-height: 150px; margin-top: 8px; }
+.eyebrow { margin: 0; font: 500 12px/1 var(--font-mono); letter-spacing: 0.32em; color: var(--text-3); }
+.title { margin: 0; font-family: var(--font-display); font-weight: 400; font-size: clamp(34px, 6vw, 52px); line-height: 1.12; color: var(--text); }
+.title em { font-style: normal; color: var(--gold); }
+.body { display: grid; gap: 6px; color: var(--text-2); line-height: 1.75; }
+.body p { margin: 0; }
+.body small { font-family: var(--font-hand); font-size: 14px; color: var(--text-3); }
+.actions { display: flex; flex-wrap: wrap; justify-content: center; gap: 12px; margin-top: 8px; }
+.stamp { margin: 10px 0 0; font: italic 500 11px/1 var(--font-serif); letter-spacing: 0.4em; color: var(--text-3); }
+
+.box { overflow: visible; transform-origin: 50% 100%; animation: tremble 2.6s ease-in-out infinite; }
+.eyes { opacity: 0; animation: peek 5.2s ease-in-out infinite; }
+@keyframes tremble {
+  0%, 60%, 100% { transform: translate(0, 0) rotate(0deg); }
+  64% { transform: translate(-1.5px, 0) rotate(-1.4deg); }
+  68% { transform: translate(1.5px, 0) rotate(1.2deg); }
+  72% { transform: translate(-1px, 0) rotate(-0.8deg); }
+  76% { transform: translate(1px, 0) rotate(0.6deg); }
+}
+@keyframes peek { 0%, 70%, 100% { opacity: 0; } 76%, 90% { opacity: 1; } }
+
+.signal { overflow: visible; }
+.red { filter: drop-shadow(0 0 10px #ff4d5e); animation: blink 1.6s steps(1, end) infinite; }
+@keyframes blink { 50% { fill: #5a2230; filter: none; } }
+
+@media (prefers-reduced-motion: reduce) {
+  .box, .eyes, .red { animation: none; }
+  .eyes { opacity: 1; }
+}

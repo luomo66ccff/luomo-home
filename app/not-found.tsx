@@ -1,5 +1,22 @@
 import Link from "next/link";
-import { ArrowLeft, Sparkles } from "lucide-react";
+import RouteMessage, { MangoBox } from "@/components/home/RouteMessage";
+
 export default function NotFound() {
-  return <main className="route-message"><div><Sparkles size={28} /><p className="route-eyebrow">404 / A LITTLE OFF COURSE</p><h1>这颗星星，<br />还没有航线。</h1><p>这个页面可能已经搬走，或地址里藏了一个小小的笔误。<br />先回到云端基地，再选一个目的地吧。</p><Link href="/"><ArrowLeft size={17} /> 返回洛墨首页</Link></div></main>;
+  return (
+    <RouteMessage
+      code="404"
+      eyebrow="OFF THE LINE · 本站不在线路图上"
+      title={<>这一站，<br /><em>不在</em>线路图上。</>}
+      art={<MangoBox />}
+      actions={(
+        <>
+          <Link className="btn btn--gold" href="/">回到 0 号站台</Link>
+          <Link className="btn" href="/#services">看看今晚的线路图</Link>
+        </>
+      )}
+    >
+      <p>您要找的页面可能已经改线，或者地址里藏了一个小小的笔误。</p>
+      <small>……角落里的纸箱是怎么回事？请不要敲它，里面的人会害怕的。</small>
+    </RouteMessage>
+  );
 }

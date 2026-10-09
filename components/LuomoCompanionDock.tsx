@@ -1,45 +1,73 @@
 "use client";
 
-import { useState, useEffect, useRef, useCallback } from "react";
-import StardustBurst from "@/components/effects/StardustBurst";
+import { useCallback, useEffect, useRef, useState } from "react";
 import Live2DShell from "@/components/live2d/Live2DShell";
-import ATRIChatPanel from "@/components/atri/ATRIChatPanel";
+import { Spark } from "@/components/home/art/Icons";
 import { atriForms, type AtriActiveForms, type AtriFormId } from "@/lib/live2d/atriForms";
-import type { CompanionId } from "@/lib/companions/companionRegistry";
-import { getCompanionProfile } from "@/lib/companions/companionRegistry";
+import { companionOrder, getCompanionProfile, type CompanionId } from "@/lib/companions/companionRegistry";
 import { getRandomReaction } from "@/lib/companions/companionReaction";
-import { CharacterSwitcher } from "@/components/layout/CharacterSwitcher";
-import { SECTIONS } from "@/content/sections";
 import { getCompanionTouchReaction, pickTouchLine, type CompanionTouchArea } from "@/lib/companions/companionTouch";
+import { isModelChatLocked } from "@/lib/modelChatLock";
 import type { AtriBrainResponse } from "@/lib/atri-brain/types";
 import { useAtriBrain } from "@/hooks/useAtriBrain";
+import { SECTIONS } from "@/content/sections";
+import { unlock } from "@/lib/home/achievements";
+import { addAffection, HEART_COUNT, heartsFor, parseAffection, type AffectionMap } from "@/lib/home/affection";
+import { KEYS, readJson, toast, writeJson } from "@/lib/home/store";
 
 type LuomoMood = "idle" | "welcome" | "curious" | "focused" | "excited" | "secret" | "system" | "greeting" | "sleepy" | "warning";
 type ThinkingPayload = { text?: string; mood?: LuomoMood; source?: string };
 type CompanionBrainResponse = Omit<Partial<AtriBrainResponse>, "source"> & { source?: string };
+type Bubble = { id: number; from: "them" | "me" | "sys"; text: string };
 
-const sectionIds = SECTIONS.map((s) => s.id);
+const sectionIds = SECTIONS.map(section => section.id);
+const AVATAR: Record<CompanionId, { mark: string; tint: string }> = {
+  atri: { mark: "A", tint: "linear-gradient(135deg, #b8e1ff, #6d8cff)" },
+  murasame: { mark: "丛", tint: "linear-gradient(135deg, #c9f2d8, #63b888)" },
+  allium: { mark: "Al", tint: "linear-gradient(135deg, #ffd6e8, #c48cff)" },
+};
+const QUICK = ["你好呀", "今天服务器怎么样？", "推荐一个站点", "你是高性能的吗？"];
+const LOG_LIMIT = 40;
 
 function getCurrentSection(): string {
   if (typeof window === "undefined") return "hero";
-  let closest = "hero"; let minDist = Infinity;
-  for (const id of sectionIds) { const el = document.getElementById(id); if (!el) continue; const rect = el.getBoundingClientRect(); const dist = Math.abs(rect.top + rect.height / 2 - window.innerHeight / 2); if (dist < minDist) { minDist = dist; closest = id; } }
+  let closest = "hero";
+  let minDist = Infinity;
+  for (const id of sectionIds) {
+    const el = document.getElementById(id);
+    if (!el) continue;
+    const rect = el.getBoundingClientRect();
+    const dist = Math.abs(rect.top + rect.height / 2 - window.innerHeight / 2);
+    if (dist < minDist) { minDist = dist; closest = id; }
+  }
   return closest;
 }
 
-interface Props { onCollapsedChange?: (collapsed: boolean) => void; initialCollapsed?: boolean; }
+function splitPages(text: string, maxLen = 72) {
+  const normalized = text.trim();
+  if (!normalized) return [];
+  const pages: string[] = [];
+  let current = "";
+  for (const sentence of normalized.split(/(?<=[\u3002\uff01\uff1f!?\u2026])/)) {
+    if ((current + sentence).length > maxLen && current) { pages.push(current); current = sentence; }
+    else current += sentence;
+  }
+  if (current) pages.push(current);
+  return pages.length ? pages : [normalized];
+}
+
+interface Props { onCollapsedChange?: (collapsed: boolean) => void; initialCollapsed?: boolean }
 
 export default function LuomoCompanionDock({ onCollapsedChange, initialCollapsed = true }: Props) {
   const [isMobile, setIsMobile] = useState(false);
   const [expanded, setExpanded] = useState(!initialCollapsed);
   const [hydrated, setHydrated] = useState(false);
+  const userToggled = useRef(false);
 
   useEffect(() => {
     const mobile = window.innerWidth < 768;
     setIsMobile(mobile);
-    let nextExpanded = !initialCollapsed;
-    if (mobile) nextExpanded = false;
-    setExpanded(nextExpanded);
+    if (!userToggled.current) setExpanded(mobile ? false : !initialCollapsed);
     setHydrated(true);
     const onResize = () => setIsMobile(window.innerWidth < 768);
     window.addEventListener("resize", onResize);
@@ -62,322 +90,360 @@ export default function LuomoCompanionDock({ onCollapsedChange, initialCollapsed
   const companionForm = Object.values(activeForms)[0] || "default";
   const [allowSecret, setAllowSecretForms] = useState(false);
   const [allowDebug, setAllowDebugForms] = useState(false);
-  const [stardustActive, setStardustActive] = useState(false);
+  const [burst, setBurst] = useState(0);
   const [section, setSection] = useState("hero");
-  const [lineIndex, setLineIndex] = useState(0);
-  const [displayedText, setDisplayedText] = useState("");
-  const [isTyping, setIsTyping] = useState(false);
-  const [companionExpression, setCompanionExpression] = useState<string | undefined>(undefined);
-  const [companionMotion, setCompanionMotion] = useState<string | undefined>(undefined);
   const [character, setCharacter] = useState<CompanionId>("atri");
-  const companionProfile = getCompanionProfile(character);
-  const [mobileOpen, setMobileOpen] = useState(false);
+  const profile = getCompanionProfile(character);
+  const [expression, setExpression] = useState<string | undefined>(undefined);
+  const [motion, setMotion] = useState<string | undefined>(undefined);
+  const [commandId, setCommandId] = useState(0);
   const [modelReady, setModelReady] = useState(false);
-  const panelOpen = isMobile ? mobileOpen : expanded;
-  const [atriLoading, setAtriLoading] = useState(false);
-  const [dialoguePages, setDialoguePages] = useState<string[]>([]);
-  const [dialoguePageIndex, setDialoguePageIndex] = useState(0);
-  const [dialogueSource, setDialogueSource] = useState("idle");
-  const [manualUntil, setManualUntil] = useState(0);
-  const typeTimerRef = useRef<ReturnType<typeof setInterval> | null>(null);
-  const cycleTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const clickCountRef = useRef(0);
-  const clickTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const manualTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const [thinking, setThinking] = useState(false);
+  const [unread, setUnread] = useState(1);
+  const [log, setLog] = useState<Bubble[]>([]);
+  const [input, setInput] = useState("");
+  const [chatLocked, setChatLocked] = useState(false);
+  const nextId = useRef(1);
+  const logRef = useRef<HTMLDivElement>(null);
+  const lastSectionLine = useRef<string>("");
+  const greeted = useRef(false);
+  const clickCount = useRef(0);
+  const clickTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const atriBrain = useAtriBrain();
   const { askAtri } = atriBrain;
+  const open = expanded;
+  const chatDisabled = atriBrain.loading || chatLocked;
 
-  const updateManualUntil = useCallback((until: number) => {
-    if (manualTimerRef.current) clearTimeout(manualTimerRef.current);
-    setManualUntil(until);
-    const delay = Math.max(0, until - Date.now());
-    manualTimerRef.current = setTimeout(() => {
-      manualTimerRef.current = null;
-      setManualUntil(0);
-    }, delay);
+  const push = useCallback((from: Bubble["from"], text: string) => {
+    const clean = text.trim();
+    if (!clean) return;
+    setLog(current => [...current, { id: nextId.current++, from, text: clean }].slice(-LOG_LIMIT));
   }, []);
 
-  useEffect(() => () => {
-    if (typeTimerRef.current) clearInterval(typeTimerRef.current);
-    if (cycleTimerRef.current) clearTimeout(cycleTimerRef.current);
-    if (clickTimerRef.current) clearTimeout(clickTimerRef.current);
-    if (manualTimerRef.current) clearTimeout(manualTimerRef.current);
+  const [affection, setAffection] = useState<AffectionMap>({});
+  useEffect(() => {
+    const sync = () => setAffection(readJson(KEYS.affection, parseAffection));
+    sync();
+    window.addEventListener("luomo:progress-reset", sync);
+    return () => window.removeEventListener("luomo:progress-reset", sync);
+  }, []);
+
+  const bumpAffection = useCallback((id: CompanionId, amount: number) => {
+    const result = addAffection(readJson(KEYS.affection, parseAffection), id, amount);
+    if (!result.changed) return;
+    writeJson(KEYS.affection, result.next);
+    setAffection(result.next);
+    if (!result.rose) return;
+    const name = getCompanionProfile(id).displayName;
+    const full = result.hearts >= HEART_COUNT;
+    toast({ title: `（${name} 的好感度上升了）`, body: full ? "……心跳的声音，好像被对方听见了。" : undefined, tone: full ? "gold" : "info" });
+    if (full) unlock("affection");
+  }, []);
+
+  useEffect(() => () => { if (clickTimer.current) clearTimeout(clickTimer.current); }, []);
+
+  useEffect(() => {
+    setChatLocked(isModelChatLocked());
+    const handler = (event: Event) => setChatLocked(Boolean((event as CustomEvent).detail?.locked));
+    window.addEventListener("model-chat:lock-change", handler);
+    return () => window.removeEventListener("model-chat:lock-change", handler);
   }, []);
 
   useEffect(() => {
-    const handler = (e: Event) => {
-      const d = (e as CustomEvent).detail;
+    const handler = (event: Event) => {
+      const d = (event as CustomEvent).detail;
       if (d?.mood) setMood(d.mood);
-      if (d?.mood === "secret") setStardustActive(true);
+      if (d?.mood === "secret") setBurst(value => value + 1);
       if (d?.form !== undefined) {
-        if (d.form === "default") {
-          setActiveForms({});
-        } else if (typeof d.form === "string" && d.form in atriForms) {
+        if (d.form === "default") setActiveForms({});
+        else if (typeof d.form === "string" && d.form in atriForms) {
           const formId = d.form as AtriFormId;
           const slot = atriForms[formId].slot;
-          setActiveForms((previous) => ({ ...previous, [slot]: formId }));
+          setActiveForms(previous => ({ ...previous, [slot]: formId }));
         }
       }
       if (d?.allowSecret !== undefined) setAllowSecretForms(d.allowSecret);
       if (d?.allowDebug !== undefined) setAllowDebugForms(d.allowDebug);
     };
     window.addEventListener("luomo:mood", handler);
-  
     return () => window.removeEventListener("luomo:mood", handler);
   }, []);
 
   useEffect(() => { if (mood !== "greeting") return; const t = setTimeout(() => setMood("idle"), 8000); return () => clearTimeout(t); }, [mood]);
   useEffect(() => { if (mood !== "secret") return; const t = setTimeout(() => setMood("idle"), 8000); return () => clearTimeout(t); }, [mood]);
 
-  const splitDialoguePages = useCallback((text: string, maxLen = 72) => {
-    const normalized = text.trim();
-    if (!normalized) return [];
-    const sentences = normalized.split(/(?<=[\u3002\uff01\uff1f!?\u2026])/);
-    const pages: string[] = [];
-    let current = "";
-    for (const sentence of sentences) {
-      if ((current + sentence).length > maxLen && current) {
-        pages.push(current);
-        current = sentence;
-      } else {
-        current += sentence;
-      }
-    }
-    if (current) pages.push(current);
-    return pages.length ? pages : [normalized];
+  const playReaction = useCallback((trigger: "switch" | "next" | "hover" | "click" | "thinking" | "warning" | "idle", companionId: CompanionId = character, reactionMood: LuomoMood = mood) => {
+    const reaction = getRandomReaction(companionId, trigger, reactionMood);
+    setExpression(reaction.expression);
+    setMotion(typeof reaction.motion === "string" ? reaction.motion : reaction.motion?.group);
+    if (reaction.expression || reaction.motion) setCommandId(value => value + 1);
+  }, [character, mood]);
+
+  const applyThinking = useCallback((payload: ThinkingPayload = {}) => {
+    setThinking(true);
+    setMood(payload.mood || "focused");
   }, []);
 
-  
-
-  const playRandomCompanionReaction = useCallback((trigger: "switch" | "next" | "hover" | "click" | "thinking" | "warning" | "idle", companionId: CompanionId = character, reactionMood = mood) => {
-    const reaction = getRandomReaction(companionId, trigger, reactionMood);
-    if (reaction.expression) setCompanionExpression(reaction.expression);
-    if (reaction.motion) setCompanionMotion(typeof reaction.motion === "string" ? reaction.motion : (reaction.motion?.group || ""));
-  }, [character, mood]);
-const handleNextLine = useCallback(() => {
-    if (atriLoading || dialogueSource === "thinking") return;
-
-    // Has multiple pages: flip to next page
-    if (dialoguePages.length > 1) {
-      const nextIndex = (dialoguePageIndex + 1) % dialoguePages.length;
-      setDialoguePageIndex(nextIndex);
-      setDisplayedText(dialoguePages[nextIndex]);
-      console.debug("[ATRI] next page", { page: nextIndex + 1, total: dialoguePages.length });
-      updateManualUntil(Date.now() + 16000);
-      return;
-    }
-
-    // Brain/fallback single page: just extend display time, no pool switch
-    if (dialogueSource === "brain" || dialogueSource === "fallback") {
-      updateManualUntil(Date.now() + 12000);
-      return;
-    }
-
-    // Non-ATRI companion: cycle through defaultLines
-    const pool = getCompanionProfile(character).defaultLines || [];
-    if (!pool.length) {
-      updateManualUntil(Date.now() + 8000);
-      playRandomCompanionReaction("next");
-      return;
-    }
-    const currentIdx = pool.indexOf(displayedText);
-    const nextIdx = currentIdx >= 0 ? (currentIdx + 1) % pool.length : 0;
-    const text = pool[nextIdx];
-    setDisplayedText(text);
-    setDialoguePages([text]);
-    setDialoguePageIndex(0);
-    updateManualUntil(Date.now() + 10000);
-    playRandomCompanionReaction("next");
-    return;
-
-  }, [atriLoading, dialogueSource, dialoguePages, dialoguePageIndex, displayedText, character, playRandomCompanionReaction, updateManualUntil]);
-
-  const canAutoUpdateDialogue = useCallback(() => {
-    return !atriLoading && Date.now() > manualUntil;
-  }, [atriLoading, manualUntil]);
-
-  const applyAtriThinking = useCallback((payload: ThinkingPayload = {}) => {
-    const text = payload.text || "ATRI \u6b63\u5728\u601d\u8003\u4e2d\u2026\u2026\u8bb0\u5fc6\u56de\u8def\u6b63\u5728\u5fae\u5fae\u53d1\u5149\u3002";
-    setAtriLoading(true);
-    setDialogueSource("thinking");
-    setDisplayedText(text);
-    setDialoguePages([text]);
-    setDialoguePageIndex(0);
-    setMood(payload.mood || "focused");
-    updateManualUntil(Date.now() + 20000);
-  }, [updateManualUntil]);
-
-  const applyAtriBrainResponse = useCallback((response: CompanionBrainResponse) => {
+  const applyResponse = useCallback((response: CompanionBrainResponse) => {
     if (!response) return;
-    setAtriLoading(false);
-    const source = response.source === "ai" || response.source === "scripted" ? "brain" : response.source === "fallback" ? "fallback" : "brain";
-    setDialogueSource(source);
-    const text = response.text || "ATRI \u5df2\u6536\u5230\u56de\u5e94\u3002";
-    const pages = splitDialoguePages(text);
-    setDialoguePages(pages);
-    setDialoguePageIndex(0);
-    setDisplayedText(pages[0] || text);
-    setIsTyping(false);
+    setThinking(false);
+    const text = response.text || "ATRI 已收到回应。";
+    for (const page of splitPages(text)) push(response.ok === false && response.source === "fallback" ? "sys" : "them", page);
     if (response.mood) setMood(response.mood);
-    if (response.form === "default") {
-      setActiveForms({});
-    } else if (response.form && response.form in atriForms) {
+    if (response.form === "default") setActiveForms({});
+    else if (response.form && response.form in atriForms) {
       const formId = response.form as AtriFormId;
       const slot = atriForms[formId].slot;
-      setActiveForms((previous) => ({ ...previous, [slot]: formId }));
+      setActiveForms(previous => ({ ...previous, [slot]: formId }));
     }
-    if (response.expression) setCompanionExpression(response.expression);
-    if (response.motion) setCompanionMotion(response.motion);
-    updateManualUntil(Date.now() + 16000);
-  }, [splitDialoguePages, updateManualUntil]);
+    setExpression(response.expression);
+    setMotion(response.motion);
+    if (response.expression || response.motion) setCommandId(value => value + 1);
+  }, [push]);
 
-  // Listen for brain responses from CommandPalette
   useEffect(() => {
-    const handler = (e: Event) => { applyAtriBrainResponse((e as CustomEvent).detail); };
+    const handler = (event: Event) => applyResponse((event as CustomEvent).detail);
     window.addEventListener("atri:brain-response", handler);
     return () => window.removeEventListener("atri:brain-response", handler);
-  }, [applyAtriBrainResponse]);
+  }, [applyResponse]);
 
-  // Listen for thinking state from CommandPalette
   useEffect(() => {
-    const handler = (e: Event) => { applyAtriThinking((e as CustomEvent).detail); };
+    const handler = (event: Event) => applyThinking((event as CustomEvent).detail);
     window.addEventListener("atri:thinking", handler);
     return () => window.removeEventListener("atri:thinking", handler);
-  }, [applyAtriThinking]);
+  }, [applyThinking]);
 
-  const openAtri = useCallback(() => {
-    setCharacter("atri");
-    if (isMobile) setMobileOpen(true);
-    else setExpanded(true);
-  }, [isMobile]);
+  const openPhone = useCallback(() => {
+    userToggled.current = true;
+    setExpanded(true);
+    setUnread(0);
+    onCollapsedChange?.(false);
+  }, [onCollapsedChange]);
 
-  const focusAtriInput = useCallback(() => {
-    openAtri();
+  const closePhone = useCallback(() => {
+    userToggled.current = true;
+    setModelReady(false);
+    setExpanded(false);
+    onCollapsedChange?.(true);
+  }, [onCollapsedChange]);
+
+  const focusInput = useCallback(() => {
     const focus = () => document.querySelector<HTMLInputElement>("[data-model-chat-input]")?.focus();
     requestAnimationFrame(() => { focus(); requestAnimationFrame(focus); });
-  }, [openAtri]);
+  }, []);
 
-  // CommandPalette and the visible chat panel share this hook instance. This
-  // keeps the global lock and request lifecycle in one place.
+  const send = useCallback(async (raw: string) => {
+    const message = raw.trim();
+    if (!message || atriBrain.loading || isModelChatLocked()) return;
+    if (character !== "atri") setCharacter("atri");
+    push("me", message);
+    unlock("atri");
+    applyThinking({ mood: "focused" });
+    const response = await askAtri(message, { companionId: "atri", currentSection: section, currentMood: mood, currentForm: companionForm, servicesCount: 5 });
+    if (response.ok) {
+      setInput(current => (current.trim() === message ? "" : current));
+      bumpAffection("atri", 2);
+    }
+    applyResponse(response);
+  }, [applyResponse, applyThinking, askAtri, atriBrain.loading, bumpAffection, character, companionForm, mood, push, section]);
+
   useEffect(() => {
-    const handler = (e: Event) => {
-      const rawMessage = (e as CustomEvent).detail?.message;
+    const handler = (event: Event) => {
+      const rawMessage = (event as CustomEvent).detail?.message;
       const message = typeof rawMessage === "string" ? rawMessage.trim() : "";
-      if (!message) {
-        focusAtriInput();
-        return;
-      }
-      openAtri();
-      applyAtriThinking({ text: "ATRI 正在思考中……记忆回路正在微微发光。", mood: "focused", source: "thinking" });
-      void askAtri(message, {
-        companionId: "atri",
-        currentSection: section,
-        currentMood: mood,
-        currentForm: companionForm,
-        servicesCount: 5,
-      }).then(applyAtriBrainResponse);
+      setCharacter("atri");
+      openPhone();
+      if (!message) { focusInput(); return; }
+      void send(message);
     };
     window.addEventListener("atri:ask", handler);
-    return () => window.removeEventListener("atri:ask", handler);
-  }, [applyAtriBrainResponse, applyAtriThinking, askAtri, companionForm, focusAtriInput, mood, openAtri, section]);
+    window.addEventListener("luomo:companion-open", handler);
+    return () => {
+      window.removeEventListener("atri:ask", handler);
+      window.removeEventListener("luomo:companion-open", handler);
+    };
+  }, [focusInput, openPhone, send]);
 
   useEffect(() => {
     const handler = () => {
       setSection(getCurrentSection());
-      setMood((previous) => (previous === "idle" || previous === "greeting" ? "idle" : previous));
+      setMood(previous => (previous === "idle" || previous === "greeting" ? "idle" : previous));
     };
-    handler(); window.addEventListener("scroll", handler, { passive: true });
+    handler();
+    window.addEventListener("scroll", handler, { passive: true });
     return () => window.removeEventListener("scroll", handler);
   }, []);
 
-  useEffect(() => { if (panelOpen) setLineIndex(0); }, [section, mood, panelOpen]);
+  useEffect(() => {
+    if (!open) return;
+    if (!greeted.current) {
+      greeted.current = true;
+      push("them", profile.defaultLines[0] ?? "你好呀，很高兴在这里遇见你。");
+    }
+    const line = profile.sectionLines?.[section] || SECTIONS.find(entry => entry.id === section)?.companionLine;
+    if (line && line !== lastSectionLine.current) {
+      lastSectionLine.current = line;
+      push("them", line);
+    }
+  }, [open, section, profile, push]);
 
   useEffect(() => {
-    if (!panelOpen) { setDisplayedText(""); return; }
-    if (!canAutoUpdateDialogue()) return;
-    if (dialogueSource === "thinking" && atriLoading) return;
-    if (Date.now() < manualUntil) return;
-    const profile = getCompanionProfile(character);
-    const sectionLine = profile.sectionLines?.[section] || SECTIONS.find(s => s.id === section)?.companionLine;
-    const allLines = sectionLine ? [sectionLine, ...profile.defaultLines] : profile.defaultLines;
-    const currentLine = allLines[lineIndex % allLines.length] || "Cloud systems are glowing.";
-    let ci = 0; setIsTyping(true); setDisplayedText("");
-    typeTimerRef.current = setInterval(() => { ci++; setDisplayedText(currentLine.slice(0, ci)); if (ci >= currentLine.length) { if (typeTimerRef.current) clearInterval(typeTimerRef.current); setIsTyping(false); cycleTimerRef.current = setTimeout(() => setLineIndex(prev => (prev + 1) % allLines.length), 5000); } }, 50);
-    return () => { if (typeTimerRef.current) clearInterval(typeTimerRef.current); if (cycleTimerRef.current) clearTimeout(cycleTimerRef.current); };
-  }, [section, mood, lineIndex, panelOpen, manualUntil, atriLoading, dialogueSource, character, canAutoUpdateDialogue]);
+    const el = logRef.current;
+    if (el) el.scrollTop = el.scrollHeight;
+  }, [log, thinking, open]);
 
-  const handleAvatarClick = useCallback(() => {
-    if (clickTimerRef.current) clearTimeout(clickTimerRef.current); clickCountRef.current += 1;
-    if (clickCountRef.current >= 7) { clickCountRef.current = 0; setMood("secret"); setStardustActive(true); return; }
-    clickTimerRef.current = setTimeout(() => { clickCountRef.current = 0; }, 4000);
-    setExpanded(!expanded); onCollapsedChange?.(expanded);
-  }, [onCollapsedChange, expanded]);
+  const onAvatar = useCallback(() => {
+    if (clickTimer.current) clearTimeout(clickTimer.current);
+    clickCount.current += 1;
+    if (clickCount.current >= 7) {
+      clickCount.current = 0;
+      setMood("secret");
+      setBurst(value => value + 1);
+      return;
+    }
+    if (clickCount.current === 1) bumpAffection(character, 1);
+    clickTimer.current = setTimeout(() => { clickCount.current = 0; }, 4000);
+    playReaction("click");
+  }, [bumpAffection, character, playReaction]);
 
-  const close = useCallback(() => { setExpanded(false); onCollapsedChange?.(true); }, [onCollapsedChange]);
-
-  const handleCompanionChange = useCallback((nextId: CompanionId) => {
+  const switchTo = useCallback((nextId: CompanionId) => {
     if (nextId === character) return;
-
     const nextProfile = getCompanionProfile(nextId);
-    const text =
-      nextProfile.defaultLines?.[0] ||
-      `${nextProfile.displayName} 已切换完成。`;
-
     setCharacter(nextId);
-    setAtriLoading(false);
-    setIsTyping(false);
-    setCompanionExpression(undefined);
-    setCompanionMotion(undefined);
+    setThinking(false);
+    setExpression(undefined);
+    setMotion(undefined);
     setActiveForms({});
-    setDialogueSource("command");
-    setDisplayedText(text);
-    setDialoguePages([text]);
-    setDialoguePageIndex(0);
+    setModelReady(false);
+    push("sys", `已切换到 ${nextProfile.displayName}`);
+    push("them", nextProfile.defaultLines?.[0] || `${nextProfile.displayName} 已切换完成。`);
     setMood("welcome");
-    updateManualUntil(Date.now() + 12000);
+    playReaction("switch", nextId, "welcome");
+  }, [character, playReaction, push]);
 
-    playRandomCompanionReaction("switch", nextId, "welcome");
-  }, [character, playRandomCompanionReaction, updateManualUntil]);
+  const nextLine = useCallback(() => {
+    const pool = profile.defaultLines || [];
+    if (pool.length) push("them", pool[Math.floor(Math.random() * pool.length)]);
+    bumpAffection(character, 1);
+    playReaction("next");
+  }, [bumpAffection, character, playReaction, profile.defaultLines, push]);
 
-  const handleCompanionTouch = useCallback((payload: { area: CompanionTouchArea }) => {
+  const onTouch = useCallback((payload: { area: CompanionTouchArea }) => {
     const reaction = getCompanionTouchReaction(character, payload.area);
     const text = pickTouchLine(reaction.lines);
-    if (text) {
-      setDisplayedText(text);
-      setDialoguePages([text]);
-      setDialoguePageIndex(0);
-      setDialogueSource("touch");
-    }
+    if (text) push("them", text);
     if (reaction.mood) setMood(reaction.mood as LuomoMood);
-    if (reaction.expression) setCompanionExpression(reaction.expression);
-    if (reaction.motion) setCompanionMotion(reaction.motion);
-    updateManualUntil(Date.now() + 9000);
-  }, [character, updateManualUntil]);
+    setExpression(reaction.expression);
+    setMotion(reaction.motion);
+    if (reaction.expression || reaction.motion) setCommandId(value => value + 1);
+    bumpAffection(character, 1);
+  }, [bumpAffection, character, push]);
 
-  return <>
-    <StardustBurst active={stardustActive} onDone={() => setStardustActive(false)} />
-    {hydrated && <div className="luomo-companion-dock">
-      {!panelOpen ? <button type="button" className="companion-launcher" aria-label="打开云端伙伴" aria-expanded={false} onClick={() => isMobile ? setMobileOpen(true) : handleAvatarClick()}><span>✳</span></button> : <>
-        <div className="companion-model" data-model-ready={modelReady}>
-          <Live2DShell modelPath={companionProfile.modelPath} layout={isMobile ? companionProfile.mobileLayout || companionProfile.layout : companionProfile.layout}
-            mood={mood} activeForms={activeForms} expression={companionExpression} motion={companionMotion} characterId={character}
-            allowSecret={allowSecret} allowDebug={allowDebug} variant={isMobile ? "mobile" : "dock"}
-            onReady={() => setModelReady(true)} onError={() => setModelReady(false)} onTouch={handleCompanionTouch} />
+  return (
+    <>
+      {burst > 0 && (
+        <div className="dock-burst" key={burst} aria-hidden="true" onAnimationEnd={event => { if (event.target === event.currentTarget.lastElementChild) setBurst(0); }}>
+          {Array.from({ length: 12 }, (_, i) => <span key={i} style={{ ["--a" as string]: `${i * 30}deg`, animationDelay: `${(i % 3) * 60}ms` }}><Spark size={10 + (i % 3) * 4} /></span>)}
         </div>
-        <section className="companion-panel" aria-label="云端伙伴">
-          <div className="companion-heading"><div><strong><span>✳</span> {companionProfile.displayName}</strong><small>在这片云里，陪你聊一会儿。</small></div>
-            <button type="button" className="companion-close" aria-label="收起云端伙伴" onClick={() => { setModelReady(false); if (isMobile) setMobileOpen(false); else close(); }}>×</button></div>
-          <CharacterSwitcher value={character} onChange={handleCompanionChange} disabled={atriBrain.loading} />
-          <p className="companion-dialogue">{displayedText || "你好呀，很高兴在这里遇见你。"}{isTyping && <span aria-hidden="true">▏</span>}</p>
-          <button type="button" className="companion-next" onClick={handleNextLine} disabled={atriBrain.loading || dialogueSource === "thinking"}>
-            {atriBrain.loading ? "正在思考…" : dialoguePages.length > 1 ? (dialoguePageIndex + 1) + "/" + dialoguePages.length + " 下一句 ↓" : "换一句话 ↓"}
-          </button>
-          {character === "atri" && companionProfile.capability.chat ? <ATRIChatPanel
-            context={{ companionId: character, currentSection: section, currentMood: mood, currentForm: companionForm, servicesCount: 5 }}
-            onThinking={applyAtriThinking} onResponse={applyAtriBrainResponse} onLoadingChange={setAtriLoading} brain={atriBrain} />
-            : <p className="companion-note">这位伙伴陪你欣赏风景，想聊天可以切换到 ATRI。</p>}
-        </section>
-      </>}
-    </div>}
-  </>;
+      )}
+      {hydrated && (
+        <div className="luomo-companion-dock" data-open={open}>
+          {!open ? (
+            <button type="button" className="companion-launcher" aria-label={unread ? "打开乘务员通讯（1 条未读）" : "打开乘务员通讯"} aria-expanded={false} onClick={openPhone}>
+              <svg width="26" height="26" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                <rect x="6" y="2.5" width="12" height="19" rx="3" fill="none" stroke="currentColor" strokeWidth="1.6" />
+                <path d="M10 5h4" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" />
+                <path d="M9 11.5h6M9 14.5h4" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" opacity=".7" />
+              </svg>
+              {unread > 0 && <span className="badge">{unread}</span>}
+            </button>
+          ) : (
+            <>
+              <div className="companion-model" data-model-ready={modelReady}>
+                <Live2DShell
+                  modelPath={profile.modelPath}
+                  layout={isMobile ? profile.mobileLayout || profile.layout : profile.layout}
+                  mood={mood}
+                  activeForms={activeForms}
+                  expression={expression}
+                  motion={motion}
+                  commandId={commandId}
+                  characterId={character}
+                  allowSecret={allowSecret}
+                  allowDebug={allowDebug}
+                  variant={isMobile ? "mobile" : "dock"}
+                  onReady={() => setModelReady(true)}
+                  onError={() => setModelReady(false)}
+                  onTouch={onTouch}
+                />
+              </div>
+              <section className="phone" aria-label={`与 ${profile.displayName} 的通讯`}>
+                <header className="phone-top">
+                  <button type="button" className="phone-avatar" style={{ background: AVATAR[character].tint }} onClick={onAvatar} aria-label={`戳一戳 ${profile.displayName}`}>{AVATAR[character].mark}</button>
+                  <div className="phone-who">
+                    <strong>
+                      {profile.displayName}
+                      <span className="phone-hearts" role="img" aria-label={`好感度 ${heartsFor(affection[character])} / ${HEART_COUNT}`}>
+                        {Array.from({ length: HEART_COUNT }, (_, i) => <i key={i} data-on={i < heartsFor(affection[character])} />)}
+                      </span>
+                    </strong>
+                    <small>{thinking ? "对方正在输入……" : `在线 · ${profile.tagline}`}</small>
+                  </div>
+                  <button type="button" className="modal-close" aria-label="收起通讯" onClick={closePhone}>
+                    <svg width="14" height="14" viewBox="0 0 14 14" aria-hidden="true" focusable="false"><path d="M2 2l10 10M12 2L2 12" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" /></svg>
+                  </button>
+                </header>
+                <div className="phone-contacts" role="group" aria-label="选择伙伴">
+                  {companionOrder.map(id => {
+                    const entry = getCompanionProfile(id);
+                    return (
+                      <button key={id} type="button" aria-pressed={id === character} onClick={() => switchTo(id)} disabled={atriBrain.loading}>
+                        <span className="mini" style={{ background: AVATAR[id].tint }} aria-hidden="true">{AVATAR[id].mark}</span>
+                        {entry.shortName}
+                      </button>
+                    );
+                  })}
+                </div>
+                <div className="phone-log" ref={logRef} aria-live="polite">
+                  {log.map(bubble => <p key={bubble.id} className={`bubble ${bubble.from}`}>{bubble.text}</p>)}
+                  {thinking && <span className="typing" aria-label="正在输入"><i /><i /><i /></span>}
+                </div>
+                {character === "atri" && profile.capability.chat ? (
+                  <>
+                    <div className="phone-quick">
+                      {QUICK.map(text => <button key={text} type="button" onClick={() => void send(text)} disabled={chatDisabled}>{text}</button>)}
+                    </div>
+                    {atriBrain.error && <p className="phone-alert" role="alert">{atriBrain.error}</p>}
+                    <div className="phone-input">
+                      <input
+                        type="text"
+                        value={input}
+                        onChange={event => setInput(event.target.value)}
+                        onKeyDown={event => {
+                          if (event.key !== "Enter" || event.nativeEvent.isComposing) return;
+                          event.preventDefault();
+                          void send(input);
+                        }}
+                        readOnly={chatDisabled}
+                        data-model-chat-input
+                        aria-label="发送给 ATRI 的消息"
+                        placeholder="向 ATRI 低声说些什么……"
+                        maxLength={500}
+                      />
+                      <button type="button" onClick={() => void send(input)} disabled={chatDisabled} data-model-chat-send>{chatDisabled ? "…" : "发送"}</button>
+                    </div>
+                  </>
+                ) : (
+                  <div className="phone-note">
+                    这位伙伴陪你欣赏风景，想聊天可以切换到 ATRI。
+                    <button type="button" className="phone-next" onClick={nextLine}>换一句话</button>
+                  </div>
+                )}
+              </section>
+            </>
+          )}
+        </div>
+      )}
+    </>
+  );
 }

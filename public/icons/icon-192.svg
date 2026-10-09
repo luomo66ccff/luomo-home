@@ -1,13 +1,25 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="192" height="192" viewBox="0 0 192 192">
-  <rect width="192" height="192" rx="40" fill="#020617"/>
-  <circle cx="96" cy="96" r="72" fill="none" stroke="url(#g)" stroke-width="2" stroke-dasharray="8 6"/>
-  <circle cx="96" cy="96" r="48" fill="none" stroke="rgba(244,114,182,0.3)" stroke-width="1.5" stroke-dasharray="4 4"/>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 192 192" width="192" height="192" role="img" aria-label="洛墨站">
   <defs>
-    <linearGradient id="g" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0%" stop-color="#22d3ee"/>
-      <stop offset="50%" stop-color="#a855f7"/>
-      <stop offset="100%" stop-color="#f472b6"/>
+    <linearGradient id="sky" x1="0" x2="0" y1="0" y2="192" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#1f2556"/>
+      <stop offset=".7" stop-color="#0c1030"/>
+      <stop offset="1" stop-color="#070a1c"/>
     </linearGradient>
+    <radialGradient id="glow" cx="112" cy="74" r="70" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#e9c87c" stop-opacity=".35"/>
+      <stop offset="1" stop-color="#e9c87c" stop-opacity="0"/>
+    </radialGradient>
   </defs>
-  <text x="96" y="108" text-anchor="middle" fill="#fde68a" font-family="sans-serif" font-weight="900" font-size="56" letter-spacing="4">LC</text>
+  <rect width="192" height="192" fill="url(#sky)"/>
+  <circle cx="112" cy="74" r="70" fill="url(#glow)"/>
+  <circle cx="112" cy="74" r="38" fill="#e9c87c"/>
+  <circle cx="128" cy="62" r="33" fill="#161b44"/>
+  <path d="M18 138C66 119 114 119 174 133" fill="none" stroke="#e9c87c" stroke-width="7" stroke-linecap="round"/>
+  <path d="M18 156C66 137 114 137 174 151" fill="none" stroke="#e9c87c" stroke-width="4" stroke-linecap="round" opacity=".7"/>
+  <g stroke="#e9c87c" stroke-width="3" opacity=".6">
+    <path d="M44 128l-2 18M72 122l-2 18M100 120l-2 18M128 122l-2 18M156 127l-2 18"/>
+  </g>
+  <path d="M50 40l4.4 10.6 10.6 4.4-10.6 4.4-4.4 10.6-4.4-10.6-10.6-4.4 10.6-4.4z" fill="#fff0c4"/>
+  <circle cx="160" cy="34" r="2.2" fill="#fff"/>
+  <circle cx="30" cy="92" r="1.8" fill="#fff" opacity=".8"/>
 </svg>

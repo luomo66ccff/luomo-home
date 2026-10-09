@@ -7,7 +7,8 @@ import { captureAtriBaseline, applyAtriActiveFormsToModel } from "@/lib/live2d/a
 import type { AtriActiveForms } from "@/lib/live2d/atriForms";
 import { pushLive2DDebug } from "@/lib/live2d/live2dDebug";
 import { applyCompanionModelLayout } from "@/lib/live2d/live2dLayout";
-import { applyCompanionExpression, applyCompanionMotion } from "@/lib/live2d/live2dControls";
+import { applyCompanionCommands, protectCompanionExpressionLifecycle, type CompanionCommandState } from "@/lib/live2d/live2dControls";
+import type { CompanionLayout } from "@/lib/companions/companionRegistry";
 import { fallbackAreaFromNormalizedPoint, type CompanionTouchArea } from "@/lib/companions/companionTouch";
 
 declare global {
@@ -18,13 +19,14 @@ declare global {
 
 interface Props {
   modelPath?: string;
-  layout?: { width?: number; height?: number; scale?: number; xRatio?: number; yRatio?: number };
+  layout?: Partial<CompanionLayout>;
   mood?: string;
   form?: string;
   allowSecret?: boolean;
   allowDebug?: boolean;
   expression?: string;
   motion?: string;
+  commandId?: number;
   emotionStrength?: number;
   activeForms?: AtriActiveForms;
   characterId?: string;
@@ -156,7 +158,28 @@ async function fetchCompanionManifest(signal: AbortSignal): Promise<CompanionMan
   return parseCompanionManifest(payload);
 }
 
-export default function Live2DCanvas({ characterId = "atri", mood = "idle", form = "default", expression, motion, emotionStrength, activeForms, allowSecret = false, allowDebug = false, onLoad, onError, onTouch, collapsed, modelPath, layout, variant = "dock" }: Props) {
+function layoutModelInViewport(model: any, app: any, characterId: string, layout?: Partial<CompanionLayout>) {
+  applyCompanionModelLayout(model, { companionId: characterId, app, layout });
+  // Profile minimum scales/offsets can exceed the small viewport above the
+  // phone. Keep the complete model inside its actual, clickable canvas.
+  try {
+    const padding = Math.min(8, app.screen.width / 10, app.screen.height / 10);
+    let bounds = model.getBounds();
+    if (!bounds?.width || !bounds?.height) return;
+    const fit = Math.min(1, (app.screen.width - padding * 2) / bounds.width, (app.screen.height - padding * 2) / bounds.height);
+    if (fit < 1) {
+      model.scale.set(model.scale.x * fit, model.scale.y * fit);
+      bounds = model.getBounds();
+    }
+    model.x += Math.max(padding, Math.min(bounds.x, app.screen.width - padding - bounds.width)) - bounds.x;
+    model.y += Math.max(padding, Math.min(bounds.y, app.screen.height - padding - bounds.height)) - bounds.y;
+  } catch (error) {
+    pushLive2DDebug("warn", "model fit correction error", { error: String(error) });
+  }
+}
+
+export default function Live2DCanvas({ characterId = "atri", mood = "idle", form = "default", expression, motion, commandId, emotionStrength, activeForms, allowSecret = false, allowDebug = false, onLoad, onError, onTouch, collapsed, modelPath, layout, variant = "dock" }: Props) {
+  const containerRef = useRef<HTMLDivElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const appRef = useRef<any>(null);
   const modelRef = useRef<any>(null);
@@ -164,7 +187,9 @@ export default function Live2DCanvas({ characterId = "atri", mood = "idle", form
   const manifestRef = useRef<CompanionManifest | null>(null);
   const loadTokenRef = useRef(0);
   const lastLayoutKeyRef = useRef<string>("");
-  const appliedCommandsRef = useRef<WeakMap<object, { expression?: string; motion?: string }>>(new WeakMap());
+  const appliedCommandsRef = useRef<WeakMap<object, CompanionCommandState>>(new WeakMap());
+  const layoutContextRef = useRef({ characterId, layout });
+  layoutContextRef.current = { characterId, layout };
   const [pixiReady, setPixiReady] = useState(false);
   const [loadState, setLoadState] = useState<"idle" | "loading" | "ready" | "error">("idle");
   const [loadError, setLoadError] = useState<string | null>(null);
@@ -240,10 +265,11 @@ export default function Live2DCanvas({ characterId = "atri", mood = "idle", form
 
         if (disposed || !canvasRef.current) return;
 
+        const viewport = containerRef.current?.getBoundingClientRect();
         const app = new (PIXI as any).Application({
           view: canvasRef.current,
-          width: size.width,
-          height: size.height,
+          width: Math.max(1, Math.round(viewport?.width || size.width)),
+          height: Math.max(1, Math.round(viewport?.height || size.height)),
           backgroundAlpha: 0,
           antialias: true,
           resolution: Math.min(window.devicePixelRatio || 1, 2),
@@ -252,8 +278,8 @@ export default function Live2DCanvas({ characterId = "atri", mood = "idle", form
         appRef.current = app;
         setPixiReady(true);
         pushLive2DDebug("success", "PIXI Application ready", {
-          width: size.width,
-          height: size.height,
+          width: app.screen.width,
+          height: app.screen.height,
         });
       } catch (e) {
         if (disposed) return;
@@ -278,6 +304,30 @@ export default function Live2DCanvas({ characterId = "atri", mood = "idle", form
       Live2DModelRef.current = null;
     };
   }, []);
+
+  // CSS determines the room above the phone. Resize the renderer as well as
+  // the model when that room changes, including mobile viewport changes.
+  useEffect(() => {
+    const container = containerRef.current;
+    const app = appRef.current;
+    if (!pixiReady || !container || !app) return;
+    const resize = () => {
+      if (appRef.current !== app) return;
+      const rect = container.getBoundingClientRect();
+      const width = Math.max(1, Math.round(rect.width));
+      const height = Math.max(1, Math.round(rect.height));
+      if (!rect.width || !rect.height || (width === app.screen.width && height === app.screen.height)) return;
+      app.renderer.resize(width, height);
+      const model = modelRef.current;
+      const context = layoutContextRef.current;
+      if (model && !model.destroyed) layoutModelInViewport(model, app, context.characterId, context.layout);
+    };
+    resize();
+    const observer = typeof ResizeObserver === "undefined" ? null : new ResizeObserver(resize);
+    observer?.observe(container);
+    window.addEventListener("resize", resize);
+    return () => { observer?.disconnect(); window.removeEventListener("resize", resize); };
+  }, [pixiReady]);
 
   // ===== 2. Model Load - runs when PIXI ready AND character changes =====
   useEffect(() => {
@@ -321,6 +371,7 @@ export default function Live2DCanvas({ characterId = "atri", mood = "idle", form
           return;
         }
 
+        protectCompanionExpressionLifecycle(model);
         modelRef.current = model;
         app.stage.addChild(model);
         if (oldModel) {
@@ -329,27 +380,8 @@ export default function Live2DCanvas({ characterId = "atri", mood = "idle", form
         }
 
         // Apply layout
-        applyCompanionModelLayout(model, { companionId: characterId, app, layout });
- const layoutKey = JSON.stringify({ characterId, resolvedModelPath, layout, variant });
- lastLayoutKeyRef.current = layoutKey;
-
-        // Auto-fit into viewport
-        requestAnimationFrame(function () {
-          if (cancelled || token !== loadTokenRef.current) return;
-          try {
-            const bounds = model.getBounds();
-            if (bounds && bounds.width && bounds.height) {
-              const screenH = app.screen.height;
-              const bottom = bounds.y + bounds.height;
-              const overBottom = bottom - screenH;
-              const overTop = 0 - bounds.y;
-              if (overBottom > 0) model.y -= overBottom + 20;
-              if (overTop > 0) model.y += overTop + 20;
-            }
-          } catch (e) {
-            pushLive2DDebug("warn", "model fit correction error", { error: String(e) });
-          }
-        });
+        layoutModelInViewport(model, app, characterId, layout);
+        lastLayoutKeyRef.current = JSON.stringify({ characterId, resolvedModelPath, layout, variant });
 
         // ATRI baseline capture (one-time per model load)
         if (characterId === "atri") {
@@ -392,7 +424,7 @@ export default function Live2DCanvas({ characterId = "atri", mood = "idle", form
     if (!modelRef.current || !appRef.current) return;
     const layoutKey = JSON.stringify({ characterId, resolvedModelPath, layout, variant });
     if (lastLayoutKeyRef.current === layoutKey) return;
-    applyCompanionModelLayout(modelRef.current, { companionId: characterId, app: appRef.current, layout });
+    layoutModelInViewport(modelRef.current, appRef.current, characterId, layout);
     lastLayoutKeyRef.current = layoutKey;
     pushLive2DDebug("info", "layout reapplied", { companionId: characterId });
   }, [loadState, characterId, resolvedModelPath, layout, variant]);
@@ -408,25 +440,23 @@ export default function Live2DCanvas({ characterId = "atri", mood = "idle", form
     const requestedExpression = expression || moodMap?.expression;
     const requestedMotion = motion || moodMap?.motion;
     const previous = appliedCommandsRef.current.get(model) || {};
-
-    if (requestedExpression && previous.expression !== requestedExpression) {
-      previous.expression = requestedExpression;
-      void applyCompanionExpression(model, characterId, requestedExpression).then(result => {
-        if (modelRef.current !== model) return;
-        pushLive2DDebug(result.ok ? "success" : "warn", "companion expression apply", result);
-        if (!result.ok && previous.expression === requestedExpression) delete previous.expression;
-      });
-    }
-    if (requestedMotion && previous.motion !== requestedMotion) {
-      previous.motion = requestedMotion;
-      void applyCompanionMotion(model, characterId, requestedMotion).then(result => {
-        if (modelRef.current !== model) return;
-        pushLive2DDebug(result.ok ? "success" : "warn", "companion motion apply", result);
-        if (!result.ok && previous.motion === requestedMotion) delete previous.motion;
-      });
-    }
     appliedCommandsRef.current.set(model, previous);
-  }, [loadState, characterId, mood, expression, motion]);
+    const token = loadTokenRef.current;
+    let cancelled = false;
+    const isCurrent = () => !cancelled && modelRef.current === model && !model.destroyed && token === loadTokenRef.current;
+    void applyCompanionCommands(model, characterId, {
+      expression: requestedExpression,
+      motion: requestedMotion,
+      expressionCommandId: expression ? commandId : undefined,
+      motionCommandId: motion ? commandId : undefined,
+    }, previous, isCurrent).then(results => {
+      if (!isCurrent()) return;
+      for (const result of results) {
+        pushLive2DDebug(result.ok ? "success" : "warn", `companion ${result.expression ? "expression" : "motion"} apply`, result);
+      }
+    });
+    return () => { cancelled = true; };
+  }, [loadState, characterId, mood, expression, motion, commandId]);
 
   // ===== 6. ATRI-specific: activeForms =====
   useEffect(() => {
@@ -440,7 +470,7 @@ export default function Live2DCanvas({ characterId = "atri", mood = "idle", form
   // ===== Error State UI =====
   if (loadState === "error") {
     return (
-      React.createElement("div", { className: "relative flex items-center justify-center rounded-3xl border border-rose-300/20 bg-slate-950/70 p-6 text-center backdrop-blur-xl", style: { width: size.width, height: size.height } },
+      React.createElement("div", { className: "relative flex items-center justify-center rounded-3xl border border-rose-300/20 bg-slate-950/70 p-6 text-center backdrop-blur-xl", style: { width: variant === "test" ? size.width : "100%", height: variant === "test" ? size.height : "100%" } },
         React.createElement("div", null,
           React.createElement("div", { className: "text-xs font-semibold text-rose-200" }, "Live2D model failed to load"),
           React.createElement("div", { className: "mt-2 text-[11px] text-rose-100/70 break-all" }, characterId + " - " + resolvedModelPath),
@@ -451,7 +481,7 @@ export default function Live2DCanvas({ characterId = "atri", mood = "idle", form
   }
 
   return (
-    React.createElement("div", { suppressHydrationWarning: true, className: "relative", style: { width: size.width, height: size.height } },
+    React.createElement("div", { ref: containerRef, suppressHydrationWarning: true, className: "relative", style: { width: variant === "test" ? size.width : "100%", height: variant === "test" ? size.height : "100%" } },
       React.createElement("canvas", {
         ref: canvasRef,
         className: "block w-full h-full pointer-events-auto",
