@@ -49,29 +49,51 @@ function hasMotionCapability(model: any, motion: string): boolean {
   return typeof manager.startMotion === "function" || typeof manager.startRandomMotion === "function";
 }
 
-export function applyCompanionExpression(model: any, companionId: string, expression?: string) {
+function isDisposed(model: any, manager: any): boolean {
+  return Boolean(model?.destroyed || model?._destroyed || manager?.destroyed || !model?.internalModel);
+}
+
+export async function applyCompanionExpression(model: any, companionId: string, expression?: string) {
   if (!expression) { const r = { ok: false, companionId, reason: "empty expression" }; log("warn","expression skip",r); return r; }
+  const manager = getExpressionManager(model);
+  const cancelled = () => ({ ok: false, companionId, expression, cancelled: true, reason: "model disposed" });
+  if (isDisposed(model, manager)) return cancelled();
   try {
     if (!hasExpressionCapability(model, expression)) throw new Error("expression manager or definition missing");
-    const result = model.expression(expression);
-    if (result === false) throw new Error("expression manager rejected expression");
+    // The SDK loads expressions asynchronously. Destroying a model aborts its
+    // requests, but SDK 0.4 can still reject after clearing the expression array.
+    const result = await model.expression(expression);
+    if (isDisposed(model, manager)) return cancelled();
+    if (result === false) {
+      const r = { ok: false, companionId, expression, reason: "expression manager rejected expression" };
+      log("warn", "expression skipped", r); return r;
+    }
     const r = { ok: true, companionId, expression, api: "model.expression(name)" };
     log("info","expression apply",r); return r;
   } catch (error) {
+    if (isDisposed(model, manager)) return cancelled();
     const r = { ok: false, companionId, reason: error instanceof Error ? error.message : String(error), expression };
     log("error","expression error",r); return r;
   }
 }
 
-export function applyCompanionMotion(model: any, companionId: string, motion?: string) {
+export async function applyCompanionMotion(model: any, companionId: string, motion?: string) {
   if (!motion) { const r = { ok: false, companionId, reason: "empty motion" }; log("warn","motion skip",r); return r; }
+  const manager = getMotionManager(model);
+  const cancelled = () => ({ ok: false, companionId, motion, cancelled: true, reason: "model disposed" });
+  if (isDisposed(model, manager)) return cancelled();
   try {
     if (!hasMotionCapability(model, motion)) throw new Error("motion manager or group missing");
-    const result = model.motion(motion, 0);
-    if (result === false) throw new Error("motion manager rejected motion");
+    const result = await model.motion(motion, 0);
+    if (isDisposed(model, manager)) return cancelled();
+    if (result === false) {
+      const r = { ok: false, companionId, motion, reason: "motion manager rejected motion" };
+      log("warn", "motion skipped", r); return r;
+    }
     const r = { ok: true, companionId, motion, api: "model.motion(group,0)" };
     log("info","motion apply",r); return r;
   } catch (error) {
+    if (isDisposed(model, manager)) return cancelled();
     const r = { ok: false, companionId, reason: error instanceof Error ? error.message : String(error), motion };
     log("error","motion error",r); return r;
   }

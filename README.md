@@ -2,11 +2,11 @@
 
 <div align="center">
 
-![Luomo Home](docs/preview-desktop-t003.png)
+![Luomo Home](docs/preview-desktop-t005.png)
 
 **个人云服务的首页，也是一个可交互的角色与项目陈列空间。**
 
-[升级报告](docs/UPGRADE-t003.md) · [Website](https://luomo.moe) · [Deployment](docs/DEPLOYMENT.md) · [Assets](ASSETS_ATTRIBUTION.md) · [MIT License](LICENSE)
+[升级报告](docs/UPGRADE-t003.md) · [上线记录](docs/DEPLOYMENT-t005.md) · [Website](https://luomo.moe) · [Deployment](docs/DEPLOYMENT.md) · [Assets](ASSETS_ATTRIBUTION.md) · [MIT License](LICENSE)
 
 </div>
 

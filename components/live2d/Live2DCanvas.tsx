@@ -410,14 +410,20 @@ export default function Live2DCanvas({ characterId = "atri", mood = "idle", form
     const previous = appliedCommandsRef.current.get(model) || {};
 
     if (requestedExpression && previous.expression !== requestedExpression) {
-      const result = applyCompanionExpression(model, characterId, requestedExpression);
-      pushLive2DDebug(result.ok ? "success" : "warn", "companion expression apply", result);
-      if (result.ok) previous.expression = requestedExpression;
+      previous.expression = requestedExpression;
+      void applyCompanionExpression(model, characterId, requestedExpression).then(result => {
+        if (modelRef.current !== model) return;
+        pushLive2DDebug(result.ok ? "success" : "warn", "companion expression apply", result);
+        if (!result.ok && previous.expression === requestedExpression) delete previous.expression;
+      });
     }
     if (requestedMotion && previous.motion !== requestedMotion) {
-      const result = applyCompanionMotion(model, characterId, requestedMotion);
-      pushLive2DDebug(result.ok ? "success" : "warn", "companion motion apply", result);
-      if (result.ok) previous.motion = requestedMotion;
+      previous.motion = requestedMotion;
+      void applyCompanionMotion(model, characterId, requestedMotion).then(result => {
+        if (modelRef.current !== model) return;
+        pushLive2DDebug(result.ok ? "success" : "warn", "companion motion apply", result);
+        if (!result.ok && previous.motion === requestedMotion) delete previous.motion;
+      });
     }
     appliedCommandsRef.current.set(model, previous);
   }, [loadState, characterId, mood, expression, motion]);
