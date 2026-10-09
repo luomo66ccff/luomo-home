@@ -192,6 +192,44 @@ button:disabled { cursor: not-allowed; }
 
 /* ───────────── Section head ───────────── */
 .section { position: relative; padding: clamp(96px, 12vw, 156px) 0 clamp(72px, 9vw, 120px); }
+
+/* Keep SSR content and native anchors while deferring mobile layouts below the hero.
+   Fallbacks are content-box heights; `auto` remembers each section's rendered size. */
+@media (max-width: 767px) {
+  #main > section:not(#hero) {
+    content-visibility: auto;
+    contain-intrinsic-block-size: auto var(--home-block-size, 900px);
+  }
+  #services { --home-block-size: 710px; }
+  #operations { --home-block-size: 825px; }
+  #projects { --home-block-size: 1050px; }
+  #about { --home-block-size: 2000px; }
+  #worlds { --home-block-size: 630px; }
+  #log { --home-block-size: 780px; }
+  #enter { --home-block-size: 1965px; }
+  html[data-home-positioning="true"] #main > section:not(#hero) {
+    content-visibility: visible;
+  }
+}
+@media (max-width: 360px) {
+  #services { --home-block-size: 760px; }
+  #operations { --home-block-size: 955px; }
+  #projects { --home-block-size: 1145px; }
+  #about { --home-block-size: 2180px; }
+  #worlds { --home-block-size: 575px; }
+  #log { --home-block-size: 800px; }
+  #enter { --home-block-size: 2185px; }
+}
+
+/* Only the hydrated controller sets these attributes; no-JS content stays usable. */
+html[data-home-paused="true"] #main *,
+html[data-home-paused="true"] #main *::before,
+html[data-home-paused="true"] #main *::after,
+#main > section[data-home-active="false"] *,
+#main > section[data-home-active="false"] *::before,
+#main > section[data-home-active="false"] *::after {
+  animation-play-state: paused !important;
+}
 .sec-head { position: relative; display: grid; grid-template-columns: auto 1fr; gap: 6px 28px; align-items: end; margin-bottom: clamp(36px, 5vw, 56px); }
 .sec-index {
   grid-row: span 2; align-self: stretch;

@@ -3,6 +3,7 @@
 import { useEffect, useRef } from "react";
 import { usePrefs } from "../PrefsContext";
 import { useReducedMotion } from "@/lib/home/hooks";
+import { homeActivityActive, subscribeHomeActivity } from "../HomeActivity";
 import s from "./system.module.css";
 
 type Mote = { x: number; y: number; vx: number; vy: number; life: number; size: number; hue: number };
@@ -20,14 +21,25 @@ export default function StarTrail() {
     if (!canvas || !ctx) return;
     const motes: Mote[] = [];
     let frame = 0;
+    let width = 0;
+    let height = 0;
+    let pixelRatio = 0;
     const resize = () => {
       const dpr = Math.min(window.devicePixelRatio || 1, 2);
-      canvas.width = window.innerWidth * dpr;
-      canvas.height = window.innerHeight * dpr;
+      const nextWidth = window.innerWidth;
+      const nextHeight = window.innerHeight;
+      if (width === nextWidth && height === nextHeight && pixelRatio === dpr) return;
+      width = nextWidth;
+      height = nextHeight;
+      pixelRatio = dpr;
+      canvas.width = Math.round(width * dpr);
+      canvas.height = Math.round(height * dpr);
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
     };
     const tick = () => {
-      ctx.clearRect(0, 0, window.innerWidth, window.innerHeight);
+      frame = 0;
+      if (!homeActivityActive()) return;
+      ctx.clearRect(0, 0, width, height);
       for (let i = motes.length - 1; i >= 0; i--) {
         const m = motes[i];
         m.life -= 0.022;
@@ -50,18 +62,24 @@ export default function StarTrail() {
       frame = motes.length ? requestAnimationFrame(tick) : 0;
     };
     const onMove = (event: PointerEvent) => {
-      if (event.pointerType !== "mouse") return;
+      if (event.pointerType !== "mouse" || !homeActivityActive()) return;
       for (let i = 0; i < 2; i++) {
         motes.push({ x: event.clientX, y: event.clientY, vx: (Math.random() - 0.5) * 1.2, vy: (Math.random() - 0.8) * 1.1, life: 1, size: 1.5 + Math.random() * 2, hue: [45, 200, 280][Math.floor(Math.random() * 3)] });
       }
       if (motes.length > 160) motes.splice(0, motes.length - 160);
       if (!frame) frame = requestAnimationFrame(tick);
     };
+    const sync = () => {
+      if (!homeActivityActive()) { cancelAnimationFrame(frame); frame = 0; }
+      else if (motes.length && !frame) frame = requestAnimationFrame(tick);
+    };
     resize();
+    const unsubscribe = subscribeHomeActivity(sync);
     window.addEventListener("resize", resize);
     window.addEventListener("pointermove", onMove, { passive: true });
     return () => {
       cancelAnimationFrame(frame);
+      unsubscribe();
       window.removeEventListener("resize", resize);
       window.removeEventListener("pointermove", onMove);
     };

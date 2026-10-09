@@ -3,6 +3,7 @@
 import { ServiceStatusProvider } from "@/components/ServiceStatusProvider";
 import LuomoCompanionDock from "@/components/LuomoCompanionDock";
 import { PrefsProvider, usePrefs } from "./PrefsContext";
+import HomeActivity from "./HomeActivity";
 import TopBar from "./system/TopBar";
 import BootGate from "./system/BootGate";
 import CommandPalette from "./system/CommandPalette";
@@ -30,6 +31,7 @@ export default function HomeShell() {
     <PrefsProvider>
       <ServiceStatusProvider>
         <a className="skip-link" href="#main">跳到正文</a>
+        <HomeActivity />
         <BootGate />
         <TopBar />
         <main id="main">

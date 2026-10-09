@@ -92,6 +92,7 @@ export default function LuomoCompanionDock({ onCollapsedChange, initialCollapsed
   const [allowDebug, setAllowDebugForms] = useState(false);
   const [burst, setBurst] = useState(0);
   const [section, setSection] = useState("hero");
+  const observedSection = useRef("hero");
   const [character, setCharacter] = useState<CompanionId>("atri");
   const profile = getCompanionProfile(character);
   const [expression, setExpression] = useState<string | undefined>(undefined);
@@ -265,14 +266,24 @@ export default function LuomoCompanionDock({ onCollapsedChange, initialCollapsed
   }, [focusInput, openPhone, send]);
 
   useEffect(() => {
-    const handler = () => {
-      setSection(getCurrentSection());
+    if (!open) return;
+    let frame = 0;
+    const update = () => {
+      frame = 0;
+      observedSection.current = getCurrentSection();
+      setSection(observedSection.current);
       setMood(previous => (previous === "idle" || previous === "greeting" ? "idle" : previous));
     };
-    handler();
+    const handler = () => { if (!frame) frame = requestAnimationFrame(update); };
+    update();
     window.addEventListener("scroll", handler, { passive: true });
-    return () => window.removeEventListener("scroll", handler);
-  }, []);
+    window.addEventListener("resize", handler);
+    return () => {
+      cancelAnimationFrame(frame);
+      window.removeEventListener("scroll", handler);
+      window.removeEventListener("resize", handler);
+    };
+  }, [open]);
 
   useEffect(() => {
     if (!open) return;
@@ -280,7 +291,8 @@ export default function LuomoCompanionDock({ onCollapsedChange, initialCollapsed
       greeted.current = true;
       push("them", profile.defaultLines[0] ?? "你好呀，很高兴在这里遇见你。");
     }
-    const line = profile.sectionLines?.[section] || SECTIONS.find(entry => entry.id === section)?.companionLine;
+    const currentSection = observedSection.current;
+    const line = profile.sectionLines?.[currentSection] || SECTIONS.find(entry => entry.id === currentSection)?.companionLine;
     if (line && line !== lastSectionLine.current) {
       lastSectionLine.current = line;
       push("them", line);

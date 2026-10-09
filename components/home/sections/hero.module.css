@@ -79,10 +79,12 @@
 .reflection rect { fill: #fff3cf; opacity: 0.55; animation: shimmer 3.4s ease-in-out infinite alternate; }
 .reflection rect:nth-child(3n) { animation-delay: -1.2s; }
 .reflection rect:nth-child(3n + 1) { animation-delay: -2.1s; }
+:global([data-theme="light"]) .reflection rect { animation-play-state: paused; }
 @keyframes shimmer { to { opacity: 0.12; transform: translateX(8px); } }
 
 .sparkles { opacity: var(--scene-day); }
 .sparkles rect { fill: #ffffff; opacity: 0; animation: sparkle 3.6s ease-in-out infinite; }
+:global(html:not([data-theme="light"])) .sparkles rect { animation-play-state: paused; }
 @keyframes sparkle { 50% { opacity: 0.9; } }
 
 .ties { animation: tiesFlow 1.4s linear infinite; }
