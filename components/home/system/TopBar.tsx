@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { LogoMark, TrainGlyph } from "../art/Icons";
 import { usePrefs } from "../PrefsContext";
 import { SECTIONS } from "@/content/sections";
@@ -13,33 +13,117 @@ export default function TopBar() {
   const { setTheme } = usePrefs();
   const theme = useDocumentTheme();
   const [active, setActive] = useState("hero");
-  const [scrolled, setScrolled] = useState(false);
-  const [progress, setProgress] = useState(0);
+  const barRef = useRef<HTMLElement>(null);
+  const railRef = useRef<HTMLDivElement>(null);
+  const fillRef = useRef<HTMLSpanElement>(null);
+  const trainRef = useRef<HTMLSpanElement>(null);
 
   useEffect(() => {
+    const bar = barRef.current;
+    const rail = railRef.current;
+    const fill = fillRef.current;
+    const train = trainRef.current;
+    if (!bar || !rail || !fill || !train) return;
+    const desktopNav = window.matchMedia("(min-width: 1081px)");
     let frame = 0;
+    let maxScroll = 0;
+    let railWidth = rail.clientWidth;
+    let viewportHeight = window.innerHeight;
+    let dimensionsDirty = true;
+    let navigationDirty = true;
+    let activeSection = "hero";
+    let navObserver: IntersectionObserver | null = null;
+    let lastProgress = -1;
+    let lastTrainX = -1;
+
+    const selectActive = (id: string) => {
+      if (activeSection === id) return;
+      activeSection = id;
+      setActive(id);
+    };
+    const syncNavigation = () => {
+      navigationDirty = false;
+      navObserver?.disconnect();
+      navObserver = null;
+      // The mobile navigation is hidden: never measure its eight sections on scroll.
+      if (!desktopNav.matches) return;
+      selectActive(currentSectionId());
+      const intersecting = new Set<string>();
+      const marker = Math.floor(viewportHeight * 0.4);
+      const observer = new IntersectionObserver(entries => {
+        if (navObserver !== observer || !desktopNav.matches) return;
+        for (const entry of entries) {
+          if (entry.isIntersecting) intersecting.add(entry.target.id);
+          else intersecting.delete(entry.target.id);
+        }
+        const section = SECTIONS.find(entry => intersecting.has(entry.id));
+        // Gap transitions are infrequent; preserve the original nearest-section rule.
+        selectActive(section?.id ?? currentSectionId());
+      }, { rootMargin: `-${marker}px 0px -${Math.max(0, viewportHeight - marker - 1)}px 0px` });
+      navObserver = observer;
+      for (const section of SECTIONS) {
+        const element = document.getElementById(section.id);
+        if (element) navObserver.observe(element);
+      }
+    };
     const update = () => {
       frame = 0;
-      const max = document.documentElement.scrollHeight - window.innerHeight;
-      setScrolled(window.scrollY > 8);
-      setProgress(max > 0 ? Math.min(1, Math.max(0, window.scrollY / max)) : 0);
-      setActive(currentSectionId());
+      // Geometry is refreshed only after viewport/content size changes, before writes.
+      if (dimensionsDirty) {
+        dimensionsDirty = false;
+        viewportHeight = window.innerHeight;
+        maxScroll = Math.max(0, document.documentElement.scrollHeight - viewportHeight);
+      }
+      if (navigationDirty) syncNavigation();
+      const y = window.scrollY;
+      const progress = maxScroll > 0 ? Math.min(1, Math.max(0, y / maxScroll)) : 0;
+      const scrolled = String(y > 8);
+      if (bar.dataset.scrolled !== scrolled) bar.dataset.scrolled = scrolled;
+      if (progress !== lastProgress) {
+        lastProgress = progress;
+        fill.style.transform = `scaleX(${progress})`;
+      }
+      const trainX = progress * railWidth;
+      if (trainX !== lastTrainX) {
+        lastTrainX = trainX;
+        train.style.transform = `translate3d(${trainX}px, 0, 0)`;
+      }
     };
     const onScroll = () => { if (!frame) frame = requestAnimationFrame(update); };
+    const onResize = () => {
+      dimensionsDirty = true;
+      navigationDirty = true;
+      onScroll();
+    };
+    const sizes = new ResizeObserver(entries => {
+      for (const entry of entries) {
+        if (entry.target === rail) railWidth = entry.contentRect.width;
+      }
+      dimensionsDirty = true;
+      onScroll();
+    });
+    sizes.observe(rail);
+    sizes.observe(document.body);
+    const main = document.getElementById("main");
+    if (main) sizes.observe(main);
     update();
     window.addEventListener("scroll", onScroll, { passive: true });
-    window.addEventListener("resize", onScroll);
+    window.addEventListener("resize", onResize);
+    desktopNav.addEventListener("change", onResize);
     return () => {
       cancelAnimationFrame(frame);
+      sizes.disconnect();
+      navObserver?.disconnect();
       window.removeEventListener("scroll", onScroll);
-      window.removeEventListener("resize", onScroll);
+      window.removeEventListener("resize", onResize);
+      desktopNav.removeEventListener("change", onResize);
     };
   }, []);
 
   const day = theme === "light";
 
   return (
-    <header className={s.bar} data-scrolled={scrolled}>
+    <header ref={barRef} className={s.bar}>
       <div className={s.barInner}>
         <a href="#hero" className={s.brand} aria-label="洛墨站，回到 0 号站台">
           <LogoMark size={32} />
@@ -76,9 +160,9 @@ export default function TopBar() {
           </button>
         </div>
       </div>
-      <div className={s.rail} aria-hidden="true">
-        <span className={s.railFill} style={{ transform: `scaleX(${progress})` }} />
-        <span className={s.railTrain} style={{ left: `${progress * 100}%` }}><TrainGlyph size={30} /></span>
+      <div ref={railRef} className={s.rail} aria-hidden="true">
+        <span ref={fillRef} className={s.railFill} />
+        <span ref={trainRef} className={s.railTrain}><TrainGlyph size={30} /></span>
       </div>
     </header>
   );

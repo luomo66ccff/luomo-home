@@ -52,8 +52,8 @@
 .paletteFoot kbd { padding: 2px 6px; border: 1px solid var(--line); border-radius: 5px; font: 600 10px/1.4 var(--font-mono); color: var(--text-3); background: color-mix(in srgb, var(--ink-0) 60%, transparent); }
 
 .rail { position: absolute; inset: auto 0 -1px; height: 2px; pointer-events: none; }
-.railFill { position: absolute; inset: 0; transform-origin: left center; background: linear-gradient(90deg, var(--gold-deep), var(--gold), var(--gold-hi)); box-shadow: 0 0 10px var(--gold); }
-.railTrain { position: absolute; top: -13px; margin-left: -28px; color: var(--gold-hi); opacity: 0; transition: opacity 0.3s ease; filter: drop-shadow(0 0 6px var(--gold)); }
+.railFill { position: absolute; inset: 0; transform: scaleX(0); transform-origin: left center; will-change: transform; background: linear-gradient(90deg, var(--gold-deep), var(--gold), var(--gold-hi)); box-shadow: 0 0 10px var(--gold); }
+.railTrain { position: absolute; left: 0; top: -13px; margin-left: -28px; transform: translate3d(0, 0, 0); will-change: transform; color: var(--gold-hi); opacity: 0; transition: opacity 0.3s ease; filter: drop-shadow(0 0 6px var(--gold)); }
 .bar[data-scrolled="true"] .railTrain { opacity: 1; }
 
 @media (max-width: 1080px) {

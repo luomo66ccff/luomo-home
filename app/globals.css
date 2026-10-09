@@ -207,7 +207,8 @@ button:disabled { cursor: not-allowed; }
   #worlds { --home-block-size: 630px; }
   #log { --home-block-size: 780px; }
   #enter { --home-block-size: 1965px; }
-  html[data-home-positioning="true"] #main > section:not(#hero) {
+  html[data-home-positioning="true"] #main > section:not(#hero),
+  #main > section:not(#hero)[data-home-warmed="true"] {
     content-visibility: visible;
   }
 }
