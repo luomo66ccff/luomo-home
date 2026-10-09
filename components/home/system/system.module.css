@@ -82,6 +82,8 @@
 }
 :global(html[data-boot="1"]) .boot { display: grid; animation: bootFallback 0.6s 3.6s forwards; }
 .boot[data-phase="out"] { opacity: 0; transition: opacity 0.55s ease; }
+:global(html[data-home-hidden="true"]) .boot,
+:global(html[data-home-hidden="true"]) .boot * { animation-play-state: paused !important; }
 @keyframes bootFallback { to { opacity: 0; visibility: hidden; pointer-events: none; } }
 .bootRing { position: relative; width: 210px; height: 210px; }
 .bootGlyph {

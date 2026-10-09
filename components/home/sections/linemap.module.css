@@ -100,6 +100,7 @@
 
 @media (max-width: 860px) {
   .map { display: none; }
+  .map *, .map *::before, .map *::after { animation-play-state: paused; }
   .strip { display: block; }
 }
 

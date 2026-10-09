@@ -94,7 +94,7 @@ export default function LineMap() {
         </SectionHead>
 
         <div className={`${s.map} orn`}>
-          <svg className={s.art} viewBox={`0 0 ${W} ${H}`} preserveAspectRatio="none" aria-hidden="true" focusable="false">
+          <svg className={s.art} data-home-motion="desktop" viewBox={`0 0 ${W} ${H}`} preserveAspectRatio="none" aria-hidden="true" focusable="false">
             <defs>
               <linearGradient id="map-line" x1="0" x2="1">
                 <stop offset="0" stopColor="var(--gold-deep)" />
