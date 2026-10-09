@@ -13,16 +13,11 @@
     "visual:check": "node scripts/visual-check.mjs"
   },
   "dependencies": {
-    "@react-three/drei": "^10.7.7",
-    "@react-three/fiber": "^9.6.1",
-    "framer-motion": "^12.42.2",
-    "lucide-react": "^0.468.0",
-    "next": "16.3.3",
+    "next": "16.3.8",
     "pixi-live2d-display": "^0.4.0",
     "pixi.js": "^6.5.10",
     "react": "^19.2.7",
-    "react-dom": "^19.2.7",
-    "three": "^0.171.0"
+    "react-dom": "^19.2.7"
   },
   "devDependencies": {
     "@types/node": "^22.10.5",

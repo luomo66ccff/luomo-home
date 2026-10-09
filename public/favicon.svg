@@ -1,13 +1,14 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="Luomo Cloud">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="洛墨站">
   <defs>
-    <linearGradient id="g" x1="8" x2="58" y1="8" y2="58" gradientUnits="userSpaceOnUse">
-      <stop stop-color="#22d3ee"/>
-      <stop offset=".52" stop-color="#a78bfa"/>
-      <stop offset="1" stop-color="#f472b6"/>
+    <linearGradient id="sky" x1="0" x2="0" y1="0" y2="64" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#1a1f4a"/>
+      <stop offset="1" stop-color="#070a1c"/>
     </linearGradient>
   </defs>
-  <rect width="64" height="64" rx="18" fill="#020617"/>
-  <circle cx="32" cy="32" r="24" fill="none" stroke="url(#g)" stroke-width="2"/>
-  <path d="M21 39h22a9 9 0 0 0 1-18 12 12 0 0 0-23-2 10 10 0 0 0 0 20Z" fill="url(#g)" opacity=".9"/>
-  <path d="M31 15l2 6 6 2-6 2-2 6-2-6-6-2 6-2 2-6Z" fill="#fde68a"/>
+  <rect width="64" height="64" rx="16" fill="url(#sky)"/>
+  <circle cx="38" cy="25" r="13" fill="#e9c87c"/>
+  <circle cx="43.6" cy="21" r="11.2" fill="#121638"/>
+  <path d="M6 46C22 39.6 38 39.6 58 44.4" fill="none" stroke="#e9c87c" stroke-width="3" stroke-linecap="round"/>
+  <path d="M6 52C22 45.6 38 45.6 58 50.4" fill="none" stroke="#e9c87c" stroke-width="1.8" stroke-linecap="round" opacity=".7"/>
+  <path d="M17 14l1.5 3.5 3.5 1.5-3.5 1.5-1.5 3.5-1.5-3.5-3.5-1.5 3.5-1.5z" fill="#fff0c4"/>
 </svg>

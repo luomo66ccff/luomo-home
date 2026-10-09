@@ -25,6 +25,7 @@ interface Props {
   activeForms?: AtriActiveForms;
   expression?: string;
   motion?: string;
+  commandId?: number;
   emotionStrength?: number;
   allowSecret?: boolean;
   allowDebug?: boolean;
@@ -36,7 +37,7 @@ interface Props {
   variant?: Live2dVariant;
 }
 
-export default function Live2DShell({ characterId = "atri", modelPath, layout, mood = "idle", form = "default", expression, motion, emotionStrength, activeForms, allowSecret = false, allowDebug = false, collapsed, onToggle, onError, onReady, onTouch, variant = "dock" }: Props) {
+export default function Live2DShell({ characterId = "atri", modelPath, layout, mood = "idle", form = "default", expression, motion, commandId, emotionStrength, activeForms, allowSecret = false, allowDebug = false, collapsed, onToggle, onError, onReady, onTouch, variant = "dock" }: Props) {
   const [failed, setFailed] = useState(false);
   const [available, setAvailable] = useState(false);
   const [reducedMotion, setReducedMotion] = useState(true);
@@ -77,7 +78,7 @@ export default function Live2DShell({ characterId = "atri", modelPath, layout, m
     <Live2DCanvas key={characterId + "|" + modelPath + "|" + variant}
       characterId={characterId} modelPath={modelPath} layout={layout} mood={mood}
       form={form} variant={variant} allowSecret={allowSecret} allowDebug={allowDebug}
-      expression={expression} motion={motion} emotionStrength={emotionStrength}
+      expression={expression} motion={motion} commandId={commandId} emotionStrength={emotionStrength}
       onLoad={() => { setFailed(false); onReady?.(); }}
       activeForms={characterId === "atri" ? activeForms : {}}
       onError={() => { setFailed(true); onError?.(); }} onTouch={onTouch}

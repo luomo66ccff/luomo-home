@@ -1,0 +1,310 @@
+.hero {
+  position: relative;
+  isolation: isolate;
+  display: flex;
+  flex-direction: column;
+  min-height: max(100svh, 800px);
+  padding-top: var(--nav-h);
+  overflow: clip;
+}
+
+/* ───── Scene ───── */
+.scene { position: absolute; inset: 0; z-index: -1; overflow: hidden; }
+.layer { position: absolute; inset: 0; width: 100%; height: 100%; }
+.stars { position: absolute; inset: 0; width: 100%; height: 100%; opacity: var(--scene-star); transition: opacity 0.8s ease; }
+
+.moonWrap {
+  position: absolute;
+  right: clamp(28px, 10vw, 180px);
+  top: calc(var(--nav-h) + clamp(14px, 5vh, 60px));
+  width: clamp(112px, 13vw, 210px);
+  aspect-ratio: 1;
+}
+.moon {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: none;
+  filter: drop-shadow(0 0 36px rgba(255, 236, 190, calc(0.5 * var(--scene-star))));
+  transition: transform 0.5s cubic-bezier(0.2, 0.8, 0.2, 1), opacity 0.8s ease;
+}
+.moon::before {
+  content: "";
+  position: absolute;
+  inset: -70%;
+  z-index: -1;
+  border-radius: 50%;
+  pointer-events: none;
+  background: radial-gradient(circle, rgba(255, 240, 200, calc(0.24 * var(--scene-star))) 0%, rgba(255, 240, 200, 0) 60%);
+}
+.moon:hover { transform: scale(1.04) rotate(-2deg); }
+.moon:active { transform: scale(0.98); }
+.moon svg { width: 100%; height: 100%; }
+.rabbit { transition: opacity 0.4s ease; }
+.moon:hover .rabbit { opacity: 0.42; }
+:global([data-theme="light"]) .moon { opacity: 0.5; filter: none; }
+
+.moonWish {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  white-space: nowrap;
+  pointer-events: none;
+  font-family: var(--font-hand);
+  font-size: 15px;
+  letter-spacing: 0.12em;
+  color: var(--gold-hi);
+  text-shadow: 0 0 14px rgba(0, 0, 0, 0.55);
+  animation: wishFloat 2.4s ease-out forwards;
+}
+@keyframes wishFloat {
+  from { opacity: 0; transform: translate(-50%, 0); }
+  20% { opacity: 1; }
+  to { opacity: 0; transform: translate(-50%, -190%); }
+}
+
+.clouds { fill: var(--cloud); opacity: var(--cloud-o); animation: cloudDrift 70s ease-in-out infinite alternate; }
+@keyframes cloudDrift { to { transform: translateX(-60px); } }
+
+.aviation { animation: blink 2.4s steps(1) infinite; }
+@keyframes blink { 50% { opacity: 0.12; } }
+.windows { opacity: 0.85; animation: windowsBreath 11s ease-in-out infinite; }
+:global([data-theme="light"]) .windows { opacity: 0.55; animation: none; }
+@keyframes windowsBreath { 50% { opacity: 0.62; } }
+
+.reflection { opacity: var(--scene-star); }
+.reflection rect { fill: #fff3cf; opacity: 0.55; animation: shimmer 3.4s ease-in-out infinite alternate; }
+.reflection rect:nth-child(3n) { animation-delay: -1.2s; }
+.reflection rect:nth-child(3n + 1) { animation-delay: -2.1s; }
+@keyframes shimmer { to { opacity: 0.12; transform: translateX(8px); } }
+
+.sparkles { opacity: var(--scene-day); }
+.sparkles rect { fill: #ffffff; opacity: 0; animation: sparkle 3.6s ease-in-out infinite; }
+@keyframes sparkle { 50% { opacity: 0.9; } }
+
+.ties { animation: tiesFlow 1.4s linear infinite; }
+@keyframes tiesFlow { to { stroke-dashoffset: -26.8; } }
+.beam { opacity: var(--scene-star); }
+
+.bamboo { position: absolute; right: 0; bottom: 0; width: clamp(130px, 18vw, 290px); height: 100%; }
+.bambooGlow { opacity: calc(0.2 + 0.8 * var(--scene-star)); animation: glowPulse 4s ease-in-out infinite; }
+.stalk {
+  transform-box: fill-box;
+  transform-origin: 50% 100%;
+  transform: rotate(var(--lean));
+  animation: sway 7s ease-in-out infinite alternate;
+}
+@keyframes sway {
+  from { transform: rotate(calc(var(--lean) - 0.7deg)); }
+  to { transform: rotate(calc(var(--lean) + 0.7deg)); }
+}
+.glowNode { filter: drop-shadow(0 0 8px #ffe3a0); animation: glowPulse 4s ease-in-out infinite; }
+:global([data-theme="light"]) .glowNode { opacity: 0.25; filter: none; animation: none; }
+@keyframes glowPulse { 50% { opacity: 0.55; } }
+
+.butterfly {
+  position: absolute;
+  display: grid;
+  margin: -12px;
+  padding: 12px;
+  border: 0;
+  color: var(--butterfly);
+  background: none;
+  cursor: pointer;
+  filter: drop-shadow(0 0 6px color-mix(in srgb, var(--butterfly) 75%, transparent));
+  animation: flutter 20s ease-in-out infinite;
+  transition: opacity 1.4s ease, translate 1.4s cubic-bezier(0.5, 0, 0.8, 0.4);
+}
+.butterfly[data-flown="true"] { opacity: 0; translate: 120px -260px; pointer-events: none; }
+.butterfly[data-i="0"] { left: 54%; top: 34%; animation-duration: 22s; }
+.butterfly[data-i="1"] { right: 12%; top: 56%; animation-duration: 18s; animation-delay: -7s; }
+.butterfly[data-i="2"] { left: 6%; top: 64%; animation-duration: 25s; animation-delay: -12s; }
+.butterfly :global(.wing-l),
+.butterfly :global(.wing-r) { transform-box: fill-box; animation: flap 0.36s ease-in-out infinite alternate; }
+.butterfly :global(.wing-l) { transform-origin: 100% 55%; }
+.butterfly :global(.wing-r) { transform-origin: 0% 55%; }
+@keyframes flap { to { transform: scaleX(0.3); } }
+@keyframes flutter {
+  0%, 100% { transform: translate(0, 0) rotate(-8deg); }
+  25% { transform: translate(70px, -46px) rotate(6deg); }
+  50% { transform: translate(24px, -100px) rotate(-4deg); }
+  75% { transform: translate(-56px, -36px) rotate(10deg); }
+}
+
+.fog {
+  position: absolute;
+  inset: auto 0 0;
+  height: 24%;
+  background: linear-gradient(180deg, transparent, color-mix(in srgb, var(--ink-0) 88%, transparent));
+}
+
+/* ───── Copy ───── */
+.inner {
+  position: relative;
+  flex: 1;
+  display: grid;
+  grid-template-columns: minmax(0, 1.12fr) minmax(280px, 0.7fr);
+  gap: clamp(28px, 5vw, 80px);
+  align-items: center;
+  padding-block: clamp(20px, 4vh, 44px) clamp(24px, 4vh, 40px);
+  pointer-events: none;
+}
+.inner > * { pointer-events: auto; }
+.copy { max-width: 640px; }
+
+.kicker {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px 14px;
+  margin: 0;
+  font: 500 11px/1.4 var(--font-mono);
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  color: var(--gold);
+}
+.kicker time { padding: 3px 8px; border: 1px solid var(--line-2); border-radius: 4px; letter-spacing: 0.12em; color: var(--text-2); }
+
+.title {
+  margin: 20px 0 18px;
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-size: clamp(52px, 6.6vw, 94px);
+  line-height: 1.06;
+  letter-spacing: 0.01em;
+  text-shadow: 0 6px 34px color-mix(in srgb, var(--ink-0) 75%, transparent);
+}
+.title em {
+  font-style: normal;
+  color: transparent;
+  background: linear-gradient(180deg, var(--gold-hi) 10%, var(--gold) 60%, var(--gold-deep));
+  -webkit-background-clip: text;
+  background-clip: text;
+  filter: drop-shadow(0 0 20px color-mix(in srgb, var(--gold) 40%, transparent));
+}
+.titleDay { display: none; }
+:global([data-theme="light"]) .titleNight { display: none; }
+:global([data-theme="light"]) .titleDay { display: inline; }
+
+.lead { max-width: 540px; margin: 0 0 32px; font-size: 16px; color: var(--text-2); }
+.lead b { color: var(--text); font-weight: 650; }
+
+.aside { display: flex; flex-direction: column; align-items: stretch; gap: 16px; align-self: end; }
+.status {
+  align-self: flex-start;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 14px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  font-size: 12.5px;
+  color: var(--text-2);
+  background: var(--surface);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  transition: border-color 0.2s ease;
+}
+.status:hover { border-color: var(--gold); }
+.status b { color: var(--text); font-family: var(--font-mono); font-weight: 600; }
+
+/* ───── Station sign & platform ───── */
+.platform { position: relative; z-index: 1; flex: none; }
+.sign { position: relative; width: min(700px, calc(100% - 40px)); margin: 0 auto; }
+.sign::before,
+.sign::after {
+  content: "";
+  position: absolute;
+  bottom: -34px;
+  width: 7px;
+  height: 34px;
+  background: linear-gradient(90deg, #2b2f58, #474d86 50%, #2b2f58);
+}
+.sign::before { left: 16%; }
+.sign::after { right: 16%; }
+.board {
+  position: relative;
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: 16px;
+  padding: 12px 20px 0;
+  border-radius: 10px;
+  overflow: hidden;
+  color: var(--paper-ink);
+  background-color: #fbf6ea;
+  background-image: var(--paper-grain);
+  box-shadow: 0 18px 50px rgba(0, 0, 0, 0.35), inset 0 0 0 1px rgba(0, 0, 0, 0.08);
+}
+.signNo {
+  display: grid;
+  place-items: center;
+  width: 50px;
+  height: 50px;
+  border: 4px solid #2f3a86;
+  border-radius: 10px;
+  font: 700 10px/1 var(--font-mono);
+  color: #2f3a86;
+  background: #fff;
+}
+.signNo b { display: block; font-size: 19px; line-height: 0.95; }
+.signMain { display: grid; justify-items: center; line-height: 1.1; }
+.signMain small { font-family: var(--font-hand); font-size: 13px; letter-spacing: 0.5em; color: #5a5070; }
+.signMain strong { font-family: var(--font-display); font-weight: 400; font-size: clamp(32px, 4.4vw, 46px); letter-spacing: 0.5em; margin-right: -0.5em; }
+.signMain em { font-family: var(--font-serif); font-style: italic; font-size: 13px; letter-spacing: 0.42em; color: #6c6386; }
+.signSide { width: 50px; display: grid; justify-items: center; gap: 2px; color: #2f3a86; font: 600 9px/1.2 var(--font-mono); letter-spacing: 0.1em; text-align: center; }
+.signBar {
+  grid-column: 1 / -1;
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  margin: 10px -20px 0;
+  padding: 7px 18px 8px;
+  border-top: 3px solid #e8c25a;
+  color: #fff;
+  background: linear-gradient(90deg, #22296a, #333d92 50%, #22296a);
+  font-size: 13px;
+  font-weight: 650;
+  letter-spacing: 0.14em;
+}
+.signBar i { margin-left: 8px; font: italic 500 10px/1 var(--font-serif); letter-spacing: 0.2em; opacity: 0.75; }
+.edge {
+  height: 50px;
+  margin-top: 34px;
+  border-top: 7px solid #e3bb4f;
+  background:
+    radial-gradient(circle at 50% 50%, rgba(0, 0, 0, 0.28) 1.4px, transparent 1.8px) 0 -7px / 9px 7px repeat-x,
+    linear-gradient(180deg, #252a52, #12152f);
+}
+:global([data-theme="light"]) .edge {
+  border-top-color: #f2c230;
+  background:
+    radial-gradient(circle at 50% 50%, rgba(0, 0, 0, 0.2) 1.4px, transparent 1.8px) 0 -7px / 9px 7px repeat-x,
+    linear-gradient(180deg, #d9e2ea, #bfcbd6);
+}
+:global([data-theme="light"]) .sign::before,
+:global([data-theme="light"]) .sign::after { background: linear-gradient(90deg, #8d9bb0, #c4cfdc 50%, #8d9bb0); }
+
+@media (max-width: 960px) {
+  .inner { grid-template-columns: 1fr; align-items: start; padding-top: 28px; }
+  .aside { align-self: stretch; }
+  .moonWrap { right: 18px; top: calc(var(--nav-h) + 14px); width: 92px; }
+  .bamboo { width: 120px; opacity: 0.85; }
+  .butterfly[data-i="0"] { left: 70%; top: 22%; }
+}
+
+@media (max-width: 560px) {
+  .title { font-size: clamp(44px, 13vw, 60px); }
+  .lead { font-size: 15px; margin-bottom: 36px; }
+  .board { grid-template-columns: auto 1fr; padding-inline: 14px; gap: 12px; }
+  .signSide { display: none; }
+  .signNo { width: 42px; height: 42px; border-width: 3px; }
+  .signNo b { font-size: 16px; }
+  .signBar { margin-inline: -14px; padding-inline: 12px; font-size: 12px; letter-spacing: 0.06em; }
+  .signBar i { display: none; }
+  .edge { height: 36px; margin-top: 26px; }
+  .sign::before, .sign::after { height: 26px; bottom: -26px; }
+}

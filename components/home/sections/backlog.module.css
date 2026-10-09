@@ -1,0 +1,29 @@
+.window {
+  position: relative;
+  max-width: 920px;
+  margin-inline: auto;
+  border: 1px solid var(--line-2);
+  border-radius: 18px;
+  background: color-mix(in srgb, var(--ink-1) 86%, transparent);
+  box-shadow: var(--shadow-soft);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+:global([data-theme="light"]) .window { background: rgba(255, 255, 255, 0.78); }
+.top { display: flex; justify-content: space-between; padding: 14px 22px; border-bottom: 1px solid var(--line-soft); font: 600 11px/1.4 var(--font-mono); letter-spacing: 0.3em; color: var(--gold); }
+.list { max-height: 560px; margin: 0; padding: 6px 0; overflow-y: auto; list-style: none; scrollbar-width: thin; }
+.entry { display: grid; grid-template-columns: 112px minmax(0, 1fr) auto; gap: 18px; align-items: start; padding: 18px 22px; border-bottom: 1px dashed var(--line-soft); transition: background 0.2s ease; }
+.entry:last-child { border-bottom: 0; background: color-mix(in srgb, var(--gold) 6%, transparent); }
+.entry:hover { background: color-mix(in srgb, var(--gold) 8%, transparent); }
+.chapter { margin: 4px 0 0; font: 600 10.5px/1.4 var(--font-mono); letter-spacing: 0.16em; color: var(--text-3); }
+.body { min-width: 0; }
+.speaker { display: inline-block; margin: 0 0 4px; padding: 1px 10px; border-radius: 6px 6px 6px 2px; font-family: var(--font-hand); font-size: 13.5px; font-weight: 600; color: #2a2140; background: linear-gradient(90deg, var(--gold-hi), var(--gold)); }
+.line { margin: 0; font-family: var(--font-hand); font-size: 17.5px; line-height: 1.7; color: var(--text); }
+.note { margin: 6px 0 0; font-size: 13.5px; color: var(--text-3); }
+.voice { display: grid; place-items: center; width: 36px; height: 36px; border: 1px solid var(--line); border-radius: 50%; color: var(--gold); background: transparent; transition: border-color 0.2s ease, transform 0.2s ease; }
+.voice:hover { border-color: var(--gold); transform: scale(1.08); }
+
+@media (max-width: 640px) {
+  .entry { grid-template-columns: minmax(0, 1fr) auto; gap: 6px 12px; padding: 16px; }
+  .chapter { grid-column: 1 / -1; margin: 0; }
+}

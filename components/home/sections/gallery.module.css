@@ -1,0 +1,99 @@
+.frame {
+  padding: 14px;
+  border: 1px solid var(--line-2);
+  border-radius: 18px;
+  background: color-mix(in srgb, var(--ink-1) 82%, transparent);
+  box-shadow: var(--shadow-soft), inset 0 0 0 5px color-mix(in srgb, var(--ink-0) 40%, transparent);
+}
+:global([data-theme="light"]) .frame { background: rgba(255, 255, 255, 0.7); }
+.frameTop { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 6px 16px; padding: 4px 8px 14px; font: 600 11px/1.4 var(--font-mono); letter-spacing: 0.26em; color: var(--gold); }
+
+.grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; margin: 0; padding: 0; list-style: none; }
+.item { min-width: 0; }
+.thumb {
+  position: relative;
+  display: block;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  padding: 0;
+  overflow: hidden;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: var(--ink-2);
+  transition: border-color 0.2s ease, box-shadow 0.3s ease;
+}
+.thumb:hover,
+.thumb:focus-visible { border-color: var(--gold); box-shadow: 0 12px 30px color-mix(in srgb, var(--gold) 20%, transparent); }
+.thumbImg { object-fit: cover; transition: transform 0.7s cubic-bezier(0.2, 0.8, 0.2, 1); }
+.thumb:hover .thumbImg { transform: scale(1.06); }
+.no { position: absolute; left: 8px; top: 8px; padding: 2px 7px; border-radius: 4px; font: 600 10px/1.5 var(--font-mono); letter-spacing: 0.1em; color: #fff; background: rgba(5, 7, 22, 0.55); }
+.seen {
+  position: absolute;
+  right: 8px;
+  top: 8px;
+  display: grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  border: 2px solid #e5484d;
+  border-radius: 50%;
+  font: 700 11px/1 var(--font-hand);
+  color: #e5484d;
+  background: rgba(255, 250, 240, 0.88);
+  transform: rotate(-14deg);
+}
+.caption {
+  position: absolute;
+  inset: auto 0 0;
+  display: grid;
+  padding: 28px 12px 10px;
+  text-align: left;
+  color: #fff;
+  background: linear-gradient(transparent, rgba(5, 7, 22, 0.86));
+  opacity: 0;
+  transform: translateY(30%);
+  transition: opacity 0.3s ease, transform 0.3s ease;
+}
+.caption strong { font-family: var(--font-display); font-weight: 400; font-size: 16px; line-height: 1.3; }
+.caption small { font-size: 11px; opacity: 0.72; }
+.thumb:hover .caption,
+.thumb:focus-visible .caption { opacity: 1; transform: none; }
+@media (hover: none) {
+  .caption { opacity: 1; transform: none; }
+}
+@media (max-width: 760px) {
+  .grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+}
+
+/* ───── Viewer ───── */
+.viewer.viewer { width: 100vw; max-width: none; height: 100dvh; max-height: none; border: 0; border-radius: 0; background: #000; }
+.viewerStage { position: relative; width: 100%; height: 100%; }
+.viewerImage { position: absolute; inset: 0; padding: 0; border: 0; background: #000; cursor: default; }
+.viewerImg { object-fit: contain; }
+.viewerTop {
+  position: absolute;
+  inset: 0 0 auto;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 20px 30px;
+  color: #fff;
+  background: linear-gradient(rgba(0, 0, 0, 0.66), transparent);
+  transition: opacity 0.3s ease;
+}
+.viewerCount { font: 600 12px/1 var(--font-mono); letter-spacing: 0.2em; color: #ffd98a; }
+.viewerPlace { margin-right: auto; font-family: var(--font-hand); font-size: 14.5px; }
+.viewerBtn { height: 30px; padding: 0 12px; border: 1px solid rgba(255, 255, 255, 0.32); border-radius: 6px; font: 600 11px/1 var(--font-mono); letter-spacing: 0.14em; color: #fff; background: rgba(0, 0, 0, 0.35); }
+.viewerBtn:hover { border-color: #ffd98a; color: #ffd98a; }
+.nav { position: absolute; top: 50%; width: 52px; height: 52px; margin-top: -26px; border: 1px solid rgba(255, 255, 255, 0.32); border-radius: 50%; font-size: 30px; line-height: 1; color: #fff; background: rgba(0, 0, 0, 0.38); transition: opacity 0.3s ease, border-color 0.2s ease; }
+.nav:hover { border-color: #ffd98a; }
+.prev { left: 18px; }
+.next { right: 18px; }
+.viewerBox { position: absolute; left: 50%; bottom: 22px; width: min(920px, calc(100% - 32px)); transform: translateX(-50%); transition: opacity 0.3s ease, transform 0.3s ease; }
+.viewerTop[data-hidden="true"],
+.nav[data-hidden="true"] { opacity: 0; pointer-events: none; }
+.viewerBox[data-hidden="true"] { opacity: 0; pointer-events: none; transform: translate(-50%, 20px); }
+@media (max-width: 640px) {
+  .nav { top: auto; bottom: 50%; width: 42px; height: 42px; }
+  .viewerPlace { display: none; }
+}

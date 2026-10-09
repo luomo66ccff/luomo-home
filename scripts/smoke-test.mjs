@@ -78,7 +78,7 @@ async function main() {
   }
 
   const home = await get("/");
-  const homepageMarkers = ["在云端", 'id="services"', 'id="operations"', ...serviceNames];
+  const homepageMarkers = ["洛墨站", "今晚的月色", 'id="services"', 'id="operations"', 'id="projects"', 'id="enter"', ...serviceNames];
   for (const marker of homepageMarkers) {
     if (!home.includes(marker)) {
       throw new Error(`homepage missing ${marker}`);
